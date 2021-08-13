@@ -269,9 +269,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         locationManager.startUpdatingLocation()
         locationManager.startUpdatingHeading()
         
-        //let pinchGesture = UIPinchGestureRecognizer(target: self, action: "pinchGesture")
-        //map.addGestureRecognizer(pinchGesture)
-        
         //Preferences
         map.tileServer = Preferences.shared.tileServer
         map.useCache = Preferences.shared.useCache
@@ -810,7 +807,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         present(alertController, animated: true)
         isDisplayingLocationServicesDenied = false
     }
-
+    
 }
 
 // MARK: StopWatchDelegate

@@ -132,8 +132,8 @@ class GPXMapView: MKMapView {
         
         // Rotation Gesture handling (for the map rotation's influence towards heading pointing arrow)
         rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(rotationGestureHandling(_:)))
-        
         addGestureRecognizer(rotationGesture)
+
         isUserInteractionEnabled = true
         isMultipleTouchEnabled = true
     }
@@ -174,6 +174,10 @@ class GPXMapView: MKMapView {
     
     /// Handles rotation detected from user, for heading arrow to update.
     @objc func rotationGestureHandling(_ gesture: UIRotationGestureRecognizer) {
+        
+        // show compass when user rotates
+        showsCompass = true
+        
         headingOffset = gesture.rotation
         updateHeading()
         
