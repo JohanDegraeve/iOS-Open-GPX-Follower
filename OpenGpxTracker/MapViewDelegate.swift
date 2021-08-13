@@ -115,14 +115,15 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIAlertViewDelegate {
     
     /// Updates map heading after user interactions end.
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+        
         guard let map = mapView as? GPXMapView else {
             return
         }
+        
         print("MapView: User interaction has ended")
         
         map.updateHeading()
         
-        //Is 
     }
     
 }

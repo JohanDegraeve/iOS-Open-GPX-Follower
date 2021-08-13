@@ -89,22 +89,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// Status variable that indicates if the location service auth was denied.
     var isDisplayingLocationServicesDenied: Bool = false
     
-    /// Defines the different statuses regarding tracking current user location.
-    enum GpxTrackingStatus {
-        
-        /// Tracking has not started or map was reset
-        case notStarted
-        
-        /// Tracking is ongoing
-        case tracking
-        
-        /// Tracking is paused (the map has some contents)
-        case paused
-    }
-    
-    /// Editing Waypoint Temporal Reference
-    var lastLocation: CLLocation? //Last point of current segment.
-
     //UI
     /// Label with the title of the app
     var appTitleLabel: UILabel
@@ -133,12 +117,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// Used to display in imperial (foot, miles, mph) or metric system (m, km, km/h)
     var useImperial = false
     
-    /// Follow user button (bottom bar)
-    var followUserButton: UIButton
-    
-    /// New pin button (bottom bar)
-    var newPinButton: UIButton
-    
     /// View GPX Files button
     var folderButton: UIButton
     
@@ -156,15 +134,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     /// Spinning Activity Indicator's color
     var shareActivityColor = UIColor(red: 0, green: 0.61, blue: 0.86, alpha: 1)
-    
-    /// Reset map button (bottom bar)
-    var resetButton: UIButton
-    
-    /// Start/Pause tracker button (bottom bar)
-    var trackerButton: UIButton
-    
-    /// Save current track into a GPX file
-    var saveButton: UIButton
     
     /// Check if device is notched type phone
     var isIPhoneX = false
@@ -199,16 +168,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.totalTrackedDistanceLabel = DistanceLabel(coder: aDecoder)!
         self.currentSegmentDistanceLabel = DistanceLabel(coder: aDecoder)!
         
-        self.followUserButton = UIButton(coder: aDecoder)!
-        self.newPinButton = UIButton(coder: aDecoder)!
         self.folderButton = UIButton(coder: aDecoder)!
-        self.resetButton = UIButton(coder: aDecoder)!
         self.aboutButton = UIButton(coder: aDecoder)!
         self.preferencesButton = UIButton(coder: aDecoder)!
         self.shareButton = UIButton(coder: aDecoder)!
-        
-        self.trackerButton = UIButton(coder: aDecoder)!
-        self.saveButton = UIButton(coder: aDecoder)!
         
         self.shareActivityIndicator = UIActivityIndicatorView(coder: aDecoder)
         
@@ -626,11 +589,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         //load data
         self.map.continueFromGPXRoot(root)
 
-        //center map in GPX data
+        //Sets the map region to display all the GPX data in the map (segments and waypoints).
         self.map.regionToGPXExtent()
-
         
         self.totalTrackedDistanceLabel.distance = self.map.session.totalTrackedDistance
+
     }
     
     ///
@@ -977,11 +940,14 @@ extension ViewController: CLLocationManagerDelegate {
     ///
     ///
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        //updates signal image accuracy
+        
         let newLocation = locations.first!
+        
         // Update horizontal accuracy
         let hAcc = newLocation.horizontalAccuracy
         signalAccuracyLabel.text =  hAcc.toAccuracy(useImperial: useImperial)
+
+        //updates signal image accuracy
         if hAcc < kSignalAccuracy6 {
             self.signalImageView.image = signalImage6
         } else if hAcc < kSignalAccuracy5 {
@@ -1007,6 +973,11 @@ extension ViewController: CLLocationManagerDelegate {
         //Update speed
         speedLabel.text = (newLocation.speed < 0) ? kUnknownSpeedText : newLocation.speed.toSpeed(useImperial: useImperial)
         
+        // center the map to new user location
+        map.centerCoordinate = newLocation.coordinate
+        
+        // remove compass when user is moving
+        map.showsCompass = false
 
     }
 
@@ -1022,11 +993,10 @@ extension ViewController: CLLocationManagerDelegate {
         // if used for following a track, then turn the map in the moving direction
         // and center the map to the location of the user
         map.camera.heading = newHeading.trueHeading
-        map.centerCoordinate = map.userLocation.coordinate
         map.showsCompass = false
 
         map.heading = newHeading // updates heading variable
-        map.updateHeading() // updates heading view's rotation
+        //map.updateHeading() // updates heading view's rotation
         
     }
 }
