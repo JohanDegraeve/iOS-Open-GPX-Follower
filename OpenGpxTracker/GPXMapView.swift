@@ -35,6 +35,8 @@ import MapCache
 
 class GPXMapView: MKMapView {
     
+    let coreDataHelper = CoreDataHelper()
+    
     /// Current session of GPX location logging. Handles all background tasks and recording.
     let session = GPXSession()
 
@@ -110,9 +112,6 @@ class GPXMapView: MKMapView {
     /// Overlay that holds map tiles
     var tileServerOverlay: MKTileOverlay = MKTileOverlay()
     
-    ///
-    let coreDataHelper = CoreDataHelper()
-    
     /// Heading of device
     var heading: CLHeading?
     
@@ -184,49 +183,6 @@ class GPXMapView: MKMapView {
     }
     
     ///
-    /// Adds a waypoint annotation in the point passed as arguments
-    ///
-    /// For example, this function can be used to add a waypoint after long press on the map view
-    ///
-    /// - Parameters:
-    ///     - point: The location in which the waypoint has to be added.
-    ///
-    func addWaypointAtViewPoint(_ point: CGPoint) {
-        let coords: CLLocationCoordinate2D = convert(point, toCoordinateFrom: self)
-        let waypoint = GPXWaypoint(coordinate: coords)
-        addWaypoint(waypoint)
-        coreDataHelper.add(toCoreData: waypoint)
-        
-    }
-    
-    ///
-    /// Adds a waypoint to the map.
-    ///
-    /// - Parameters: The waypoint to add to the map.
-    ///
-    func addWaypoint(_ waypoint: GPXWaypoint) {
-    	session.addWaypoint(waypoint)
-        addAnnotation(waypoint)
-        extent.extendAreaToIncludeLocation(waypoint.coordinate)
-    }
-    
-    ///
-    /// Removes a Waypoint from the map
-    ///
-    /// - Parameters: The waypoint to remove from the map.
-    ///
-    func removeWaypoint(_ waypoint: GPXWaypoint) {
-        let index = session.waypoints.firstIndex(of: waypoint)
-        if index == nil {
-            print("Waypoint not found")
-            return
-        } 
-        removeAnnotation(waypoint)
-        session.waypoints.remove(at: index!)
-        coreDataHelper.deleteWaypoint(fromCoreDataAt: index!)
-    }
-    
-    ///
     /// Updates the heading arrow based on the heading information
     ///
     func updateHeading() {
@@ -244,23 +200,6 @@ class GPXMapView: MKMapView {
         UIView.animate(withDuration: 0.15) {
             self.headingImageView?.transform = CGAffineTransform(rotationAngle: newRotation)
         }
-    }
-    
-    ///
-    /// Adds a new point to current segment.
-    /// - Parameters:
-    ///    - location: Typically a location provided by CLLocation
-    ///
-    func addPointToCurrentTrackSegmentAtLocation(_ location: CLLocation) {
-    let pt = GPXTrackPoint(location: location)
-        coreDataHelper.add(toCoreData: pt, withTrackSegmentID: session.trackSegments.count)
-        session.addPointToCurrentTrackSegmentAtLocation(location)
-        //redrawCurrent track segment overlay
-        //First remove last overlay, then re-add the overlay updated with the new point
-        removeOverlay(currentSegmentOverlay)
-        currentSegmentOverlay = session.currentSegment.overlay
-        addOverlay(currentSegmentOverlay)
-        extent.extendAreaToIncludeLocation(location.coordinate)
     }
     
     ///
@@ -319,18 +258,11 @@ class GPXMapView: MKMapView {
     ///     - gpx: The result of loading a gpx file with iOS-GPX-Framework.
     ///
     func importFromGPXRoot(_ gpx: GPXRoot) {
-        clearMap()
-        addWaypoints(for: gpx)
-        addTrackSegments(for: gpx)
-    }
 
-    private func addWaypoints(for gpx: GPXRoot, fromImport: Bool = true) {
-        for waypoint in gpx.waypoints {
-            addWaypoint(waypoint)
-            if fromImport {
-                coreDataHelper.add(toCoreData: waypoint)
-            }
-        }
+        clearMap()
+
+        addTrackSegments(for: gpx)
+
     }
 
     private func addTrackSegments(for gpx: GPXRoot) {
@@ -351,7 +283,6 @@ class GPXMapView: MKMapView {
     
     func continueFromGPXRoot(_ gpx: GPXRoot) {
         clearMap()
-        addWaypoints(for: gpx, fromImport: false)
         
         session.continueFromGPXRoot(gpx)
         

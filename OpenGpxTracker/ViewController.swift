@@ -996,7 +996,7 @@ extension ViewController: CLLocationManagerDelegate {
         map.showsCompass = false
 
         map.heading = newHeading // updates heading variable
-        //map.updateHeading() // updates heading view's rotation
+        map.updateHeading() // updates heading view's rotation
         
     }
 }
