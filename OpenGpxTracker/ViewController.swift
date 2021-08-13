@@ -6,40 +6,15 @@
 //
 //  Localized by nitricware on 19/08/19.
 //
+// update to make it a gpx follower in stead of tracker by Johan Degraeve 13/08/2021 at later
 
 import UIKit
 import CoreLocation
 import MapKit
 import CoreGPX
 
-// swiftlint:disable line_length
-
-/// Purple color for button background
-let kPurpleButtonBackgroundColor: UIColor =  UIColor(red: 146.0/255.0, green: 166.0/255.0, blue: 218.0/255.0, alpha: 0.90)
-
-/// Green color for button background
-let kGreenButtonBackgroundColor: UIColor = UIColor(red: 142.0/255.0, green: 224.0/255.0, blue: 102.0/255.0, alpha: 0.90)
-
-/// Red color for button background
-let kRedButtonBackgroundColor: UIColor =  UIColor(red: 244.0/255.0, green: 94.0/255.0, blue: 94.0/255.0, alpha: 0.90)
-
-/// Blue color for button background
-let kBlueButtonBackgroundColor: UIColor = UIColor(red: 74.0/255.0, green: 144.0/255.0, blue: 226.0/255.0, alpha: 0.90)
-
-/// Blue color for disabled button background
-let kDisabledBlueButtonBackgroundColor: UIColor = UIColor(red: 74.0/255.0, green: 144.0/255.0, blue: 226.0/255.0, alpha: 0.10)
-
-/// Red color for disabled button background
-let kDisabledRedButtonBackgroundColor: UIColor =  UIColor(red: 244.0/255.0, green: 94.0/255.0, blue: 94.0/255.0, alpha: 0.10)
-
 /// White color for button background
 let kWhiteBackgroundColor: UIColor = UIColor(red: 254.0/255.0, green: 254.0/255.0, blue: 254.0/255.0, alpha: 0.90)
-
-/// Delete Waypoint Button tag. Used in a waypoint bubble
-let kDeleteWaypointAccesoryButtonTag = 666
-
-/// Edit Waypoint Button tag. Used in a waypoint bubble.
-let kEditWaypointAccesoryButtonTag = 333
 
 /// Text to display when the system is not providing coordinates.
 let kNotGettingLocationText = NSLocalizedString("NO_LOCATION", comment: "no comment")
@@ -72,10 +47,6 @@ let kSignalAccuracy2 = 101.0
 /// Upper limits threshold (in meters) on signal accuracy.
 let kSignalAccuracy1 = 201.0
 
-/// - if false then don't show the buttons to start and stop tracking etc.
-/// - maybe in future this can be stored in preferences, then app could be used for tracking or following
-let usedForTracking = false
-
 ///
 /// Main View Controller of the Application. It is loaded when the application is launched
 ///
@@ -83,23 +54,6 @@ let usedForTracking = false
 ///
 ///
 class ViewController: UIViewController, UIGestureRecognizerDelegate {
-    
-    /// Shall the map be centered on current user position?
-    /// If yes, whenever the user moves, the center of the map too.
-    var followUser: Bool = true {
-        didSet {
-            if followUser {
-                print("followUser=true")
-                followUserButton.setImage(UIImage(named: "follow_user_high"), for: UIControl.State())
-                map.setCenter((map.userLocation.coordinate), animated: true)
-                
-            } else {
-                print("followUser=false")
-               followUserButton.setImage(UIImage(named: "follow_user"), for: UIControl.State())
-            }
-            
-        }
-    }
     
     /// location manager instance configuration
     let locationManager: CLLocationManager = {
@@ -135,17 +89,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// Status variable that indicates if the location service auth was denied.
     var isDisplayingLocationServicesDenied: Bool = false
     
-    /// Has the map any waypoint?
-    var hasWaypoints: Bool = false {
-        /// Whenever it is updated, if it has waypoints it sets the save and reset button
-        didSet {
-            if hasWaypoints {
-                saveButton.backgroundColor = kBlueButtonBackgroundColor
-                resetButton.backgroundColor = kRedButtonBackgroundColor
-            }
-        }
-    }
-
     /// Defines the different statuses regarding tracking current user location.
     enum GpxTrackingStatus {
         
@@ -359,11 +302,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         //set the position of the compass.
         map.compassRect = CGRect(x: map.frame.width/2 - 18, y: isIPhoneX ? 105.0 : 70.0, width: 36, height: 36)
         
-        //Each time user pans, if the map is following the user, it stops doing that.
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(ViewController.stopFollowingUser(_:)))
-        panGesture.delegate = self
-        map.addGestureRecognizer(panGesture)
-        
         locationManager.delegate = self
         locationManager.startUpdatingLocation()
         locationManager.startUpdatingHeading()
@@ -375,7 +313,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         map.tileServer = Preferences.shared.tileServer
         map.useCache = Preferences.shared.useCache
         useImperial = Preferences.shared.useImperial
-        //locationManager.activityType = Preferences.shared.locationActivityType
         
         //
         // Config user interface
@@ -441,19 +378,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         totalTrackedDistanceLabel.autoresizingMask = [.flexibleWidth, .flexibleLeftMargin, .flexibleRightMargin]
         //timeLabel.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5)
         map.addSubview(totalTrackedDistanceLabel)
-        
-        
-        if usedForTracking {
-
-            currentSegmentDistanceLabel.textAlignment = .right
-            currentSegmentDistanceLabel.font = font18
-            currentSegmentDistanceLabel.useImperial = useImperial
-            currentSegmentDistanceLabel.distance = 0.00
-            currentSegmentDistanceLabel.autoresizingMask = [.flexibleWidth, .flexibleLeftMargin, .flexibleRightMargin]
-            //timeLabel.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5)
-            map.addSubview(currentSegmentDistanceLabel)
-
-        }
         
         //about button
         aboutButton.frame = CGRect(x: 5 + 8, y: 14 + 5 + 48 + 5 + iPhoneXdiff, width: 32, height: 32)
@@ -548,7 +472,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     func addConstraints(_ isIPhoneX: Bool) {
         addConstraintsToAppTitleBar(isIPhoneX)
         addConstraintsToInfoLabels(isIPhoneX)
-        addConstraintsToButtonBar(isIPhoneX)
     }
     /// Adds constraints to subviews forming the app title bar (top bar)
     func addConstraintsToAppTitleBar(_ isIPhoneX: Bool) {
@@ -593,61 +516,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         NSLayoutConstraint(item: totalTrackedDistanceLabel, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: kSignalViewOffset).isActive = true
         NSLayoutConstraint(item: totalTrackedDistanceLabel, attribute: .top, relatedBy: .equal, toItem: speedLabel, attribute: .bottom, multiplier: 1, constant: 5).isActive = true
         
-        if (usedForTracking) {
-
-            NSLayoutConstraint(item: currentSegmentDistanceLabel, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: -7).isActive = true
-            NSLayoutConstraint(item: currentSegmentDistanceLabel, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: kSignalViewOffset).isActive = true
-            NSLayoutConstraint(item: currentSegmentDistanceLabel, attribute: .top, relatedBy: .equal, toItem: totalTrackedDistanceLabel, attribute: .bottom, multiplier: 1, constant: 0).isActive = true
-
-        }
-
-    }
-    
-    /// Adds constraints to subviews forming the button bar (bottom session controls bar)
-    func addConstraintsToButtonBar(_ isIPhoneX: Bool) {
-        
-        if !usedForTracking {return}
-        
-        // MARK: Button Bar
-        
-        // constants
-        let kBottomGap: CGFloat = isIPhoneX ? 0 : 15
-        let kBottomDistance: CGFloat = kBottomGap + 24
-        
-        // Switch off all autoresizing masks translate
-        trackerButton.translatesAutoresizingMaskIntoConstraints = false
-        newPinButton.translatesAutoresizingMaskIntoConstraints = false
-        followUserButton.translatesAutoresizingMaskIntoConstraints = false
-        saveButton.translatesAutoresizingMaskIntoConstraints = false
-        resetButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        // set trackerButton to horizontal center of view
-        NSLayoutConstraint(item: trackerButton, attribute: .centerX, relatedBy: .equal, toItem: map, attribute: .centerX, multiplier: 1, constant: 0).isActive = true
-        
-        // seperation distance between each button
-        NSLayoutConstraint(item: trackerButton, attribute: .leading, relatedBy: .equal, toItem: newPinButton, attribute: .trailing, multiplier: 1, constant: kButtonSeparation).isActive = true
-        NSLayoutConstraint(item: newPinButton, attribute: .leading, relatedBy: .equal, toItem: followUserButton, attribute: .trailing, multiplier: 1, constant: kButtonSeparation).isActive = true
-        NSLayoutConstraint(item: saveButton, attribute: .leading, relatedBy: .equal, toItem: trackerButton, attribute: .trailing, multiplier: 1, constant: kButtonSeparation).isActive = true
-        NSLayoutConstraint(item: resetButton, attribute: .leading, relatedBy: .equal, toItem: saveButton, attribute: .trailing, multiplier: 1, constant: kButtonSeparation).isActive = true
-
-        // seperation distance between button and bottom of view
-        NSLayoutConstraint(item: self.bottomLayoutGuide, attribute: .top, relatedBy: .equal, toItem: followUserButton, attribute: .bottom, multiplier: 1, constant: kBottomDistance).isActive = true
-        NSLayoutConstraint(item: self.bottomLayoutGuide, attribute: .top, relatedBy: .equal, toItem: newPinButton, attribute: .bottom, multiplier: 1, constant: kBottomDistance).isActive = true
-        NSLayoutConstraint(item: self.bottomLayoutGuide, attribute: .top, relatedBy: .equal, toItem: trackerButton, attribute: .bottom, multiplier: 1, constant: kBottomGap).isActive = true
-        NSLayoutConstraint(item: self.bottomLayoutGuide, attribute: .top, relatedBy: .equal, toItem: saveButton, attribute: .bottom, multiplier: 1, constant: kBottomDistance).isActive = true
-        NSLayoutConstraint(item: self.bottomLayoutGuide, attribute: .top, relatedBy: .equal, toItem: resetButton, attribute: .bottom, multiplier: 1, constant: kBottomDistance).isActive = true
-        
-        // fixed dimensions for all buttons
-        NSLayoutConstraint(item: followUserButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonSmallSize).isActive = true
-        NSLayoutConstraint(item: followUserButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonSmallSize).isActive = true
-        NSLayoutConstraint(item: newPinButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonSmallSize).isActive = true
-        NSLayoutConstraint(item: newPinButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonSmallSize).isActive = true
-        NSLayoutConstraint(item: trackerButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonLargeSize).isActive = true
-        NSLayoutConstraint(item: trackerButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonLargeSize).isActive = true
-        NSLayoutConstraint(item: saveButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonSmallSize).isActive = true
-        NSLayoutConstraint(item: saveButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonSmallSize).isActive = true
-        NSLayoutConstraint(item: resetButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonSmallSize).isActive = true
-        NSLayoutConstraint(item: resetButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonSmallSize).isActive = true
     }
     
     /// For handling compass location changes when orientation is switched.
@@ -757,8 +625,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.stopWatch.reset()
         //load data
         self.map.continueFromGPXRoot(root)
-        //stop following user
-        self.followUser = false
+
         //center map in GPX data
         self.map.regionToGPXExtent()
 
@@ -892,15 +759,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             shareActivityIndicator.stopAnimating()
             shareButton.setImage(UIImage(named: "share"), for: UIControl.State())
             shareButton.isUserInteractionEnabled = true
-        }
-    }
-    
-    ///
-    /// After invoking this fuction, the map will not be centered on current user position.
-    ///
-    @objc func stopFollowingUser(_ gesture: UIPanGestureRecognizer) {
-        if self.followUser {
-            self.followUser = false
         }
     }
     
@@ -1163,14 +1021,10 @@ extension ViewController: CLLocationManagerDelegate {
         
         // if used for following a track, then turn the map in the moving direction
         // and center the map to the location of the user
-        if (!usedForTracking) {
+        map.camera.heading = newHeading.trueHeading
+        map.centerCoordinate = map.userLocation.coordinate
+        map.showsCompass = false
 
-            map.camera.heading = newHeading.trueHeading
-            map.centerCoordinate = map.userLocation.coordinate
-            map.showsCompass = false
-
-        }
-        
         map.heading = newHeading // updates heading variable
         map.updateHeading() // updates heading view's rotation
         
@@ -1180,7 +1034,4 @@ extension ViewController: CLLocationManagerDelegate {
 extension Notification.Name {
     static let loadRecoveredFile = Notification.Name("loadRecoveredFile")
     static let updateAppearance = Notification.Name("updateAppearance")
-    // swiftlint:disable file_length
 }
-
-// swiftlint:enable line_length

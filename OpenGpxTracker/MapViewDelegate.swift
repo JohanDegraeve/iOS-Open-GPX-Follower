@@ -12,31 +12,6 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIAlertViewDelegate {
     /// The Waypoint is being edited (if there is any)
     var waypointBeingEdited: GPXWaypoint = GPXWaypoint()
     
-    /// Displays a pin with whose annotation (bubble) will include delete and edit buttons.
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        if annotation.isKind(of: MKUserLocation.self) {
-            return nil
-        }
-        let annotationView: MKPinAnnotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "PinView")
-        annotationView.canShowCallout = true
-        annotationView.isDraggable = true
-        //let detailButton: UIButton = UIButton.buttonWithType(UIButtonType.DetailDisclosure) as UIButton
-        
-        let deleteButton: UIButton = UIButton(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
-        deleteButton.setImage(UIImage(named: "delete"), for: UIControl.State())
-        deleteButton.setImage(UIImage(named: "deleteHigh"), for: .highlighted)
-        deleteButton.tag = kDeleteWaypointAccesoryButtonTag
-        annotationView.rightCalloutAccessoryView = deleteButton
-        
-        let editButton: UIButton = UIButton(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
-        editButton.setImage(UIImage(named: "edit"), for: UIControl.State())
-        editButton.setImage(UIImage(named: "editHigh"), for: .highlighted)
-        editButton.tag = kEditWaypointAccesoryButtonTag
-        annotationView.leftCalloutAccessoryView = editButton
-        
-        return annotationView
-    }
-    
     /// Displays the line for each segment
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         if overlay.isKind(of: MKTileOverlay.self) {
@@ -63,56 +38,6 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIAlertViewDelegate {
         return MKOverlayRenderer()
     }
     
-    /// Handles the actions of delete and edit button
-    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-        print("calloutAccesoryControlTapped ")
-        guard let waypoint = view.annotation as? GPXWaypoint else {
-            return
-        }
-        
-        guard let button = control as? UIButton else {
-            return
-        }
-        
-        guard let map = mapView as? GPXMapView else {
-            return
-        }
-        
-        switch button.tag {
-        case kDeleteWaypointAccesoryButtonTag:
-            print("[calloutAccesoryControlTapped: DELETE button] deleting waypoint with name \(waypoint.name ?? "''")")
-            map.removeWaypoint(waypoint)
-        case kEditWaypointAccesoryButtonTag:
-            print("[calloutAccesoryControlTapped: EDIT] editing waypoint with name \(waypoint.name ?? "''")")
-            
-            let indexofEditedWaypoint = map.session.waypoints.firstIndex(of: waypoint)
-            
-            let alertController = UIAlertController(title: NSLocalizedString("EDIT_WAYPOINT_NAME_TITLE", comment: "no comment"),
-                                                    message: NSLocalizedString("EDIT_WAYPOINT_NAME_MESSAGE", comment: "no comment"),
-                                                    preferredStyle: .alert)
-            alertController.addTextField { (textField) in
-                textField.text = waypoint.title
-                textField.clearButtonMode = .always
-            }
-            let saveAction = UIAlertAction(title: NSLocalizedString("SAVE", comment: "no comment"), style: .default) { _ in
-                print("Edit waypoint alert view")
-                self.waypointBeingEdited.title = alertController.textFields?[0].text
-                map.coreDataHelper.update(toCoreData: self.waypointBeingEdited, from: indexofEditedWaypoint!)
-            }
-            let cancelAction = UIAlertAction(title: NSLocalizedString("CANCEL", comment: "no comment"), style: .cancel) { _ in }
-            
-            alertController.addAction(saveAction)
-            alertController.addAction(cancelAction)
-            
-            UIApplication.shared.keyWindow?.rootViewController?.present(alertController, animated: true)
-            
-            self.waypointBeingEdited = waypoint
-            
-        default:
-            print("[calloutAccesoryControlTapped ERROR] unknown control")
-        }
-    }
-
     /// Handles the change of the coordinates when a pin is dropped.
     func mapView(_ mapView: MKMapView,
                  annotationView view: MKAnnotationView,
@@ -187,13 +112,6 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIAlertViewDelegate {
             })
         }
     }
-    
-    ///
-    /// Adds a small arrow image to the annotationView.
-    /// This annotationView should be the MKUserLocation
-    ///
-    func addHeadingView(toAnnotationView annotationView: MKAnnotationView) {
-           }
     
     /// Updates map heading after user interactions end.
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {

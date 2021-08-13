@@ -67,7 +67,7 @@
       <RemoteRunnable
          runnableDebuggingMode = "2"
          BundleIdentifier = "com.apple.Carousel"
-         RemotePath = "/GPX Tracker">
+         RemotePath = "/GPX Follower">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BF692F562209AAF900F8A0F1"
@@ -87,7 +87,7 @@
       <RemoteRunnable
          runnableDebuggingMode = "2"
          BundleIdentifier = "com.apple.Carousel"
-         RemotePath = "/GPX Tracker">
+         RemotePath = "/GPX Follower">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BF692F562209AAF900F8A0F1"

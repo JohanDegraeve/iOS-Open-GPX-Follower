@@ -155,12 +155,6 @@ class AddGPXFileViewController: UITableViewController, UITextFieldDelegate {
                     
                     self.urlEnteredByUser = text
                     
-                    // do the action
-                    //self.downloadGPX(siteUrl: self.urlEnteredByUser, completionHandler: {
-                        
-                    //})
-
-                    
                 }, cancelHandler: nil)
                 
                 // present the alert
