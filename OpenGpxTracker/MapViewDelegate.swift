@@ -9,9 +9,6 @@ import CoreGPX
 ///
 class MapViewDelegate: NSObject, MKMapViewDelegate, UIAlertViewDelegate {
 
-    /// The Waypoint is being edited (if there is any)
-    var waypointBeingEdited: GPXWaypoint = GPXWaypoint()
-    
     /// Displays the line for each segment
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         if overlay.isKind(of: MKTileOverlay.self) {
