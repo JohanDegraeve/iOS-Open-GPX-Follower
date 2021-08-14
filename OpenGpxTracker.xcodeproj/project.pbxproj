@@ -99,7 +99,6 @@
 		F8B7181526C060E8002ED1C3 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7181426C060E8002ED1C3 /* String.swift */; };
 		F8B7181726C07922002ED1C3 /* StringProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7181626C07922002ED1C3 /* StringProtocol.swift */; };
 		F8B7181926C083B4002ED1C3 /* AddGPXFileViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7181826C083B4002ED1C3 /* AddGPXFileViewControllerDelegate.swift */; };
-		F8B7181B26C7DD1F002ED1C3 /* CLLocationCoordinate2D+BoundingBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7181A26C7DD1F002ED1C3 /* CLLocationCoordinate2D+BoundingBox.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -279,7 +278,6 @@
 		F8B7181426C060E8002ED1C3 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		F8B7181626C07922002ED1C3 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
 		F8B7181826C083B4002ED1C3 /* AddGPXFileViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGPXFileViewControllerDelegate.swift; sourceTree = "<group>"; };
-		F8B7181A26C7DD1F002ED1C3 /* CLLocationCoordinate2D+BoundingBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CLLocationCoordinate2D+BoundingBox.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -531,7 +529,6 @@
 				F8B7181026BF2B6A002ED1C3 /* UIAlertController.swift */,
 				F8B7181426C060E8002ED1C3 /* String.swift */,
 				F8B7181626C07922002ED1C3 /* StringProtocol.swift */,
-				F8B7181A26C7DD1F002ED1C3 /* CLLocationCoordinate2D+BoundingBox.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -865,7 +862,6 @@
 				898EECDB19C49B5800B4B207 /* AppDelegate.swift in Sources */,
 				89EA86632157B42C002E03A7 /* GPXFileInfo.swift in Sources */,
 				899D676C19CD9E9E00C88A0A /* GPXTrackSegment+MapKit.swift in Sources */,
-				F8B7181B26C7DD1F002ED1C3 /* CLLocationCoordinate2D+BoundingBox.swift in Sources */,
 				899D677219CE8B3600C88A0A /* StopWatch.swift in Sources */,
 				89F6E0F7227E107C00CE3E3F /* Preferences.swift in Sources */,
 				BFE026C0244A0160005423E6 /* String+CountInstances.swift in Sources */,
