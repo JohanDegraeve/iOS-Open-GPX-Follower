@@ -62,6 +62,9 @@ class GPXMapView: MKMapView {
         }
     }
     
+    /// temp storage heading, updated each time a new heading is received from the location manager. Used when user rotates map (not device but map)
+    var storedHeading: CLHeading?
+
     /// Arrow image to display heading (orientation of the device)
     /// initialized on MapViewDelegate
     var headingImageView: UIImageView?
@@ -111,9 +114,6 @@ class GPXMapView: MKMapView {
     
     /// Overlay that holds map tiles
     var tileServerOverlay: MKTileOverlay = MKTileOverlay()
-    
-    /// Heading of device
-    var heading: CLHeading?
     
     /// Offset to heading due to user's map rotation
     var headingOffset: CGFloat?
@@ -179,7 +179,7 @@ class GPXMapView: MKMapView {
         showsCompass = true
         
         headingOffset = gesture.rotation
-        updateHeading()
+        updateHeading(to: storedHeading)
         
         if gesture.state == .ended {
             headingOffset = nil
@@ -187,23 +187,27 @@ class GPXMapView: MKMapView {
     }
     
     ///
-    /// Updates the heading arrow based on the heading information
-    ///
-    func updateHeading() {
-        guard let heading = heading else { return }
+    /// - Updates the heading arrow based on the heading information
+    /// - If parameter heading = nil, then set to camera.heading (meaning point in same direction as map, which is usually the direction the user is headin gto
+    func updateHeading(to heading: CLHeading?) {
         
+        // why setting only hear to false ?
         headingImageView?.isHidden = false
-        let rotation = CGFloat((heading.trueHeading - camera.heading)/180 * Double.pi)
         
-        var newRotation = rotation
+        var rotation: CGFloat!
+        // if heading nil then set rotation to north
+        if let heading = heading {
+            rotation = CGFloat((heading.trueHeading - camera.heading)/180 * Double.pi)
+        } else {
+            rotation = CGFloat(0)
+        }
         
         if let headingOffset = headingOffset {
-            newRotation = rotation + headingOffset
+            rotation = rotation + headingOffset
         }
  
-        UIView.animate(withDuration: 0.15) {
-            self.headingImageView?.transform = CGAffineTransform(rotationAngle: newRotation)
-        }
+        headingImageView?.transform = CGAffineTransform(rotationAngle: rotation)
+        
     }
     
     ///

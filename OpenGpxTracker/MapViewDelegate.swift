@@ -42,9 +42,7 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIAlertViewDelegate {
             return
         }
         
-        print("MapView: User interaction has ended")
-        
-        map.updateHeading()
+        map.updateHeading(to: nil)
         
     }
     

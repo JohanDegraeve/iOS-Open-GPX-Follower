@@ -857,6 +857,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             // temporary store current centerCoordinate of map
             let currentCenterCoordinate = map.centerCoordinate // Temporary saved map current center position
             
+            print("map.centerCoordinate.latitude before = : \(map.centerCoordinate.latitude) ")
+            print("map.centerCoordinate.longitute before = : \(map.centerCoordinate.longitude) ")
+
             // temporary set centerCoordinate of map to current location
             map.centerCoordinate = newLocation.coordinate
             
@@ -869,6 +872,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             // reset centerCoordinate of map to original
             map.centerCoordinate = currentCenterCoordinate
             
+            print("map.centerCoordinate.latitude after = : \(map.centerCoordinate.latitude) ")
+            print("map.centerCoordinate.longitute after = : \(map.centerCoordinate.longitude) ")
+
             // now move to the new newCenterCoordinates, with animation
             map.setCenter(newCenterCoordinates, animated: true)
             
@@ -1053,15 +1059,14 @@ extension ViewController: CLLocationManagerDelegate {
         print("ViewController::didUpdateHeading true: \(newHeading.trueHeading) magnetic: \(newHeading.magneticHeading)")
         print("mkMapcamera heading=\(map.camera.heading)")
 
-        // user rotated, so update center off the map
+        // map possibly rotated, so update center off the map
         updateMapCenter(locationManager: locationManager)
         
         // if used for following a track, then turn the map in the moving direction
-        // and center the map to the location of the user
         map.camera.heading = newHeading.trueHeading
 
-        map.heading = newHeading // updates heading variable
-        map.updateHeading() // updates heading view's rotation
+        map.storedHeading = newHeading // updates heading variable
+        map.updateHeading(to: newHeading) // updates heading view's rotation
         
     }
 }
