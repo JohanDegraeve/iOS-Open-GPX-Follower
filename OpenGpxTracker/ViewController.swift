@@ -13,6 +13,12 @@ import CoreLocation
 import MapKit
 import CoreGPX
 
+/// determines automatic zooming, if value is for example 1, and I'm moving at 30 km/h, then the top of the screen is 500 meter away
+let reachTopOfScreenInMinutes = 1.0
+
+/// minimum distance of top of screen in meters
+let minimumTopOfScreenInMeters = 200.0
+
 /// White color for button background
 let kWhiteBackgroundColor: UIColor = UIColor(red: 254.0/255.0, green: 254.0/255.0, blue: 254.0/255.0, alpha: 0.90)
 
@@ -46,6 +52,12 @@ let kSignalAccuracy3 = 51.0
 let kSignalAccuracy2 = 101.0
 /// Upper limits threshold (in meters) on signal accuracy.
 let kSignalAccuracy1 = 201.0
+
+/// to measure the average speeds
+var measuredSpeads = [Double]()
+
+/// maximum amount to store in measuredSpeads
+let maxMeasuredSpeads = 10
 
 ///
 /// Main View Controller of the Application. It is loaded when the application is launched
@@ -967,14 +979,53 @@ extension ViewController: CLLocationManagerDelegate {
         let altitude = newLocation.altitude.toAltitude(useImperial: useImperial)
         coordsLabel.text = String(format: NSLocalizedString("COORDS_LABEL", comment: "no comment"), latFormat, lonFormat, altitude)
         
-        //Update speed
-        speedLabel.text = (newLocation.speed < 0) ? kUnknownSpeedText : newLocation.speed.toSpeed(useImperial: useImperial)
-        
-        // center the map to new user location
-        map.centerCoordinate = newLocation.coordinate
-        
-        // remove compass when user is moving
-        map.showsCompass = false
+        // only if speed >= 0, then calculate new average speed
+        if newLocation.speed >= 0.0 {
+
+            //Update speed text, start by setting to actual speed report by locationManager
+            speedLabel.text = (newLocation.speed < 0) ? kUnknownSpeedText : newLocation.speed.toSpeed(useImperial: useImperial)
+            
+            // store new speed in array, to keep track of recent speeds and calculate the average
+            // but remove last one if maximum amount is already stored
+            if measuredSpeads.count == maxMeasuredSpeads {measuredSpeads.removeLast()}
+            measuredSpeads.insert(newLocation.speed, at: 0)
+            
+            // calculate average of measuredSpeads
+            let averageSpeed = measuredSpeads.reduce(0.0, +)/Double(measuredSpeads.count)
+            print("average speed = : \(averageSpeed) ")
+            
+            // now if the speed reported by the locationManager is still > 0, then use average value for speed text
+            speedLabel.text = (newLocation.speed < 0) ? kUnknownSpeedText : averageSpeed.toSpeed(useImperial: useImperial)
+
+            // when moving, the top of the screen should be reached in approximately 1 minute
+            // the 1 minute is configurable later on
+            // so the question is where would in one minute if I keep moving at the current speed
+            let topOfScreenDistanceInMeters = max(averageSpeed * reachTopOfScreenInMinutes, minimumTopOfScreenInMeters)
+            print("in 1 minute distance = : \(topOfScreenDistanceInMeters) ")
+            
+            
+            // calculate top right corner of a box around current location, with distance topOfScreenDistanceInMeters
+            let topRight = newLocation.coordinate.calculateBoundingCoordinates(withDistance: topOfScreenDistanceInMeters).1
+            
+            
+            // the location needs to be at approcimately 1/5th of the bottom of the screen
+            // so calculate now again a box around the location but now at 1/4th of the topOfScreenDistanceInMeters, and there we take te bottomLeft corner.
+            let bottomOfScreenDistanceInMeters = topOfScreenDistanceInMeters / 5.0
+            let bottomLeft = newLocation.coordinate.calculateBoundingCoordinates(withDistance: bottomOfScreenDistanceInMeters).0
+            
+            // zzz
+            let center = CLLocationCoordinate2D(latitude: topRight.latitude - (topRight.latitude - bottomLeft.latitude) * 0.5, longitude: topRight.longitude - (topRight.longitude - bottomLeft.longitude) * 0.5)
+           // map.setRegion(MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: abs(topRight.latitude - bottomLeft.latitude) * 1.1, longitudeDelta: abs(topRight.longitude - bottomLeft.longitude) * 1.1)), animated: true)
+            
+            // user location should be at 1/5 of bottom of screen
+            map.centerCoordinate = center
+            
+        }
+
+        // remove compass if user is moving
+        if (map.showsCompass) {
+            map.showsCompass = false
+        }
 
     }
 
