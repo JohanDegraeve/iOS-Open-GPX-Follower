@@ -25,6 +25,8 @@ let maxMeasuredSpeads = 7
 /// delta's to apply to latitude longitude (tests show that at 100 km/h the value 0.018 is reached, so to reach 0.058 you would need to drive at 300 km/h
 let latitudeLongitudeDeltas = [0.001, 0.003, 0.005, 0.006, 0.007, 0.008, 0.009, 0.010, 0.0110, 0.012, 0.013, 0.014, 0.015, 0.016, 0.017, 0.018, 0.019, 0.020, 0.021, 0.022, 0.023, 0.024, 0.025, 0.026, 0.027, 0.028, 0.029, 0.030, 0.031, 0.032, 0.033, 0.034, 0.035, 0.036, 0.037, 0.038, 0.039, 0.040, 0.041, 0.042, 0.043, 0.044, 0.045, 0.046, 0.047, 0.048, 0.049, 0.050, 0.051, 0.052, 0.053, 0.054, 0.055, 0.056, 0.057, 0.058]
 
+let pauzeUdateMapCenterAfterGestureEndForHowManySeconds = 30.0
+
 /// White color for button background
 let kWhiteBackgroundColor: UIColor = UIColor(red: 254.0/255.0, green: 254.0/255.0, blue: 254.0/255.0, alpha: 0.90)
 
@@ -418,6 +420,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         addConstraints(isIPhoneX)
         
         map.rotationGesture.delegate = self
+        map.panGesture.delegate = self
         updateAppearance()
         
         if #available(iOS 13, *) {
@@ -814,6 +817,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             
             // set speedlabel text to average speed
             speedLabel.text = averageSpeed.toSpeed(useImperial: useImperial)
+
+            // if time since last gesture end is less than pauzeUdateMapCenterAfterGestureEndForHowManySeconds, then don't further update the map
+            if abs(map.timeStampGestureEnd.timeIntervalSince(Date())) < pauzeUdateMapCenterAfterGestureEndForHowManySeconds {return}
             
             /* ****************************************************************************** */
             /* when moving, the top of the screen should be reached in approximately 1 minute */
@@ -1065,8 +1071,14 @@ extension ViewController: CLLocationManagerDelegate {
         updateMapCenter(locationManager: locationManager)
         
         // then turn the map in the moving direction
-        map.camera.heading = newHeading.trueHeading
+        // only if end of last gesture > pauzeUdateMapCenterAfterGestureEndForHowManySeconds
+        if abs(map.timeStampGestureEnd.timeIntervalSince(Date())) >= pauzeUdateMapCenterAfterGestureEndForHowManySeconds {
+            
+            map.camera.heading = newHeading.trueHeading
 
+        }
+
+        
         map.storedHeading = newHeading // updates heading variable
         map.updateHeading(to: newHeading) // updates heading view's rotation
         

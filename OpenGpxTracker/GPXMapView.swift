@@ -121,6 +121,11 @@ class GPXMapView: MKMapView {
     /// Gesture for heading arrow to be updated in realtime during user's map interactions
     var rotationGesture = UIRotationGestureRecognizer()
     
+    var panGesture = UIPanGestureRecognizer()
+    
+    /// when did the last gesture end ?
+    var timeStampGestureEnd:Date = Date(timeIntervalSince1970: 0)
+    
     ///
     /// Initializes the map with an empty currentSegmentOverlay.
     ///
@@ -133,7 +138,11 @@ class GPXMapView: MKMapView {
         // Rotation Gesture handling (for the map rotation's influence towards heading pointing arrow)
         rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(rotationGestureHandling(_:)))
         addGestureRecognizer(rotationGesture)
-
+        
+        // Initialize Swipe Gesture Recognizer - needed to set
+        panGesture = UIPanGestureRecognizer(target: self, action: #selector(didPan(_:)))
+        addGestureRecognizer(panGesture)
+        
         isUserInteractionEnabled = true
         isMultipleTouchEnabled = true
     }
@@ -144,17 +153,12 @@ class GPXMapView: MKMapView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        // don't show compass if used as follower
-     //   if (usedForTracking) {
-            
-            // set compass position by setting its frame
-            if let compassView = subviews.filter({ $0.isKind(of: NSClassFromString("MKCompassView")!) }).first {
-                if compassRect.origin.x != 0 {
-                    compassView.frame = compassRect
-                }
+        // set compass position by setting its frame
+        if let compassView = subviews.filter({ $0.isKind(of: NSClassFromString("MKCompassView")!) }).first {
+            if compassRect.origin.x != 0 {
+                compassView.frame = compassRect
             }
-
-   //     }
+        }
         
         updateMapInformation(tileServer)
     }
@@ -182,8 +186,26 @@ class GPXMapView: MKMapView {
         updateHeading(to: storedHeading)
         
         if gesture.state == .ended {
+            
             headingOffset = nil
+
+            timeStampGestureEnd = Date()
+            
         }
+        
+    }
+    
+    @objc private func didPan(_ sender: UIPanGestureRecognizer) {
+        
+        // show compass when user pans
+        showsCompass = true
+
+        if sender.state == .ended {
+            
+            timeStampGestureEnd = Date()
+
+        }
+        
     }
     
     ///
