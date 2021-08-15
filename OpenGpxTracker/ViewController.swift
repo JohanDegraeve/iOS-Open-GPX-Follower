@@ -14,10 +14,16 @@ import MapKit
 import CoreGPX
 
 /// determines automatic zooming, if value is for example 1, and I'm moving at 30 km/h, then the top of the screen is 500 meter away
-let reachTopOfScreenInMinutes = 1.0
+let reachTopOfScreenInMinutes = 1.5
 
 /// minimum distance of top of screen in meters
-let minimumTopOfScreenInMeters = 200.0
+let minimumTopOfScreenInMeters = 500.0
+
+/// maximum amount to store in measuredSpeads
+let maxMeasuredSpeads = 7
+
+/// delta's to apply to latitude longitude (tests show that at 100 km/h the value 0.018 is reached, so to reach 0.058 you would need to drive at 300 km/h
+let latitudeLongitudeDeltas = [0.001, 0.003, 0.005, 0.006, 0.007, 0.008, 0.009, 0.010, 0.0110, 0.012, 0.013, 0.014, 0.015, 0.016, 0.017, 0.018, 0.019, 0.020, 0.021, 0.022, 0.023, 0.024, 0.025, 0.026, 0.027, 0.028, 0.029, 0.030, 0.031, 0.032, 0.033, 0.034, 0.035, 0.036, 0.037, 0.038, 0.039, 0.040, 0.041, 0.042, 0.043, 0.044, 0.045, 0.046, 0.047, 0.048, 0.049, 0.050, 0.051, 0.052, 0.053, 0.054, 0.055, 0.056, 0.057, 0.058]
 
 /// White color for button background
 let kWhiteBackgroundColor: UIColor = UIColor(red: 254.0/255.0, green: 254.0/255.0, blue: 254.0/255.0, alpha: 0.90)
@@ -56,8 +62,8 @@ let kSignalAccuracy1 = 201.0
 /// to measure the average speeds
 var measuredSpeads = [Double]()
 
-/// maximum amount to store in measuredSpeads
-let maxMeasuredSpeads = 10
+/// current index in latitueLongitudedeltas, default 2
+var currentLongitudedeltaIndex = 2
 
 ///
 /// Main View Controller of the Application. It is loaded when the application is launched
@@ -292,7 +298,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         // Set default zoom
         let center = locationManager.location?.coordinate ?? CLLocationCoordinate2D(latitude: 8.90, longitude: -79.50)
-        let span = MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+        let span = MKCoordinateSpan(latitudeDelta: latitudeLongitudeDeltas[currentLongitudedeltaIndex], longitudeDelta: latitudeLongitudeDeltas[currentLongitudedeltaIndex])
         let region = MKCoordinateRegion(center: center, span: span)
         map.setRegion(region, animated: true)
         self.view.addSubview(map)
@@ -834,47 +840,78 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             
             // store new speed in array, to keep track of recent speeds and calculate the average
             // but remove last one if maximum amount is already stored
-            if measuredSpeads.count == maxMeasuredSpeads {measuredSpeads.removeLast()}
+            if measuredSpeads.count == maxMeasuredSpeads {
+                measuredSpeads.removeLast()
+            }
             measuredSpeads.insert(newSpeed, at: 0)
             
             // calculate average of measuredSpeads
             let averageSpeed = measuredSpeads.reduce(0.0, +)/Double(measuredSpeads.count)
-            print("average speed = : \(averageSpeed) ")
             
-            // now if the speed reported by the locationManager is still > 0, then use average value for speed text
-            speedLabel.text = (newSpeed < 0) ? kUnknownSpeedText : averageSpeed.toSpeed(useImperial: useImperial)
+            // set speedlabel text to average speed
+            speedLabel.text = averageSpeed.toSpeed(useImperial: useImperial)
+            
+            /* ****************************************************************************** */
+            /* when moving, the top of the screen should be reached in approximately 1 minute */
+            /* zoom in or out to achieve this (approximately)                                 */
+            /* ****************************************************************************** */
             
             // when moving, the top of the screen should be reached in approximately 1 minute
             // the 1 minute is configurable later on
             // so the question is where would in one minute if I keep moving at the current speed
-            let topOfScreenDistanceInMeters = max(averageSpeed * reachTopOfScreenInMinutes, minimumTopOfScreenInMeters)
-            print("in 1 minute distance = : \(topOfScreenDistanceInMeters) ")
+            let requiredDistanceToTopOffViewInMeters = max(averageSpeed * reachTopOfScreenInMinutes * 60, minimumTopOfScreenInMeters)
             
-            /* ************************************************************************ */
-            /* heading should be on bottom at about 1/5th of total height of the screen */
-            /* ************************************************************************ */
-
             // temporary store current centerCoordinate of map
             let currentCenterCoordinate = map.centerCoordinate // Temporary saved map current center position
             
-            print("map.centerCoordinate.latitude before = : \(map.centerCoordinate.latitude) ")
-            print("map.centerCoordinate.longitute before = : \(map.centerCoordinate.longitude) ")
-
             // temporary set centerCoordinate of map to current location
             map.centerCoordinate = newLocation.coordinate
             
+            // calculate distance in meters, to top off view
+            // distance is calculated from current center (which is now set to the location of the user), then multiplied with 0.7/0.5. 0.7 being where the user's location will be in the view after call to map.setCenter, 0.5 being the current location in the view
+            let distanceToTopOfViewInMeters = abs(newLocation.distance(from: CLLocation(latitude: map.centerCoordinate.latitude + map.region.span.latitudeDelta, longitude: map.centerCoordinate.longitude))) * 0.7/0.5
+            
+            // just a piece of code that is used two times, it sets map.region to a region with latitudeDelta, value from latitudeLongitudeDeltas array, using index currentLongitudedeltaIndex
+            let setMapRegion = {
+                let region = MKCoordinateRegion(center: self.map.centerCoordinate, span: MKCoordinateSpan(latitudeDelta: latitudeLongitudeDeltas[currentLongitudedeltaIndex], longitudeDelta: latitudeLongitudeDeltas[currentLongitudedeltaIndex]))
+                
+                self.map.setRegion(region, animated: false)
+                
+                if let storedHeading = self.map.storedHeading {
+                    self.map.camera.heading = storedHeading.trueHeading
+
+                }
+                
+            }
+
+            // now if distanceToTopOfViewInMeters is more than x% more or less than requiredDistanceToTopOffViewInMeters, then decrease or increase the span
+            if distanceToTopOfViewInMeters > requiredDistanceToTopOffViewInMeters * 1.2 && currentLongitudedeltaIndex > 0 {
+                
+                currentLongitudedeltaIndex-=1
+                
+                setMapRegion()
+                
+            } else if distanceToTopOfViewInMeters < requiredDistanceToTopOffViewInMeters * 0.8 && currentLongitudedeltaIndex < latitudeLongitudeDeltas.count {
+                
+                currentLongitudedeltaIndex+=1
+                
+                setMapRegion()
+                
+            }
+
+            /* ************************************************************************ */
+            /* heading should be on bottom at about 1/5th of total height of the screen */
+            /* ************************************************************************ */
+            
             // create new center to where we want to shift
             let fakecenter = CGPoint(x: view.center.x, y: view.center.y - view.bounds.height * 0.3)
-
+            
             // create new coordinate to which we want to center the map
             let newCenterCoordinates = map.convert(fakecenter, toCoordinateFrom: view)
             
             // reset centerCoordinate of map to original
             map.centerCoordinate = currentCenterCoordinate
             
-            print("map.centerCoordinate.latitude after = : \(map.centerCoordinate.latitude) ")
-            print("map.centerCoordinate.longitute after = : \(map.centerCoordinate.longitude) ")
-
             // now move to the new newCenterCoordinates, with animation
             map.setCenter(newCenterCoordinates, animated: true)
             
