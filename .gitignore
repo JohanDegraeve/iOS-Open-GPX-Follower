@@ -65,6 +65,9 @@ build/
 
 xcuserdata
 
+#breakpoints
+Breakpoints*
+
 ####
 # XCode 4 workspaces - more detailed
 #
