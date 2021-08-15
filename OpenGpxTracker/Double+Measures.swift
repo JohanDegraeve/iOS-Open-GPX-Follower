@@ -4,7 +4,6 @@
 //
 //  Created by merlos on 03/05/2019.
 //
-// Shared file: this file is also included in the OpenGpxTracker-Watch Extension target.
 
 import Foundation
 

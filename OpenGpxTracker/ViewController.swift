@@ -301,6 +301,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let span = MKCoordinateSpan(latitudeDelta: latitudeLongitudeDeltas[currentLongitudedeltaIndex], longitudeDelta: latitudeLongitudeDeltas[currentLongitudedeltaIndex])
         let region = MKCoordinateRegion(center: center, span: span)
         map.setRegion(region, animated: true)
+        
         self.view.addSubview(map)
         
         addNotificationObservers()
@@ -543,8 +544,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
         notificationCenter.addObserver(self, selector: #selector(applicationWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
 
-        notificationCenter.addObserver(self, selector: #selector(presentReceivedFile(_:)), name: .didReceiveFileFromAppleWatch, object: nil)
-
         notificationCenter.addObserver(self, selector: #selector(loadRecoveredFile(_:)), name: .loadRecoveredFile, object: nil)
         
         notificationCenter.addObserver(self, selector: #selector(updateAppearance), name: .updateAppearance, object: nil)
@@ -555,25 +554,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         if #available(iOS 13, *) {
             setNeedsStatusBarAppearanceUpdate()
             updatePolylineColor()
-        }
-    }
-    
-    ///
-    /// Presents alert when file received from Apple Watch
-    ///
-    @objc func presentReceivedFile(_ notification: Notification) {
-        DispatchQueue.main.async {
-            guard let fileName = notification.userInfo?["fileName"] as? String? else { return }
-            // alert to display to notify user that file has been received.
-            let alertTitle = NSLocalizedString("WATCH_FILE_RECEIVED_TITLE", comment: "no comment")
-            let alertMessage = NSLocalizedString("WATCH_FILE_RECEIVED_MESSAGE", comment: "no comment")
-            let controller = UIAlertController(title: alertTitle, message: String(format: alertMessage, fileName ?? ""), preferredStyle: .alert)
-            let action = UIAlertAction(title: NSLocalizedString("DONE", comment: "no comment"), style: .default) { _ in
-                print("ViewController:: Presented file received message from WatchConnectivity Session")
-            }
-            
-            controller.addAction(action)
-            self.present(controller, animated: true, completion: nil)
         }
     }
     
@@ -878,6 +858,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                 self.map.setRegion(region, animated: false)
                 
                 if let storedHeading = self.map.storedHeading {
+                    
                     self.map.camera.heading = storedHeading.trueHeading
 
                 }

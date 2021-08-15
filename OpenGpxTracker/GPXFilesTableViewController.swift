@@ -11,7 +11,6 @@ import Foundation
 import UIKit
 import CoreGPX
 import MessageUI
-import WatchConnectivity
 
 /// Text displayed when there are no GPX files in the folder.
 let kNoFiles = NSLocalizedString("NO_FILES", comment: "no comment")
@@ -354,7 +353,6 @@ extension GPXFilesTableViewController {
         
         notificationCenter.addObserver(self, selector: #selector(reloadTableData),
                                        name: .didReceiveFileFromURL, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(reloadTableData), name: .didReceiveFileFromAppleWatch, object: nil)
     }
     
     ///

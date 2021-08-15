@@ -208,20 +208,6 @@ extension AppDelegate: WCSessionDelegate {
         }
     }
     
-    /// Called when a file is received from Apple Watch.
-    /// Displays a popup informing about the reception of the file.
-    func session(_ session: WCSession, didReceive file: WCSessionFile) {
-        // swiftlint:disable force_cast
-        let fileName = file.metadata!["fileName"] as! String?
-        
-        DispatchQueue.global().sync {
-            GPXFileManager.moveFrom(file.fileURL, fileName: fileName)
-            print("ViewController:: Received file from WatchConnectivity Session")
-        }
-        
-        // posts notification that file is received from apple watch
-        NotificationCenter.default.post(name: .didReceiveFileFromAppleWatch, object: nil, userInfo: ["fileName": fileName ?? ""])
-    }
 }
 
 /// Notifications for file receival from external source.
@@ -230,6 +216,4 @@ extension Notification.Name {
     /// Use when a file is received from external source.
     static let didReceiveFileFromURL = Notification.Name("didReceiveFileFromURL")
     
-    /// Use when a file is received from Apple Watch.
-    static let didReceiveFileFromAppleWatch = Notification.Name("didReceiveFileFromAppleWatch")
 }

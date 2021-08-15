@@ -5,8 +5,6 @@
 //  Created by merlos on 04/05/2019.
 //  Copyright © 2019 TransitBox. All rights reserved.
 //
-// Shared file: this file is also included in the OpenGpxTracker-Watch Extension target.
-
 import Foundation
 import CoreLocation
 
