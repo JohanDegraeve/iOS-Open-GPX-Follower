@@ -71,7 +71,7 @@ var currentLongitudedeltaIndex = 2
 /// Displays a map and a set the buttons to control the tracking
 ///
 ///
-class ViewController: UIViewController, UIGestureRecognizerDelegate {
+class ViewController: UIViewController {
     
     /// location manager instance configuration
     let locationManager: CLLocationManager = {
@@ -415,25 +415,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         signalAccuracyLabel.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin]
         map.addSubview(signalAccuracyLabel)
 
-        //
-        // Button Bar
-        //
-        // [ Small ] [ Small ] [ Large     ] [Small] [ Small]
-        //                     [ (tracker) ]
-        //
-        //                     [ track     ]
-        // [ follow] [ +Pin  ] [ Pause     ] [ Save ] [ Reset]
-        //                     [ Resume    ]
-        //
-        //                       trackerX
-        //                         |
-        //                         |
-        // [-----------------------|--------------------------]
-        //                  map.frame/2 (center)
-
         addConstraints(isIPhoneX)
         
-        map.rotationGesture.delegate = self
         updateAppearance()
         
         if #available(iOS 13, *) {
@@ -720,14 +703,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    ///
-    /// UIGestureRecognizerDelegate required for stopFollowingUser
-    ///
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
-    }
-   
     ///
     /// There was a memory warning. Right now, it does nothing but to log a line.
     ///
@@ -1080,7 +1055,7 @@ extension ViewController: CLLocationManagerDelegate {
         // map possibly rotated, so update center off the map
         updateMapCenter(locationManager: locationManager)
         
-        // if used for following a track, then turn the map in the moving direction
+        // then turn the map in the moving direction
         map.camera.heading = newHeading.trueHeading
 
         map.storedHeading = newHeading // updates heading variable
