@@ -71,7 +71,7 @@ var currentLongitudedeltaIndex = 2
 /// Displays a map and a set the buttons to control the tracking
 ///
 ///
-class ViewController: UIViewController {
+class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     /// location manager instance configuration
     let locationManager: CLLocationManager = {
@@ -417,6 +417,7 @@ class ViewController: UIViewController {
 
         addConstraints(isIPhoneX)
         
+        map.rotationGesture.delegate = self
         updateAppearance()
         
         if #available(iOS 13, *) {
@@ -703,6 +704,14 @@ class ViewController: UIViewController {
         }
     }
     
+    ///
+    /// UIGestureRecognizerDelegate required for stopFollowingUser
+    ///
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+   
     ///
     /// There was a memory warning. Right now, it does nothing but to log a line.
     ///
