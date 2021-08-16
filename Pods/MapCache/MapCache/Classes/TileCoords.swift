@@ -2,7 +2,7 @@
 //  TileCoords.swift
 //  MapCache
 //
-//  Created by merlos on 10/06/2019.
+//  Based on Open GPX Tracker created by merlos on 10/06/2019.
 //
 
 import Foundation

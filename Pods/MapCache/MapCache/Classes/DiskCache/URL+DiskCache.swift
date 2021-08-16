@@ -2,7 +2,7 @@
 //  File.swift
 //  MapCache
 //
-//  Created by merlos on 23/11/2019.
+//  Based on Open GPX Tracker created by merlos on 23/11/2019.
 //
 
 import Foundation

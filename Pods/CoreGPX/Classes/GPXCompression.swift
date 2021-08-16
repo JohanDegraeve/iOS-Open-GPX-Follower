@@ -2,7 +2,7 @@
 //  GPXParser+Lossy.swift
 //  Pods
 //
-//  Created by Vincent Neo on 25/10/19.
+//    Based on Open GPX Tracker. Orignal source created by Vincent Neo on 25/10/19.
 //
 
 import Foundation

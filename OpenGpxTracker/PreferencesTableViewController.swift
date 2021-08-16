@@ -1,8 +1,8 @@
 //
 //  PreferencesTableViewController.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by merlos on 24/10/15.
+//  Based on Open GPX Tracker created by merlos on 24/10/15.
 //
 //  Localized by nitricware on 19/08/19.
 //

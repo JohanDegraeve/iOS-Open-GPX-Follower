@@ -1,8 +1,8 @@
 //
 //  DefaultDateFormat.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by Vincent on 4/3/20.
+//    Based on Open GPX Tracker. Orignal source created by Vincent on 4/3/20.
 //
 
 import Foundation

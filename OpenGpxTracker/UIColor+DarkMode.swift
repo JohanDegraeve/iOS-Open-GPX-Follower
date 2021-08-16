@@ -1,8 +1,8 @@
 //
 //  UIColor+DarkMode.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by Vincent on 29/11/19.
+//    Based on Open GPX Tracker. Orignal source created by Vincent on 29/11/19.
 //
 
 import UIKit

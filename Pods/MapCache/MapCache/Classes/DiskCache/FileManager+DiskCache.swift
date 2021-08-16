@@ -2,7 +2,7 @@
 //  FileManager+DiskCache.swift
 //  MapCache
 //
-//  Created by merlos on 02/06/2019.
+//  Based on Open GPX Tracker created by merlos on 02/06/2019.
 //
 
 // Original source code from Haneke

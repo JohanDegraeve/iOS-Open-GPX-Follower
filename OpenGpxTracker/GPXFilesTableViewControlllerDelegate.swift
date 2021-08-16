@@ -1,8 +1,8 @@
 //
 //  GPXLoadFileDelegate.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by merlos on 23/09/14.
+//  Based on Open GPX Tracker created by merlos on 23/09/14.
 //
 
 import Foundation

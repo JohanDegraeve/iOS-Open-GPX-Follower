@@ -1,8 +1,8 @@
 //
 //  Preferences.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by merlos on 04/05/2019.
+//  Based on Open GPX Tracker created by merlos on 04/05/2019.
 //  Copyright © 2019 TransitBox. All rights reserved.
 //
 import Foundation

@@ -1,8 +1,8 @@
 //
 //  GPXExtentCoordinates.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by merlos on 22/01/15.
+//  Based on Open GPX Tracker created by merlos on 22/01/15.
 //
 
 import Foundation

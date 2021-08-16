@@ -1,8 +1,8 @@
 //
 //  Double+Meatures.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by merlos on 03/05/2019.
+//  Based on Open GPX Tracker created by merlos on 03/05/2019.
 //
 
 import Foundation

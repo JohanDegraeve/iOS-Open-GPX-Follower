@@ -2,7 +2,7 @@
 //  GPXExtensionsElement.swift
 //  Pods
 //
-//  Created by Vincent on 14/7/19.
+//    Based on Open GPX Tracker. Orignal source created by Vincent on 14/7/19.
 //
 
 import Foundation

@@ -1,8 +1,8 @@
 //
 //  GPXTileServer.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by merlos on 25/01/15.
+//  Based on Open GPX Tracker created by merlos on 25/01/15.
 //
 import Foundation
 

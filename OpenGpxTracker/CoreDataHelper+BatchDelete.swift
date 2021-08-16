@@ -1,8 +1,8 @@
 //
 //  CoreDataHelper+BatchDelete.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by Vincent on 1/8/20.
+//    Based on Open GPX Tracker. Orignal source created by Vincent on 1/8/20.
 //
 
 import CoreData

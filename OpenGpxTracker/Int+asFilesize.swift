@@ -1,8 +1,8 @@
 //
 //  Int+inKB.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by merlos on 23/09/2018.
+//  Based on Open GPX Tracker created by merlos on 23/09/2018.
 //  Copyright © 2018 TransitBox. All rights reserved.
 //
 

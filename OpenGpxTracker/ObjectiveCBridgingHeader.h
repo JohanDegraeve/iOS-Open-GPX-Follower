@@ -1,8 +1,8 @@
 //
 //  BridgeToObjectiveC.h
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by merlos on 14/09/14.
+//  Based on Open GPX Tracker created by merlos on 14/09/14.
 //
 
 #ifndef OpenGpxTracker_ObjectiveCBridgingHeader_h

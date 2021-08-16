@@ -1,8 +1,8 @@
 //
 //  CoreDataAlertView.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by Vincent on 25/6/19.
+//    Based on Open GPX Tracker. Orignal source created by Vincent on 25/6/19.
 //
 
 import UIKit

@@ -1,8 +1,8 @@
 //
 //  MailerManager.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by merlos on 21/09/14.
+//  Based on Open GPX Tracker created by merlos on 21/09/14.
 //  Copyright (c) 2014 TransitBox. All rights reserved.
 //
 

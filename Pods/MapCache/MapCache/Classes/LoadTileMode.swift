@@ -2,7 +2,7 @@
 //  LoadTileMode.swift
 //  MapCache
 //
-//  Created by merlos on 09/05/2020.
+//  Based on Open GPX Tracker created by merlos on 09/05/2020.
 //
 
 import Foundation

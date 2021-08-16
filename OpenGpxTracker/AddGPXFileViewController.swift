@@ -1,6 +1,6 @@
 //
 //  AddGPXFileViewController.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
 //  Created by Johan Degraeve on 06/08/2021.
 //

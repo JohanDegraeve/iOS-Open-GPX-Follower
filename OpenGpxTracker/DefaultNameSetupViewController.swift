@@ -1,8 +1,8 @@
 //
 //  DefaultNameSetupViewController.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by Vincent on 3/3/20.
+//    Based on Open GPX Tracker. Orignal source created by Vincent on 3/3/20.
 //
 
 import UIKit

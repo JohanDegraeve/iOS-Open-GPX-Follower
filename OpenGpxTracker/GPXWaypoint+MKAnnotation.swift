@@ -1,8 +1,8 @@
 //
 //  GPXPin.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by merlos on 16/09/14.
+//  Based on Open GPX Tracker created by merlos on 16/09/14.
 //
 
 import Foundation

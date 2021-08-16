@@ -2,7 +2,7 @@
 //  ZoomableTile.swift
 //  MapCache
 //
-//  Created by merlos on 26/09/2020.
+//  Based on Open GPX Tracker created by merlos on 26/09/2020.
 //
 
 import Foundation

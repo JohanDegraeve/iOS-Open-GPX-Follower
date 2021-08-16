@@ -2,7 +2,7 @@
 //  GPXTrackSegment.swift
 //  GPXKit
 //
-//  Created by Vincent on 9/12/18.
+//    Based on Open GPX Tracker. Orignal source created by Vincent on 9/12/18.
 //
 
 import Foundation

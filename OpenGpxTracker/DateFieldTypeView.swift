@@ -1,8 +1,8 @@
 //
 //  DateFieldTypeView.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by Vincent Neo on 15/4/20.
+//    Based on Open GPX Tracker. Orignal source created by Vincent Neo on 15/4/20.
 //
 
 import UIKit

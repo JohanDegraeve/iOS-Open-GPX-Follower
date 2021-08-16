@@ -1,8 +1,8 @@
 //
 //  GPXRoot+length.swift
-//  OpenGpxTracker
+//  OpenGpxFollower
 //
-//  Created by merlos on 01/10/15.
+//  Based on Open GPX Tracker created by merlos on 01/10/15.
 //
 
 import Foundation
