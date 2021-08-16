@@ -336,7 +336,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
         //speed Label
         speedLabel.textAlignment = .right
-        speedLabel.font = font18
+        speedLabel.font = font36
         speedLabel.text = 0.00.toSpeed(useImperial: useImperial)
         //timeLabel.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5)
         map.addSubview(speedLabel)
