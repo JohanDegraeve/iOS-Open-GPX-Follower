@@ -1,72 +1,35 @@
-Open GPX Tracker for iOS + WatchOS
-===============================================
+Open GPX Follower
+=================
 
-[![Available on the app store](https://merlos.github.io/iOS-Open-GPX-Tracker/images/download-app-store.svg)](https://itunes.apple.com/app/open-gpx-tracker/id984503772)
+- Load GPX files from Internet and display them on map
+- When you start moving, map will automatically rotate in moving direction, and pan the screen as you move
+- with offline map cache support.
 
-Open GPX Tracker is a GPS logger for iOS (iPhone, iPad, iPod) with offline map cache support. Track your location, add waypoints and send your logs by email as GPX files.
-
-This app has no annoying time restrictions, no ads and no in-app-purchases. Create unlimited GPX traces :).
+Based on [GPX Tracker](https://github.com/merlos/iOS-Open-GPX-Tracker)
 
 If you are goint to track without Internet... don't worry! Just browse the area where you'll be tracking and it will be cached.
 
-Requires iOS 9.0 or above. Open GPX tracker is an open source app.
-
-![GPS Tracker logs](https://merlos.github.io/iOS-Open-GPX-Tracker/images/open-gpx-tracker-4-screenshots.png)
-
-You can use Open GPX tracker for:
-
- - Creating routes and waypoints for editing Open Street Map.
- - Publishing Open Street Map Traces.
- - [Creating GPX files for testing your iOS apps in Xcode](https://medium.com/@merlos/how-to-simulate-locations-in-xcode-b0f7f16e126d).
+Open GPX Follower is an open source app (same lincense as Open GPX Tracker)
 
 ## Main Features
 
- - Displays tracking route in a map
+ - Displays GPX track on map
  - Supports Apple Map Kit, [Open Street Map](http://wiki.openstreetmap.org/wiki/Tile_usage_policy) and [Carto DB](http://www.cartodb.com) as map sources
  - Offline maps support (of browsed areas)
- - Pause / Resume tracking
- - Add waypoint to user location
- - Add waypoint to any place in the map with a long press
- - Edit waypoint name
- - Drag & Drop waypoint pin
- - Remove waypoint
- - Load on map a saved session and continue tracking
  - Displays current location and altitude
- - Displays tracked time
  - Displays user heading (device orientation) 
  - Displays location accuracy 
- - Displays tracked distance (total and current segment)
- - GPX files can be imported from any other app using the share option
  - Share GPX files with other apps
- - File sharing through iTunes
  - Settings
     - Offline cache On/Off
     - Clear cache
     - Select the map server.
   - Darkmode
-  - i18n support: English, German, Chinese (simplified), Spanish
 
-### Apple Watch Features (since 1.6.0)
-- Create GPX Files on your Apple Watch
-- Pause/Resume tracking
-- Save into GPX File
-- Add waypoint to user location
-- Send file to your paired device iPhone/iPad
-- Display GPS Signal strength
-- View current location information (speed, latitude, longitude, altitude)
-
-## Install
-
-The app is [available on the App Store](https://itunes.apple.com/app/open-gpx-tracker/id984503772) since May 2015.
-
-Another option to install the app is to download the source code and compile it by yourself using Xcode. If you want to run it on a device, you also need an Apple developer account.
-
-## Translate Open GPX Tracker
-Open GPX tracker supports language translations (since 1.7.0). [See list of supported languages and how to translate the app into your language](https://github.com/merlos/iOS-Open-GPX-Tracker/wiki/How-to-translate-Open-GPX-Tracker-into-my-language).
 
 ## Download Source code
 This application is written in Swift. To download the code run this command in a console:
-
+TO BE COMPLETED
 ```
  git clone https://github.com/merlos/iOS-Open-GPX-Tracker.git
 ```
