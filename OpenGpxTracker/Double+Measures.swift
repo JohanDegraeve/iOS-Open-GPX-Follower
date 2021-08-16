@@ -109,7 +109,7 @@ extension Double {
     ///     The speed in miles per hour (mph) with two decimals as
     /// string ("120.34mph")
     func toMilesPerHour() -> String {
-        return String(format: "%.2fmph", toMilesPerHour() as Double)
+        return String(format: "%.2f mph", toMilesPerHour() as Double)
     }
     
     /// Assuming current value is a speed in meters per second (m/s),
@@ -126,7 +126,7 @@ extension Double {
     ///     The speed in kilometers per hour with two decimals as
     /// string  ("120.34km/h")
     func toKilometersPerHour() -> String {
-        return String(format: "%.2fkm/h", toKilometersPerHour() as Double)
+        return String(format: "%.2f km/h", toKilometersPerHour() as Double)
     }
     
     /// Assuming current value is a speed in meters per second (m/s),
