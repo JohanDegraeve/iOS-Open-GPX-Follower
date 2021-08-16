@@ -317,7 +317,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let font12 = UIFont(name: "DinAlternate-Bold", size: 12.0)
         
         //add the app title Label (Branding, branding, branding! )
-        appTitleLabel.text = "  Open GPX Tracker"
+        let dictionary = Bundle.main.infoDictionary
+        appTitleLabel.text = "  "
+        if let appname = dictionary?["CFBundleDisplayName"] as? String {
+            appTitleLabel.text = "  " + appname
+        }
+
+        
         appTitleLabel.textAlignment = .left
         appTitleLabel.font = UIFont.boldSystemFont(ofSize: 10)
         //appTitleLabel.textColor = UIColor(red: 0.0/255.0, green: 0.0/255.0, blue: 0.0/255.0, alpha: 1.0)
