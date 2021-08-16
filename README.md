@@ -29,35 +29,20 @@ Open GPX Follower is an open source app (same lincense as Open GPX Tracker)
 
 ## Download Source code
 This application is written in Swift. To download the code run this command in a console:
-TO BE COMPLETED
+
 ```
- git clone https://github.com/merlos/iOS-Open-GPX-Tracker.git
+ git clone https://github.com/JohanDegraeve/iOS-Open-GPX-Follower.git
 ```
 
 Then, to test it open the file `OpenGpxTracker.xcworkspace` with XCode.
 
 Please note the [limitations of using Open Street Maps Tile Servers](http://wiki.openstreetmap.org/wiki/Tile_usage_policy)
 
-### Add a tile server
-Adding a tile server is easy, just edit the file `GPXTileServer.swift`, uncomment the lines with `AnotherMap` and modify the templateUrl to point to the new tile server.
-
-You have a list of tile servers in [Open Street Map Wiki](http://wiki.openstreetmap.org/wiki/Tile_servers)
-
-## Reference documentation
-
-The application is being documented using [jazzy](https://github.com/realm/jazzy) and following [NSHipster tutorial on swift documentation](https://nshipster.com/swift-documentation/).
-
-![Documentation Status](https://www.merlos.org/iOS-Open-GPX-Tracker/docs/badge.svg)
-
-[Read Source code documentation](https://www.merlos.org/iOS-Open-GPX-Tracker/docs/index.html)
-
-## Contribute
-You can contribute by forking and submitting a pull request.
-
-Please note that by submitting any pull request you are providing me (Juan M. Merlos) the rights to include and distribute those changes also on the binary app published on the App Store (which is released under Apple's Standard License Agreement)
 
 ## License
-Open GPX Tracker app for iOS.  Copyright (C) 2014  Juan M. Merlos (@merlos)
+Open GPX Follwoer app for iOS.  Copyright (C) 2021  Johan Degraeve
+
+based on GPX Tracker app for iOS written by Juan M. Merlos and Vincent Neo
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the **GNU General Public License** as published by
