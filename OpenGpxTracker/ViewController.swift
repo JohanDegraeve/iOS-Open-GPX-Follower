@@ -97,9 +97,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// Map View delegate 
     let mapViewDelegate = MapViewDelegate()
     
-    /// Stop watch instance to control elapsed time
-    var stopWatch = StopWatch()
-    
+
     /// Name of the last file that was saved (without extension)
     var lastGpxFilename: String = ""
     
@@ -121,9 +119,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     /// Label that displays current latitude and longitude (lat,long)
     var coordsLabel: UILabel
-    
-    /// Displays current elapsed time (00:00)
-    var timeLabel: UILabel
     
     /// Label that displays last known speed (in km/h)
     var speedLabel: UILabel
@@ -183,7 +178,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.signalAccuracyLabel = UILabel(coder: aDecoder)!
         self.coordsLabel = UILabel(coder: aDecoder)!
         
-        self.timeLabel = UILabel(coder: aDecoder)!
         self.speedLabel = UILabel(coder: aDecoder)!
         self.totalTrackedDistanceLabel = DistanceLabel(coder: aDecoder)!
         self.currentSegmentDistanceLabel = DistanceLabel(coder: aDecoder)!
@@ -235,7 +229,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     ///
     override func viewDidLoad() {
         super.viewDidLoad()
-        stopWatch.delegate = self
         
         map.coreDataHelper.retrieveFromCoreData()
         
@@ -340,15 +333,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         // Tracked info
         let iPhoneXdiff: CGFloat  = isIPhoneX ? 40 : 0
-
-        //timeLabel
-        timeLabel.textAlignment = .right
-        timeLabel.font = font36
-        timeLabel.text = "00:00"
-        //timeLabel.shadowColor = UIColor.whiteColor()
-        //timeLabel.shadowOffset = CGSize(width: 1, height: 1)
-        //timeLabel.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5)
-        map.addSubview(timeLabel)
 
         //speed Label
         speedLabel.textAlignment = .right
@@ -470,19 +454,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let kSignalViewOffset: CGFloat = 25
         
         // Switch off all autoresizing masks translate
-        timeLabel.translatesAutoresizingMaskIntoConstraints = false
         speedLabel.translatesAutoresizingMaskIntoConstraints = false
         totalTrackedDistanceLabel.translatesAutoresizingMaskIntoConstraints = false
         currentSegmentDistanceLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        NSLayoutConstraint(item: timeLabel, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: -7).isActive = true
-        NSLayoutConstraint(item: timeLabel, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: kSignalViewOffset).isActive = true
-        // self.topLayoutGuide takes care of the iPhone X safe area, iPhoneXdiff not needed
-        NSLayoutConstraint(item: timeLabel, attribute: .top, relatedBy: .equal, toItem: self.topLayoutGuide, attribute: .bottom, multiplier: 1, constant: 20).isActive = true
-        
         NSLayoutConstraint(item: speedLabel, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: -7).isActive = true
         NSLayoutConstraint(item: speedLabel, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: kSignalViewOffset).isActive = true
-        NSLayoutConstraint(item: speedLabel, attribute: .top, relatedBy: .equal, toItem: timeLabel, attribute: .bottom, multiplier: 1, constant: -5).isActive = true
+        NSLayoutConstraint(item: speedLabel, attribute: .top, relatedBy: .equal, toItem: self.topLayoutGuide, attribute: .bottom, multiplier: 1, constant: 20).isActive = true
         
         NSLayoutConstraint(item: totalTrackedDistanceLabel, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: -7).isActive = true
         NSLayoutConstraint(item: totalTrackedDistanceLabel, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: kSignalViewOffset).isActive = true
@@ -572,8 +550,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         lastGpxFilename = fileName
         // adds last file name to core data as well
         self.map.coreDataHelper.add(toCoreData: fileName, willContinueAfterSave: false)
-        //force reset timer just in case reset does not do it
-        self.stopWatch.reset()
+
         //load data
         self.map.continueFromGPXRoot(root)
 
@@ -902,20 +879,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
 }
 
-// MARK: StopWatchDelegate
-
-///
-/// Updates the `timeLabel` with the `stopWatch` elapsedTime.
-/// In the main ViewController there is a label that holds the elapsed time, that is, the time that
-/// user has been tracking his position.
-///
-///
-extension ViewController: StopWatchDelegate {
-    func stopWatch(_ stropWatch: StopWatch, didUpdateElapsedTimeString elapsedTimeString: String) {
-        timeLabel.text = elapsedTimeString
-    }
-}
-
 // MARK: PreferencesTableViewControllerDelegate
 
 extension ViewController: PreferencesTableViewControllerDelegate {
@@ -978,8 +941,7 @@ extension ViewController: GPXFilesTableViewControllerDelegate {
         lastGpxFilename = gpxFilename
         // adds last file name to core data as well
         self.map.coreDataHelper.add(toCoreData: gpxFilename, willContinueAfterSave: false)
-        //force reset timer just in case reset does not do it
-        self.stopWatch.reset()
+
         //load data
         self.map.importFromGPXRoot(gpxRoot)
 
