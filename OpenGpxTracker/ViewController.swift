@@ -111,9 +111,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// Label with the title of the app
     var appTitleLabel: UILabel
 
-    /// Image with the GPS signal
-    var signalImageView: UIImageView
-    
     /// Label that displays current latitude and longitude (lat,long)
     var coordsLabel: UILabel
     
@@ -150,28 +147,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// Check if device is notched type phone
     var isIPhoneX = false
     
-    // Signal accuracy images
-    /// GPS signal image. Level 0 (no signal)
-    let signalImage0 = UIImage(named: "signal0")
-    /// GPS signal image. Level 1
-    let signalImage1 = UIImage(named: "signal1")
-    /// GPS signal image. Level 2
-    let signalImage2 = UIImage(named: "signal2")
-    /// GPS signal image. Level 3
-    let signalImage3 = UIImage(named: "signal3")
-    /// GPS signal image. Level 4
-    let signalImage4 = UIImage(named: "signal4")
-    /// GPS signal image. Level 5
-    let signalImage5 = UIImage(named: "signal5")
-    /// GPS signal image. Level 6
-    let signalImage6 = UIImage(named: "signal6")
- 
     /// Initializer. Just initializes the class vars/const
     required init(coder aDecoder: NSCoder) {
         self.map = GPXMapView(coder: aDecoder)!
         
         self.appTitleLabel = UILabel(coder: aDecoder)!
-        self.signalImageView = UIImageView(coder: aDecoder)!
 
         self.coordsLabel = UILabel(coder: aDecoder)!
         
@@ -392,12 +372,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         folderButton.autoresizingMask = [.flexibleRightMargin]
         map.addSubview(folderButton)
         
-        // Add signal accuracy images and labels
-        signalImageView.image = signalImage0
-        signalImageView.frame = CGRect(x: self.view.frame.width/2 - 25.0, y: 14 + 5 + iPhoneXdiff, width: 50, height: 30)
-        signalImageView.autoresizingMask  = [.flexibleLeftMargin, .flexibleRightMargin]
-        map.addSubview(signalImageView)
-
         addConstraints(isIPhoneX)
         
         map.rotationGesture.delegate = self
@@ -951,8 +925,7 @@ extension ViewController: CLLocationManagerDelegate {
     /// Location manager calls this func to inform there was an error.
     ///
     /// It performs the following actions:
-    ///  - Sets coordsLabel with `kNotGettingLocationText`, signal accuracy to
-    ///    kUnknownAccuracyText and signalImageView to signalImage0.
+    ///  - Sets coordsLabel with `kNotGettingLocationText
     ///  - If the error code is `CLError.denied` it calls `checkLocationServicesStatus`
     
     ///
@@ -960,7 +933,6 @@ extension ViewController: CLLocationManagerDelegate {
         print("didFailWithError \(error)")
         coordsLabel.text = kNotGettingLocationText
 
-        signalImageView.image = signalImage0
         let locationError = error as? CLError
         switch locationError?.code {
         case CLError.locationUnknown:
@@ -983,26 +955,6 @@ extension ViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         let newLocation = locations.first!
-        
-        // Update horizontal accuracy
-        let hAcc = newLocation.horizontalAccuracy
-
-        //updates signal image accuracy
-        if hAcc < kSignalAccuracy6 {
-            self.signalImageView.image = signalImage6
-        } else if hAcc < kSignalAccuracy5 {
-            self.signalImageView.image = signalImage5
-        } else if hAcc < kSignalAccuracy4 {
-            self.signalImageView.image = signalImage4
-        } else if hAcc < kSignalAccuracy3 {
-            self.signalImageView.image = signalImage3
-        } else if hAcc < kSignalAccuracy2 {
-            self.signalImageView.image = signalImage2
-        } else if hAcc < kSignalAccuracy1 {
-            self.signalImageView.image = signalImage1
-        } else {
-            self.signalImageView.image = signalImage0
-        }
         
         //Update coordsLabel
         let latFormat = String(format: "%.6f", newLocation.coordinate.latitude)
