@@ -382,6 +382,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         if #available(iOS 13, *) {
             shareActivityColor = .mainUIColor
         }
+        
+        // prevent screen dim/lock - once opened, the app will stay in the foreground
+        UIApplication.shared.isIdleTimerDisabled = true
+        
     }
     
     // MARK: - Add Constraints for views
