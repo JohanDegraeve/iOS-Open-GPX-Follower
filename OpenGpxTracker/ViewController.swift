@@ -114,9 +114,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// Image with the GPS signal
     var signalImageView: UIImageView
     
-    /// Current GPS signal accuracy text (based on kSignalAccuracyX constants)
-    var signalAccuracyLabel: UILabel
-    
     /// Label that displays current latitude and longitude (lat,long)
     var coordsLabel: UILabel
     
@@ -175,7 +172,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         self.appTitleLabel = UILabel(coder: aDecoder)!
         self.signalImageView = UIImageView(coder: aDecoder)!
-        self.signalAccuracyLabel = UILabel(coder: aDecoder)!
+
         self.coordsLabel = UILabel(coder: aDecoder)!
         
         self.speedLabel = UILabel(coder: aDecoder)!
@@ -400,12 +397,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         signalImageView.frame = CGRect(x: self.view.frame.width/2 - 25.0, y: 14 + 5 + iPhoneXdiff, width: 50, height: 30)
         signalImageView.autoresizingMask  = [.flexibleLeftMargin, .flexibleRightMargin]
         map.addSubview(signalImageView)
-        signalAccuracyLabel.frame = CGRect(x: self.view.frame.width/2 - 25.0, y: 14 + 5 + 30 + iPhoneXdiff, width: 50, height: 12)
-        signalAccuracyLabel.font = font12
-        signalAccuracyLabel.text = kUnknownAccuracyText
-        signalAccuracyLabel.textAlignment = .center
-        signalAccuracyLabel.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin]
-        map.addSubview(signalAccuracyLabel)
 
         addConstraints(isIPhoneX)
         
@@ -923,7 +914,6 @@ extension ViewController: PreferencesTableViewControllerDelegate {
         //Because we dont know if last speed was unknown we set it as unknown.
         // In regular circunstances it will go to the new units relatively fast.
         speedLabel.text = kUnknownSpeedText
-        signalAccuracyLabel.text = kUnknownAccuracyText
     }}
 
 // MARK: location manager Delegate
@@ -969,7 +959,7 @@ extension ViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("didFailWithError \(error)")
         coordsLabel.text = kNotGettingLocationText
-        signalAccuracyLabel.text = kUnknownAccuracyText
+
         signalImageView.image = signalImage0
         let locationError = error as? CLError
         switch locationError?.code {
@@ -996,7 +986,6 @@ extension ViewController: CLLocationManagerDelegate {
         
         // Update horizontal accuracy
         let hAcc = newLocation.horizontalAccuracy
-        signalAccuracyLabel.text =  hAcc.toAccuracy(useImperial: useImperial)
 
         //updates signal image accuracy
         if hAcc < kSignalAccuracy6 {
