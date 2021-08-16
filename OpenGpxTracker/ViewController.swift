@@ -85,9 +85,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         manager.distanceFilter = 2 //meters
         manager.headingFilter = 3 //degrees (1 is default)
         manager.pausesLocationUpdatesAutomatically = false
+        
         if #available(iOS 9.0, *) {
-            manager.allowsBackgroundLocationUpdates = true
+            manager.allowsBackgroundLocationUpdates = false
         }
+        
         return manager
     }()
     
@@ -283,7 +285,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         //
         // HEADER
         let font36 = UIFont(name: "DinCondensed-Bold", size: 36.0)
-        let font18 = UIFont(name: "DinAlternate-Bold", size: 18.0)
         let font12 = UIFont(name: "DinAlternate-Bold", size: 12.0)
         
         //add the app title Label (Branding, branding, branding! )

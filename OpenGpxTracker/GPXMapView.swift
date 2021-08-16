@@ -183,7 +183,10 @@ class GPXMapView: MKMapView {
         showsCompass = true
         
         headingOffset = gesture.rotation
-        updateHeading(to: storedHeading)
+        
+        if let storedHeading = storedHeading {
+            updateHeading(to: storedHeading)
+        }
         
         if gesture.state == .ended {
             
@@ -210,19 +213,15 @@ class GPXMapView: MKMapView {
     
     ///
     /// - Updates the heading arrow based on the heading information
-    /// - If parameter heading = nil, then set to camera.heading (meaning point in same direction as map, which is usually the direction the user is headin gto
-    func updateHeading(to heading: CLHeading?) {
+    func updateHeading(to heading: CLHeading) {
         
-        // why setting only hear to false ?
+        // why setting only here to false ?
         headingImageView?.isHidden = false
         
         var rotation: CGFloat!
+        
         // if heading nil then set rotation to north
-        if let heading = heading {
-            rotation = CGFloat((heading.trueHeading - camera.heading)/180 * Double.pi)
-        } else {
-            rotation = CGFloat(0)
-        }
+        rotation = CGFloat((heading.trueHeading - camera.heading)/180 * Double.pi)
         
         if let headingOffset = headingOffset {
             rotation = rotation + headingOffset

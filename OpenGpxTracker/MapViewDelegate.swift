@@ -35,17 +35,6 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIAlertViewDelegate {
         return MKOverlayRenderer()
     }
     
-    /// Updates map heading after user interactions end.
-    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-        
-        guard let map = mapView as? GPXMapView else {
-            return
-        }
-        
-        map.updateHeading(to: nil)
-        
-    }
-    
     /// Adds the pin to the map with an animation (comes from the top of the screen)
     func mapView(_ mapView: MKMapView, didAdd views: [MKAnnotationView]) {
 
