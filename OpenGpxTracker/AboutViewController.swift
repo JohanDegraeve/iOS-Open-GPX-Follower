@@ -54,7 +54,18 @@ class AboutViewController: UIViewController {
         self.webView?.navigationDelegate = self
         
         let path = Bundle.main.path(forResource: "about", ofType: "html")
-        let text = try? String(contentsOfFile: path!, encoding: String.Encoding.utf8)
+        var text = try? String(contentsOfFile: path!, encoding: String.Encoding.utf8)
+        
+        // get version from info.plist and replace {unknown version} by version
+        let dictionary = Bundle.main.infoDictionary
+        if let version = dictionary?["CFBundleShortVersionString"] as? String {
+            text = text?.replacingOccurrences(of: "{unknown version}", with: version)
+        }
+        
+        // get app name from info.plist and replace {unknown version} by version
+        if let appname = dictionary?["CFBundleDisplayName"] as? String {
+            text = text?.replacingOccurrences(of: "{app name}", with: appname)
+        }
         
         webView?.loadHTMLString(text!, baseURL: nil)
         webView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
