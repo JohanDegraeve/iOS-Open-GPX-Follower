@@ -515,17 +515,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    /// returns a string with the format of current date dd-MMM-yyyy-HHmm' (20-Jun-2018-1133)
-    ///
-    func defaultFilename() -> String {
-        let defaultDate = DefaultDateFormat()
-        //let dateFormatter = DateFormatter()
-        //dateFormatter.dateFormat = "dd-MMM-yyyy-HHmm"
-        let dateStr = defaultDate.getDateFromPrefs()
-        print("fileName:" + dateStr)//dateFormatter.string(from: Date()))
-        return dateStr//dateFormatter.string(from: Date())
-    }
-    
     @objc func loadRecoveredFile(_ notification: Notification) {
         guard let root = notification.userInfo?["recoveredRoot"] as? GPXRoot else {
             return
@@ -629,9 +618,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             }
             
             //Create a temporary file
-            let filename =  self.lastGpxFilename.isEmpty ? self.defaultFilename() : self.lastGpxFilename
             let gpxString: String = self.map.exportToGPXString()
-            let tmpFile = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(filename).gpx")
+            let tmpFile = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(self.lastGpxFilename).gpx")
             GPXFileManager.saveToURL(tmpFile, gpxContents: gpxString)
             //Add it to the list of tmpFiles.
             //Note: it may add more than once the same file to the list.
