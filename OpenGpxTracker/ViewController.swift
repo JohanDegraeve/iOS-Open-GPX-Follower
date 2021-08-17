@@ -67,6 +67,23 @@ var measuredSpeads = [Double]()
 /// current index in latitueLongitudedeltas, default 2
 var currentLongitudedeltaIndex = 2
 
+/// UserDefaults.standard
+fileprivate let defaults = UserDefaults.standard
+
+/// when app is fully launched, value will be true, otherwise false
+let userDefaultsKeyForNotInitialAppLaunch = "userDefaultsKeyForNotInitialAppLaunch"
+
+/// if true, then this is at least the second time the app is launched
+var notInitialAppLaunch = defaults.bool(forKey: userDefaultsKeyForNotInitialAppLaunch) {
+    
+    didSet {
+        
+        defaults.setValue(notInitialAppLaunch, forKey: userDefaultsKeyForNotInitialAppLaunch)
+        
+    }
+    
+}
+
 ///
 /// Main View Controller of the Application. It is loaded when the application is launched
 ///
@@ -685,6 +702,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// - Seealso: displayLocationServicesDisabledAlert, displayLocationServicesDeniedAlert
     ///
     func checkLocationServicesStatus() {
+        
+        // if this is the first launch, then no need to display alerts, because iOS itself is at the same time requesting access to location services for the app
+        // set userDefaultsKeyForNotInitialAppLaunch to true now, so next time, if stil no access to location services, it will show the alerts
+        if !UserDefaults.standard.bool(forKey: userDefaultsKeyForNotInitialAppLaunch) {
+            
+            UserDefaults.standard.setValue(true, forKey: userDefaultsKeyForNotInitialAppLaunch)
+            
+            return
+            
+        }
+        
         //Are location services enabled?
         if !CLLocationManager.locationServicesEnabled() {
             displayLocationServicesDisabledAlert()
@@ -695,6 +723,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             displayLocationServicesDeniedAlert()
             return
         }
+        
     }
     ///
     /// Displays an alert that informs the user that location services are disabled.
