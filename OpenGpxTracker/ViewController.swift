@@ -78,7 +78,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// location manager instance configuration
     let locationManager: CLLocationManager = {
         let manager = CLLocationManager()
-        manager.requestAlwaysAuthorization()
+        manager.requestWhenInUseAuthorization()
         manager.activityType = CLActivityType(rawValue: Preferences.shared.locationActivityTypeInt)!
         print("Chosen CLActivityType: \(manager.activityType.name)")
         manager.desiredAccuracy = kCLLocationAccuracyBest
@@ -691,7 +691,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             return
         }
         //Does the app have permissions to use the location servies?
-        if !([.authorizedAlways, .authorizedWhenInUse].contains(CLLocationManager.authorizationStatus())) {
+        if !([.authorizedWhenInUse].contains(CLLocationManager.authorizationStatus())) {
             displayLocationServicesDeniedAlert()
             return
         }

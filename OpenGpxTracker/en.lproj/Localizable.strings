@@ -22,7 +22,7 @@
 "ENABLE_LOCATION_SERVICES" = "Go to settings and enable location.";
 "SETTINGS" = "Settings";
 "ACCESS_TO_LOCATION_DENIED" = "Access to location denied";
-"ALLOW_LOCATION" = "On Location settings, allow always access to location for GPX Tracker ";
+"ALLOW_LOCATION" = "On Location settings, allow access to location for GPX Tracker ";
 "COORDS_LABEL" = "(%@, %@) · altitude: %@";
 "NO_FILES" = "No GPX files";
 "YOUR_FILES" = "Your GPX files";
