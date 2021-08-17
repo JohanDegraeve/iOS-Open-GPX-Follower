@@ -21,7 +21,7 @@
 "ENABLE_LOCATION_SERVICES" = "Gehe in die Einstellungen und schalte die Ortungsdienste ein.";
 "SETTINGS" = "Einstellungen";
 "ACCESS_TO_LOCATION_DENIED" = "Zugriff auf Standort verweigert.";
-"ALLOW_LOCATION" = "Erlaube GPX Tracker immer den Zugriff auf den Standort in den Einstellungen. ";
+"ALLOW_LOCATION" = "Erlaube GPX Follower immer den Zugriff auf den Standort in den Einstellungen. ";
 "COORDS_LABEL" = "(%@, %@) · Höhe: %@";
 "NO_FILES" = "Keine GPX Dateien";
 "YOUR_FILES" = "Deine GPX Dateien";
@@ -54,7 +54,7 @@
 "FILE_SELECTED_MESSAGE" = "Was möchtest Du tun?";
 "ERROR_OCCURED_TITLE" = "Fehler aufgetreten";
 "ERROR_OCCURED_MESSAGE" = "GPX Datei wurde nicht an iOS App gesendet: %s ";
-"GPX_TRACKER" = "GPX Tracker";
+"GPX_TRACKER" = "GPX Follower";
 "FILE_SAVED_TITLE" = "GPX Datei gespeichert";
 "FILE_SAVED_MESSAGE" = "Aktuelle Sitzung als %s.gpx gespeichert ";
 

@@ -55,7 +55,7 @@
 "FILE_SELECTED_MESSAGE" = "Wat wil je graag doen?";
 "ERROR_OCCURED_TITLE" = "Error";
 "ERROR_OCCURED_MESSAGE" = "GPX bestand was succesvol verstuurd naar iOS App, door middel van %s ";
-"GPX_TRACKER" = "GPX Tracker";
+"GPX_TRACKER" = "GPX Follower";
 "FILE_SAVED_TITLE" = "GPX bestand opgeslagen";
 "FILE_SAVED_MESSAGE" = "Huidige sessie opgeslagen als %s.gpx ";
 

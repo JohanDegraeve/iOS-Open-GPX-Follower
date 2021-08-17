@@ -22,7 +22,7 @@ Created by Phiilman on 28.03.20.
 "ENABLE_LOCATION_SERVICES" = "Salli sijainti puhelimen asetuksista.";
 "SETTINGS" = "Asetukset";
 "ACCESS_TO_LOCATION_DENIED" = "Access to location denied";
-"ALLOW_LOCATION" = "Vaihda puhelimen asetuksista GPX Tracker sijainti, salli aina.";
+"ALLOW_LOCATION" = "Vaihda puhelimen asetuksista GPX Follower sijainti, salli aina.";
 "COORDS_LABEL" = "(%@, %@) · korkeus: %@";
 "NO_FILES" = "Ei GPX -tiedostoja";
 "YOUR_FILES" = "Sinun GPX tiedostosi";
@@ -55,7 +55,7 @@ Created by Phiilman on 28.03.20.
 "FILE_SELECTED_MESSAGE" = "Mitä haluaisit tehdä?";
 "ERROR_OCCURED_TITLE" = "Virhe tapahtunut";
 "ERROR_OCCURED_MESSAGE" = "GPX -tiedoston lähetys iOS:iin ei onnistunut: %s ";
-"GPX_TRACKER" = "GPX Tracker";
+"GPX_TRACKER" = "GPX Follower";
 "FILE_SAVED_TITLE" = "GPX -tiedosto tallennettu";
 "FILE_SAVED_MESSAGE" = "Tapahtuma tallennettu nimellä %s.gpx ";
 

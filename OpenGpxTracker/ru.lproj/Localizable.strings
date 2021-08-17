@@ -22,7 +22,7 @@
 "ENABLE_LOCATION_SERVICES" = "Перейдите в настройки и включите геолокацию.";
 "SETTINGS" = "Параметры";
 "ACCESS_TO_LOCATION_DENIED" = "Доступ к геолокации запрещен";
-"ALLOW_LOCATION" = "В настройках геолокации разрешите GPX Tracker использоваю Вашу геопозицию";
+"ALLOW_LOCATION" = "В настройках геолокации разрешите GPX Follower использоваю Вашу геопозицию";
 "COORDS_LABEL" = "(%@, %@) · высота: %@";
 "NO_FILES" = "Нет GPX-файлов";
 "YOUR_FILES" = "Ваши GPX-файлы";
@@ -55,7 +55,7 @@
 "FILE_SELECTED_MESSAGE" = "Что вы хотите с ним сделать?";
 "ERROR_OCCURED_TITLE" = "Произошла ошибка";
 "ERROR_OCCURED_MESSAGE" = "Ошибка отправки GPX-файла в приложение iOS, по причине \"%s\" ";
-"GPX_TRACKER" = "GPX Tracker";
+"GPX_TRACKER" = "GPX Follower";
 "FILE_SAVED_TITLE" = "GPX-файл сохранен";
 "FILE_SAVED_MESSAGE" = "Текущая сессия сохранена как %s.gpx ";
 
