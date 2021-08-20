@@ -17,21 +17,11 @@ import MapCache
 /// A MapView that Tracks user position
 ///
 /// - it is able to convert GPX file into map
-/// - it is able to return a GPX file from map
-///
 ///
 /// ### Some definitions
 ///
 /// 1. A **track** is a set of segments.
 /// 2. A **segment** is set of points. A segment is linked to a MKPolyline overlay in the map.
-
-/// Each time the user touches "Start Tracking" => a segment is created (currentSegment)
-/// Each time the users touches "Pause Tracking" => the segment is added to trackSegments
-/// When the user saves the file => trackSegments are consolidated in a single track that is
-/// added to the file.
-/// If the user opens the file in a session for the second, then tracks some seg ments and saves
-/// the file again, the resulting gpx file will have two tracks.
-///
 
 class GPXMapView: MKMapView {
     
@@ -344,4 +334,41 @@ class GPXMapView: MKMapView {
         }
         
     }
+    
+    /// onTrack
+    /// - returns
+    ///     - boolean : that tells if there's at least one trackpoint within minimumDistanceInMeters, (circle around userlocation of minimumDistanceInMeters radius, should be on screen)
+    func onTrack(minimumDistanceInMeters: Double) -> Bool {
+        
+        for track in session.tracks {
+            
+            for segment in track.tracksegments {
+                
+                for trackpoint in segment.trackpoints {
+                    
+                    if let latitude = trackpoint.latitude, let longitude = trackpoint.longitude {
+
+                        if let location = userLocation.location {
+                            
+                            if location.distance(from: CLLocation(latitude: latitude, longitude: longitude)) <= minimumDistanceInMeters {
+                                
+                                return true
+                                
+                            }
+                            
+                        }
+                        
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+        return false
+        
+    }
+    
+
 }
