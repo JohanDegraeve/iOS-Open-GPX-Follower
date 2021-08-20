@@ -2,7 +2,7 @@
 //  ParserElement.swift
 //  CoreGPX
 //
-//    Based on Open GPX Tracker. Orignal source created by Vincent on 2/7/19.
+//  Created by Vincent on 2/7/19.
 //
 //  Referenced from GitHub, yahoojapan/SwiftyXMLParser
 

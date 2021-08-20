@@ -2,7 +2,7 @@
 //  GPXError.swift
 //  Pods
 //
-//    Based on Open GPX Tracker. Orignal source created by Vincent on 4/9/19.
+//  Created by Vincent on 4/9/19.
 //
 
 import Foundation

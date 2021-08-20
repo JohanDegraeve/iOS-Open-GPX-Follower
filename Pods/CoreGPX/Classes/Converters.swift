@@ -2,7 +2,7 @@
 //  Conversions.swift
 //  CoreGPX
 //
-//    Based on Open GPX Tracker. Orignal source created by Vincent on 21/3/19.
+//  Created by Vincent on 21/3/19.
 //
 
 import Foundation

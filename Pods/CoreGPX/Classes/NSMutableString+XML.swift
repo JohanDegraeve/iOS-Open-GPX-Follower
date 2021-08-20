@@ -2,7 +2,7 @@
 //  NSMutableString+XML.swift
 //  CoreGPX
 //
-//    Based on Open GPX Tracker. Orignal source created by Vincent Neo on 6/6/19.
+//  Created by Vincent Neo on 6/6/19.
 //
 
 import Foundation
