@@ -548,6 +548,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         if !wasSentToBackground {
             return
         }
+        
+        // reset map timeStampGestureEnd
+        // assume the user has been gesturing right before bringing the app to the background, and then immediately coming to the foreground, then it would take 30 seconds before the map starts centering again around the user's location, rotating the map and autozooming
+        map.timeStampGestureEnd = Date(timeIntervalSince1970: 0)
+        
         checkLocationServicesStatus()
         locationManager.startUpdatingLocation()
         locationManager.startUpdatingHeading()
@@ -799,6 +804,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             // when moving, the top of the screen should be reached in approximately 1 minute
             // the 1 minute is configurable later on
             // so the question is where would in one minute if I keep moving at the current speed
+            // Exception : is user is too far away from the track, then verify that track is still visible on the screen and if not zoom in
             let requiredDistanceToTopOffViewInMeters = max(averageSpeed * reachTopOfScreenInMinutes * 60, minimumTopOfScreenInMeters)
             
             // temporary store current centerCoordinate of map
@@ -810,6 +816,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             // calculate distance in meters, to top off view
             // distance is calculated from current center (which is now set to the location of the user), then multiplied with 0.7/0.5. 0.7 being where the user's location will be in the view after call to map.setCenter, 0.5 being the current location in the view
             let distanceToTopOfViewInMeters = abs(newLocation.distance(from: CLLocation(latitude: map.centerCoordinate.latitude + map.region.span.latitudeDelta, longitude: map.centerCoordinate.longitude))) * 0.7/0.5
+            
             
             // just a piece of code that is used two times, it sets map.region to a region with latitudeDelta, value from latitudeLongitudeDeltas array, using index currentLongitudedeltaIndex
             let setMapRegion = {
@@ -984,7 +991,7 @@ extension ViewController: CLLocationManagerDelegate {
         let altitude = newLocation.altitude.toAltitude(useImperial: useImperial)
         coordsLabel.text = String(format: NSLocalizedString("COORDS_LABEL", comment: "no comment"), latFormat, lonFormat, altitude)
         
-        // user moved location, so udpate center of the map
+        // user moved location, so update center of the map
         updateMapCenter(locationManager: locationManager)
 
     }
