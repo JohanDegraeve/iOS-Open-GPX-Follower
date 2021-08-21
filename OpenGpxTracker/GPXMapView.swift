@@ -337,8 +337,8 @@ class GPXMapView: MKMapView {
     
     /// onTrack
     /// - returns
-    ///     - boolean : that tells if there's at least one trackpoint within minimumDistanceInMeters, (circle around userlocation of minimumDistanceInMeters radius, should be on screen)
-    func onTrack(minimumDistanceInMeters: Double) -> Bool {
+    ///     - boolean : that tells if there's at least one trackpoint within maximumDistanceInMeters, (circle around userlocation of maximumDistanceInMeters radius, should have at least one trackpoint)
+    func onTrack(maximumDistanceInMeters: Int) -> Bool {
         
         for track in session.tracks {
             
@@ -350,7 +350,7 @@ class GPXMapView: MKMapView {
 
                         if let location = userLocation.location {
                             
-                            if location.distance(from: CLLocation(latitude: latitude, longitude: longitude)) <= minimumDistanceInMeters {
+                            if location.distance(from: CLLocation(latitude: latitude, longitude: longitude)) <= Double(maximumDistanceInMeters) {
                                 
                                 return true
                                 
@@ -370,5 +370,58 @@ class GPXMapView: MKMapView {
         
     }
     
+    /// checks if track is currently in the view, reducing view with x percent
+    /// - parameters:
+    ///     - reduceView : use a value between 50 and 100. If for instance 80, then the track must be in a view that is 80 percent of size of the real view
+    func trackIsInTheMapView(reduceView percentage: Int) -> Bool {
+        
+        // Latitude runs 0–90° north and south. Longitude runs 0–180° east and west.
+        
+        /// topLeft of the map
+        let mapTopLeft = CLLocationCoordinate2D(latitude: region.center.latitude + region.span.latitudeDelta / 2, longitude: region.center.longitude - region.span.longitudeDelta / 2)
+        
+        /// bottomRight of the map
+        let mapBottomRight = CLLocationCoordinate2D(latitude: region.center.latitude - region.span.latitudeDelta / 2, longitude: region.center.longitude + region.span.longitudeDelta / 2)
 
+        /// how much to reduce longitude region to verify if extent falls within region
+        let diffLongitude = region.span.longitudeDelta * Double(100 - percentage) / 100.0 / 2
+
+        /// how much to reduce latitude of region to verify if extent falls within region
+        let diffLatitude = region.span.latitudeDelta * Double(100 - percentage) / 100.0 / 2
+
+        /// topLeft of reduced map in which extent should be
+        let reducedMapTopLeft = CLLocationCoordinate2D(latitude: mapTopLeft.latitude - abs(diffLatitude), longitude: mapTopLeft.longitude + diffLongitude)
+
+        /// bottomRight of reduced map in which extent should be
+        let reducedBottomRight = CLLocationCoordinate2D(latitude: mapBottomRight.latitude + abs(diffLatitude), longitude: mapBottomRight.longitude - diffLongitude)
+
+        /// iterate through all tracks, segments and trackpoints
+        for track in session.tracks {
+            
+            for segment in track.tracksegments {
+                
+                for trackpoint in segment.trackpoints {
+                    
+                    if let latitude = trackpoint.latitude, let longitude = trackpoint.longitude {
+                        
+                        if latitude < reducedMapTopLeft.latitude && latitude > reducedBottomRight.latitude
+                            &&
+                            longitude > reducedMapTopLeft.longitude && longitude < reducedBottomRight.longitude {
+                            
+                            return true
+                            
+                        }
+
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+        return false
+        
+    }
+    
 }

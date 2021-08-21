@@ -13,6 +13,17 @@ import CoreLocation
 import MapKit
 import CoreGPX
 
+/// - current location is further away from track than maximumDistanceFromTrackBeforeStartingZoomInInMeter, then start zooming in
+let maximumDistanceFromTrackBeforeStartingZoomInInMeter = 150
+
+/// - if not on track anymore then mapped will be zoomed out further to make sure that the track is still visible in a view 70% of the normal full view
+/// - value between 0 and 100, but better take between 50 and 90
+let reducedViewPercentageMax = 70
+
+/// - if not on track anymore then mapped will be zoomed out, if track is within reducedViewPercentageMin, then we will zoom back in
+/// - value between 0 and 100, but better take between 40 and less than reducedViewPercentageMax
+let reducedViewPercentageMin = 40
+
 /// determines automatic zooming, if value is for example 1, and I'm moving at 30 km/h, then the top of the screen is 500 meter away
 let reachTopOfScreenInMinutes = 1.5
 
@@ -22,10 +33,11 @@ let minimumTopOfScreenInMeters = 500.0
 /// maximum amount to store in measuredSpeads
 let maxMeasuredSpeads = 7
 
-/// delta's to apply to latitude longitude (tests show that at 100 km/h the value 0.018 is reached, so to reach 0.058 you would need to drive at 300 km/h
-let latitudeLongitudeDeltas = [0.001, 0.003, 0.005, 0.006, 0.007, 0.008, 0.009, 0.010, 0.0110, 0.012, 0.013, 0.014, 0.015, 0.016, 0.017, 0.018, 0.019, 0.020, 0.021, 0.022, 0.023, 0.024, 0.025, 0.026, 0.027, 0.028, 0.029, 0.030, 0.031, 0.032, 0.033, 0.034, 0.035, 0.036, 0.037, 0.038, 0.039, 0.040, 0.041, 0.042, 0.043, 0.044, 0.045, 0.046, 0.047, 0.048, 0.049, 0.050, 0.051, 0.052, 0.053, 0.054, 0.055, 0.056, 0.057, 0.058]
-
+/// if user gestures the map, then there's no more auto rotation and zoom, this for maximum pauzeUdateMapCenterAfterGestureEndForHowManySeconds seconds
 let pauzeUdateMapCenterAfterGestureEndForHowManySeconds = 30.0
+
+/// delta latitude land ongitude to use in MKSpan, for zooming in or out
+let latitudeLongitudeDeltas:[Double] = [0.001, 0.003] + (0...100).map{ 0.005 * pow(1.1, Double($0)) }
 
 /// White color for button background
 let kWhiteBackgroundColor: UIColor = UIColor(red: 254.0/255.0, green: 254.0/255.0, blue: 254.0/255.0, alpha: 0.90)
@@ -799,12 +811,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             /* ****************************************************************************** */
             /* when moving, the top of the screen should be reached in approximately 1 minute */
             /* zoom in or out to achieve this (approximately)                                 */
+            /*                                                                                */
+            /* And if not on track anhymore then also zoom out should occur to make sure the  */
+            /* track stays on sreen                                                           */
             /* ****************************************************************************** */
             
-            // when moving, the top of the screen should be reached in approximately 1 minute
-            // the 1 minute is configurable later on
-            // so the question is where would in one minute if I keep moving at the current speed
-            // Exception : is user is too far away from the track, then verify that track is still visible on the screen and if not zoom in
+            /// - when moving, the top of the screen should be reached in approximately reachTopOfScreenInMinutes minute
+            /// - so the question is where would in one minute if I keep moving at the current speed
+            /// - Exception : is user is too far away from the track, then verify that track is still visible on the screen and if not zoom in
             let requiredDistanceToTopOffViewInMeters = max(averageSpeed * reachTopOfScreenInMinutes * 60, minimumTopOfScreenInMeters)
             
             // temporary store current centerCoordinate of map
@@ -815,40 +829,53 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             
             // calculate distance in meters, to top off view
             // distance is calculated from current center (which is now set to the location of the user), then multiplied with 0.7/0.5. 0.7 being where the user's location will be in the view after call to map.setCenter, 0.5 being the current location in the view
-            let distanceToTopOfViewInMeters = abs(newLocation.distance(from: CLLocation(latitude: map.centerCoordinate.latitude + map.region.span.latitudeDelta, longitude: map.centerCoordinate.longitude))) * 0.7/0.5
+            // Latitude runs 0–90° north and south. Longitude runs 0–180° east and west.
+            let distanceToTopOfViewInMeters = abs(newLocation.distance(from: CLLocation(latitude: map.centerCoordinate.latitude, longitude: map.centerCoordinate.longitude + map.region.span.longitudeDelta))) * 0.7/0.5
             
+            /// is user on track or not ? (storing in a variable because it's used two times)
+            let userIsOntrack = map.onTrack(maximumDistanceInMeters: maximumDistanceFromTrackBeforeStartingZoomInInMeter)
             
-            // just a piece of code that is used two times, it sets map.region to a region with latitudeDelta, value from latitudeLongitudeDeltas array, using index currentLongitudedeltaIndex
-            let setMapRegion = {
-                let region = MKCoordinateRegion(center: self.map.centerCoordinate, span: MKCoordinateSpan(latitudeDelta: latitudeLongitudeDeltas[currentLongitudedeltaIndex], longitudeDelta: latitudeLongitudeDeltas[currentLongitudedeltaIndex]))
-                
-                self.map.setRegion(region, animated: false)
-                
-                if let storedHeading = self.map.storedHeading {
+            // If there's a track then first off all check that the user is currently on track, within maximumDistanceFromTrackBeforeStartingZoomInInMeter
+            // if there's no track loaded yet, then the zoom will only depend on the speed
+            if userIsOntrack || map.session.tracks.count == 0 {
+
+                // now if distanceToTopOfViewInMeters is more than x% more or less than requiredDistanceToTopOffViewInMeters, then decrease or increase the span
+                if distanceToTopOfViewInMeters > requiredDistanceToTopOffViewInMeters * 1.3 {
                     
-                    self.map.camera.heading = storedHeading.trueHeading
-
+                    zoomIn()
+                    
+                } else if distanceToTopOfViewInMeters < requiredDistanceToTopOffViewInMeters * 0.7 {
+                    
+                    zoomOut()
+                    
                 }
-                
-            }
 
-            // now if distanceToTopOfViewInMeters is more than x% more or less than requiredDistanceToTopOffViewInMeters, then decrease or increase the span
-            if distanceToTopOfViewInMeters > requiredDistanceToTopOffViewInMeters * 1.2 && currentLongitudedeltaIndex > 0 {
+            } else {
                 
-                currentLongitudedeltaIndex-=1
+                // user is not on the track
                 
-                setMapRegion()
-                
-            } else if distanceToTopOfViewInMeters < requiredDistanceToTopOffViewInMeters * 0.8 && currentLongitudedeltaIndex < latitudeLongitudeDeltas.count {
-                
-                currentLongitudedeltaIndex+=1
-                
-                setMapRegion()
+                if map.trackIsInTheMapView(reduceView: reducedViewPercentageMax) {
+                    
+                    // track is visible, but maybe we can further zoom in
+                    if map.trackIsInTheMapView(reduceView: reducedViewPercentageMin) {
+                        
+                        // zoom in
+                        zoomIn()
+                        
+                    }
+                    
+                } else {
+                    
+                    // zoom out
+                    zoomOut()
+                    
+                }
                 
             }
 
             /* ************************************************************************ */
             /* heading should be on bottom at about 1/5th of total height of the screen */
+            /* only if user is on track, otherwise we put the location in the center    */
             /* ************************************************************************ */
             
             // create new center to where we want to shift
@@ -857,11 +884,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             // create new coordinate to which we want to center the map
             let newCenterCoordinates = map.convert(fakecenter, toCoordinateFrom: view)
             
-            // reset centerCoordinate of map to original
-            map.centerCoordinate = currentCenterCoordinate
-            
-            // now move to the new newCenterCoordinates, with animation
-            map.setCenter(newCenterCoordinates, animated: true)
+            // now move to the new newCenterCoordinates, with animation - only if on track
+            // if not on track then map.centerCoordinate = newLocation.coordinate (just be done a few statements earlier)
+            if userIsOntrack {
+
+                // reset centerCoordinate of map to original
+                map.centerCoordinate = currentCenterCoordinate
+                
+                map.setCenter(newCenterCoordinates, animated: true)
+
+            }
             
             // remove compass cause user moves or rotates, it's simply not necessary to see while moving
             if (map.showsCompass) {
@@ -869,6 +901,46 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             }
 
         }
+    }
+    
+    /// - just a piece of code that is used several times, it sets map.region to a region with latitudeDelta, value from latitudeLongitudeDeltas array, using index currentLongitudedeltaIndex
+    /// - also sets back map.camera.heading to storedHeading.trueHeading (probaly this has changed by setting map.centerCoordinate = newLocation.coordinate ?
+    func setMapRegion() {
+        
+        let region = MKCoordinateRegion(center: self.map.centerCoordinate, span: MKCoordinateSpan(latitudeDelta: latitudeLongitudeDeltas[currentLongitudedeltaIndex], longitudeDelta: latitudeLongitudeDeltas[currentLongitudedeltaIndex]))
+        
+        self.map.setRegion(region, animated: false)
+        
+        if let storedHeading = self.map.storedHeading {
+            
+            self.map.camera.heading = storedHeading.trueHeading
+            
+        }
+        
+    }
+
+    /// reduces currentLongitudedeltaIndex, if not yet 0
+    func zoomIn() {
+        
+        if (currentLongitudedeltaIndex > 0) {
+            currentLongitudedeltaIndex-=1
+        }
+        
+        setMapRegion()
+
+    }
+    
+    /// increases currentLongitudedeltaIndex , if not yet reached maximum
+    func zoomOut() {
+        
+        if (currentLongitudedeltaIndex < latitudeLongitudeDeltas.count - 1) {
+            
+            currentLongitudedeltaIndex+=1
+
+        }
+        
+        setMapRegion()
+        
     }
     
 }
