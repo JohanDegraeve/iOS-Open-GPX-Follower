@@ -326,7 +326,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         appTitleLabel.textAlignment = .left
         appTitleLabel.font = UIFont.boldSystemFont(ofSize: 10)
         //appTitleLabel.textColor = UIColor(red: 0.0/255.0, green: 0.0/255.0, blue: 0.0/255.0, alpha: 1.0)
-        appTitleLabel.textColor = UIColor.yellow
+        appTitleLabel.textColor = UIColor.green
         appTitleLabel.backgroundColor = UIColor(red: 58.0/255.0, green: 57.0/255.0, blue: 54.0/255.0, alpha: 0.80)
         self.view.addSubview(appTitleLabel)
         

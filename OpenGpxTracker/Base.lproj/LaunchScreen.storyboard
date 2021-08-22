@@ -26,11 +26,11 @@
                                     <constraint firstAttribute="height" constant="43" id="eZr-kB-Rkx"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="32"/>
-                                <color key="textColor" red="0.99942404029999998" green="0.98555368190000003" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="textColor" red="0.078431372549019607" green="1" blue="0.0039215686274509803" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.079106544961734693" green="1" blue="0.0031401965082908162" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="GJd-Yh-RWb" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leadingMargin" id="Ylr-4B-ChJ"/>
                             <constraint firstItem="GJd-Yh-RWb" firstAttribute="top" secondItem="F7k-3Z-aRn" secondAttribute="bottom" constant="255" id="m6g-g5-DtJ"/>
