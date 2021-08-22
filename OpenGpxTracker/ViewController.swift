@@ -809,17 +809,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         // set lastCallToUpdateMapCenter
         timestampLastCallToUpdateMapCenter = Date()
         
-        let newSpeed = locationManager.location?.speed
-        
-        let newLocation = locationManager.location
-        
-        // only if speed >= 0, then calculate new average speed
-        if let newLocation = newLocation {
+        // unwrap location
+        if let newLocation = locationManager.location {
             
             // inititalize set speedlabel text to unknown, will be updated if newSpeed is not nil
             speedLabel.text = kUnknownSpeedText
-            
-            if let newSpeed = newSpeed {
+
+            // only if speed >= 0, then calculate new average speed
+            if let newSpeed = locationManager.location?.speed {
                 
                 // Update speed text, start by setting to actual speed report by locationManager
                 speedLabel.text = (newSpeed < 0) ? kUnknownSpeedText : newSpeed.toSpeed(useImperial: useImperial)
