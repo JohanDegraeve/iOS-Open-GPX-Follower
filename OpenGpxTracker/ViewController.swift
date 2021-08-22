@@ -125,9 +125,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// Map View
     var map: GPXMapView
     
-    /// Map View delegate 
+    /// Map View delegate
     let mapViewDelegate = MapViewDelegate()
-    
 
     /// Name of the last file that was saved (without extension)
     var lastGpxFilename: String = ""
@@ -806,7 +805,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             speedLabel.text = averageSpeed.toSpeed(useImperial: useImperial)
 
             // if time since last gesture end is less than pauzeUdateMapCenterAfterGestureEndForHowManySeconds, then don't further update the map
-            if abs(map.timeStampGestureEnd.timeIntervalSince(Date())) < pauzeUdateMapCenterAfterGestureEndForHowManySeconds {return}
+            if screenFrozen() {return}
             
             /* ****************************************************************************** */
             /* when moving, the top of the screen should be reached in approximately 1 minute */
@@ -943,6 +942,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
     }
     
+    /// if screen is frozen, then user has been doing a gesture, or just clicked the screen, which stops the map following the user
+    /// and also displays buttons like settings, information, folder.
+    /// initial value = true, means at startup, buttons are visible, for instance to load a gpx file
+    func screenFrozen() -> Bool {
+        
+        return abs(map.timeStampGestureEnd.timeIntervalSince(Date())) < pauzeUdateMapCenterAfterGestureEndForHowManySeconds
+        
+    }
+
 }
 
 // MARK: PreferencesTableViewControllerDelegate
