@@ -39,6 +39,11 @@ let pauzeUdateMapCenterAfterGestureEndForHowManySeconds = 30.0
 /// delta latitude land ongitude to use in MKSpan, for zooming in or out
 let latitudeLongitudeDeltas:[Double] = [0.001, 0.003] + (0...100).map{ 0.005 * pow(1.1, Double($0)) }
 
+/// - timer will check latest update of the map, if no recent update, then update will be triggered
+/// - normally an update of the map is done by moving or rotating the device, but sometimes (eg at launch) the device is not moving, but still an update might be needed, for instance zoomin or zoomout after loading a track
+/// - this value determines how often to do the check
+let timeScheduleToCheckMapUpdateInSeconds = 0.5
+
 /// White color for button background
 let kWhiteBackgroundColor: UIColor = UIColor(red: 254.0/255.0, green: 254.0/255.0, blue: 254.0/255.0, alpha: 0.90)
 
@@ -177,6 +182,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// Check if device is notched type phone
     var isIPhoneX = false
     
+    /// to keep track when last time map view as updated
+    var timestampLastCallToUpdateMapCenter = Date(timeIntervalSince1970: 0)
+    
     /// Initializer. Just initializes the class vars/const
     required init(coder aDecoder: NSCoder) {
         self.map = GPXMapView(coder: aDecoder)!
@@ -195,8 +203,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.shareButton = UIButton(coder: aDecoder)!
         
         self.shareActivityIndicator = UIActivityIndicatorView(coder: aDecoder)
-        
+
         super.init(coder: aDecoder)!
+        
+        // timer will check latest update of the map, if no recent update, then update will be triggered
+        // normally an update of the map is done by moving or rotating the device, but sometimes (eg at launch) the device is not moving, but still an update might be needed, for instance zoomin or zoomout after loading a track
+        Timer.scheduledTimer(timeInterval: timeScheduleToCheckMapUpdateInSeconds, target: self, selector: #selector(regularCallToUpdateMapCenter), userInfo: nil, repeats: true)
+        
     }
     
     ///
@@ -779,24 +792,46 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         isDisplayingLocationServicesDenied = false
     }
     
+    /// for use in timer as selector, makes a call to updateMapCenter
+    @objc func regularCallToUpdateMapCenter() {
+        
+        if abs(timestampLastCallToUpdateMapCenter.timeIntervalSince(Date())) > timeScheduleToCheckMapUpdateInSeconds {
+
+            updateMapCenter(locationManager: locationManager)
+
+        }
+        
+    }
+    
+    /// updates the map center, map zoom, map rotation, depending on user location, speed, distance from track and wheter or not user reacently did a gesture
     func updateMapCenter(locationManager: CLLocationManager) {
+
+        // set lastCallToUpdateMapCenter
+        timestampLastCallToUpdateMapCenter = Date()
         
         let newSpeed = locationManager.location?.speed
         
         let newLocation = locationManager.location
         
         // only if speed >= 0, then calculate new average speed
-        if let newSpeed = newSpeed, let newLocation = newLocation, newSpeed >= 0.0 {
+        if let newLocation = newLocation {
             
-            //Update speed text, start by setting to actual speed report by locationManager
-            speedLabel.text = (newSpeed < 0) ? kUnknownSpeedText : newSpeed.toSpeed(useImperial: useImperial)
+            // inititalize set speedlabel text to unknown, will be updated if newSpeed is not nil
+            speedLabel.text = kUnknownSpeedText
             
-            // store new speed in array, to keep track of recent speeds and calculate the average
-            // but remove last one if maximum amount is already stored
-            if measuredSpeads.count == maxMeasuredSpeads {
-                measuredSpeads.removeLast()
+            if let newSpeed = newSpeed {
+                
+                // Update speed text, start by setting to actual speed report by locationManager
+                speedLabel.text = (newSpeed < 0) ? kUnknownSpeedText : newSpeed.toSpeed(useImperial: useImperial)
+                
+                // store new speed in array, to keep track of recent speeds and calculate the average
+                // but remove last one if maximum amount is already stored
+                if measuredSpeads.count == maxMeasuredSpeads {
+                    measuredSpeads.removeLast()
+                }
+                measuredSpeads.insert(newSpeed, at: 0)
+                
             }
-            measuredSpeads.insert(newSpeed, at: 0)
             
             // calculate average of measuredSpeads
             let averageSpeed = measuredSpeads.reduce(0.0, +)/Double(measuredSpeads.count)
