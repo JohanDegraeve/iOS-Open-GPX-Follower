@@ -526,6 +526,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     ///  5. whenever it should load file from Core Data recovery mechanism
     ///
     func addNotificationObservers() {
+        
         let notificationCenter = NotificationCenter.default
         
         notificationCenter.addObserver(self, selector: #selector(ViewController.didEnterBackground),
@@ -538,6 +539,34 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         notificationCenter.addObserver(self, selector: #selector(loadRecoveredFile(_:)), name: .loadRecoveredFile, object: nil)
         
         notificationCenter.addObserver(self, selector: #selector(updateAppearance), name: .updateAppearance, object: nil)
+        
+        notificationCenter.addObserver(self, selector: #selector(loadNewFile),
+                                       name: .didReceiveFileFromURL, object: nil)
+
+    }
+    
+    /// will load most recent file and use as current gpx track to follow
+    ///
+    /// used when user opens gpx file from "Files" app or downloads via browser and opens the file with GPX Follower
+    ///
+    /// assuming that this is always the most recent file stored in the GPXFileManager
+    @objc func loadNewFile() {
+        
+        /// most recent file
+        if let mostRecentFile = GPXFileManager.mostRecentFile() {
+            
+                print("Load gpx File in ViewController: \(mostRecentFile.fileName)")
+            
+                guard let gpx = GPXParser(withURL: mostRecentFile.fileURL)?.parsedData() else {
+                    
+                    print("ViewController failed to load file \(mostRecentFile.fileName): failed to parse GPX file")
+                    
+                    return
+                }
+
+                didLoadGPXFileWithName(self.lastGpxFilename, gpxRoot: gpx)
+
+            }
     }
     
     /// To update appearance when mapView requests to do so
@@ -996,7 +1025,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         return abs(map.timeStampGestureEnd.timeIntervalSince(Date())) < pauzeUdateMapCenterAfterGestureEndForHowManySeconds
         
     }
-
+    
 }
 
 // MARK: PreferencesTableViewControllerDelegate
@@ -1056,10 +1085,6 @@ extension ViewController: GPXFilesTableViewControllerDelegate {
     /// Resets whatever estatus was before.
     ///
     func didLoadGPXFileWithName(_ gpxFilename: String, gpxRoot: GPXRoot) {
-
-        lastGpxFilename = gpxFilename
-        // adds last file name to core data as well
-        self.map.coreDataHelper.add(toCoreData: gpxFilename, willContinueAfterSave: false)
 
         //load data
         self.map.importFromGPXRoot(gpxRoot)

@@ -174,7 +174,7 @@ class GPXFileManager: NSObject {
     }
     
     /// returns the GPXFileInfo with the most recent udpate date, nil of there's no files
-    class func getMostRecentFile() -> GPXFileInfo? {
+    class func mostRecentFile() -> GPXFileInfo? {
         
         var returnValue: GPXFileInfo?
         
