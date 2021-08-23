@@ -562,9 +562,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                     print("ViewController failed to load file \(mostRecentFile.fileName): failed to parse GPX file")
                     
                     return
+                    
                 }
 
-                didLoadGPXFileWithName(self.lastGpxFilename, gpxRoot: gpx)
+                didLoadGPXFileWithName(gpxRoot: gpx)
 
             }
     }
@@ -1084,7 +1085,7 @@ extension ViewController: GPXFilesTableViewControllerDelegate {
     ///
     /// Resets whatever estatus was before.
     ///
-    func didLoadGPXFileWithName(_ gpxFilename: String, gpxRoot: GPXRoot) {
+    func didLoadGPXFileWithName(gpxRoot: GPXRoot) {
 
         //load data
         self.map.importFromGPXRoot(gpxRoot)

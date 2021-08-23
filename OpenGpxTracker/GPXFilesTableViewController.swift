@@ -251,7 +251,7 @@ class GPXFilesTableViewController: UITableViewController, UINavigationBarDelegat
             
             DispatchQueue.main.sync {
                 displayLoadingFileAlert(viewController: self, false) {
-                    self.delegate?.didLoadGPXFileWithName(gpxFileInfo.fileName, gpxRoot: gpx)
+                    self.delegate?.didLoadGPXFileWithName(gpxRoot: gpx)
                     self.dismiss(animated: true, completion: nil)
                 }
             }
