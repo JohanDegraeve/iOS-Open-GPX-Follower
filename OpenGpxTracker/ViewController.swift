@@ -101,6 +101,9 @@ var notInitialAppLaunch = defaults.bool(forKey: userDefaultsKeyForNotInitialAppL
     
 }
 
+/// when fired, a call will be made to updateMapCenter
+var timerToCheckMapUpdate: Timer?
+
 ///
 /// Main View Controller of the Application. It is loaded when the application is launched
 ///
@@ -206,10 +209,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
         super.init(coder: aDecoder)!
         
-        // timer will check latest update of the map, if no recent update, then update will be triggered
-        // normally an update of the map is done by moving or rotating the device, but sometimes (eg at launch) the device is not moving, but still an update might be needed, for instance zoomin or zoomout after loading a track
-        Timer.scheduledTimer(timeInterval: timeScheduleToCheckMapUpdateInSeconds, target: self, selector: #selector(regularCallToUpdateMapCenter), userInfo: nil, repeats: true)
+        launchTimerToCheckMapUpdate()
         
+    }
+    
+    /// timer will check latest update of the map, if no recent update, then update will be triggered
+    /// normally an update of the map is done by moving or rotating the device, but sometimes (eg at launch) the device is not moving, but still an update might be needed, for instance zoomin or zoomout after loading a track
+    private func launchTimerToCheckMapUpdate() {
+
+        timerToCheckMapUpdate = Timer.scheduledTimer(timeInterval: timeScheduleToCheckMapUpdateInSeconds, target: self, selector: #selector(regularCallToUpdateMapCenter), userInfo: nil, repeats: true)
+
     }
     
     ///
@@ -573,6 +582,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             return
         }
         
+        launchTimerToCheckMapUpdate()
+        
         // reset map timeStampGestureEnd
         // assume the user has been gesturing right before bringing the app to the background, and then immediately coming to the foreground, then it would take 30 seconds before the map starts centering again around the user's location, rotating the map and autozooming
         map.timeStampGestureEnd = Date(timeIntervalSince1970: 0)
@@ -592,6 +603,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     @objc func didEnterBackground() {
         wasSentToBackground = true // flag the application was sent to background
         print("viewController:: didEnterBackground")
+        
+        // stop timerToCheckMapUpdateInSeconds
+        timerToCheckMapUpdate?.invalidate()
 
     }
     
