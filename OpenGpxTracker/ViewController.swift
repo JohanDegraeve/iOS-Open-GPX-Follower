@@ -809,7 +809,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         // set lastCallToUpdateMapCenter
         timestampLastCallToUpdateMapCenter = Date()
         
-        // unwrap location
+        // unwrap locationg
         if let newLocation = locationManager.location {
             
             // inititalize set speedlabel text to unknown, will be updated if newSpeed is not nil

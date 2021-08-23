@@ -233,24 +233,24 @@ class GPXFilesTableViewController: UITableViewController, UINavigationBarDelegat
     internal func actionLoadFileAtIndex(_ rowIndex: Int) {
         DispatchQueue.global(qos: .userInitiated).async {
             DispatchQueue.main.sync {
-                self.displayLoadingFileAlert(true)
+                displayLoadingFileAlert(viewController: self, true)
             }
             
             guard let gpxFileInfo: GPXFileInfo = (self.fileList.object(at: rowIndex) as? GPXFileInfo) else {
                 print("GPXFileTableViewController:: actionLoadFileAtIndex(\(rowIndex)): failed to get fileURL")
-                self.displayLoadingFileAlert(false)
+                displayLoadingFileAlert(viewController: self, false)
                 return
             }
             
             print("Load gpx File: \(gpxFileInfo.fileName)")
             guard let gpx = GPXParser(withURL: gpxFileInfo.fileURL)?.parsedData() else {
                 print("GPXFileTableViewController:: actionLoadFileAtIndex(\(rowIndex)): failed to parse GPX file")
-                self.displayLoadingFileAlert(false)
+                displayLoadingFileAlert(viewController: self, false)
                 return
             }
             
             DispatchQueue.main.sync {
-                self.displayLoadingFileAlert(false) {
+                displayLoadingFileAlert(viewController: self, false) {
                     self.delegate?.didLoadGPXFileWithName(gpxFileInfo.fileName, gpxRoot: gpx)
                     self.dismiss(animated: true, completion: nil)
                 }
@@ -259,35 +259,6 @@ class GPXFilesTableViewController: UITableViewController, UINavigationBarDelegat
 
     }
     
-    /// Displays an alert with a activity indicator view to indicate loading of gpx file to map
-    func displayLoadingFileAlert(_ loading: Bool, completion: (() -> Void)? = nil) {
-        // setup of controllers and views
-        let alertController = UIAlertController(title: NSLocalizedString("LOADING_FILE", comment: "no comment"), message: nil, preferredStyle: .alert)
-        let activityIndicatorView = UIActivityIndicatorView(frame: CGRect(x: 35, y: 30, width: 32, height: 32))
-        activityIndicatorView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        activityIndicatorView.style = .whiteLarge
-        
-        if #available(iOS 13, *) {
-            activityIndicatorView.color = .blackAndWhite
-        } else {
-            activityIndicatorView.color = .black
-        }
-
-        if loading { // will display alert
-            activityIndicatorView.startAnimating()
-            alertController.view.addSubview(activityIndicatorView)
-            
-            self.present(alertController, animated: true, completion: nil)
-        } else { // will dismiss alert
-            activityIndicatorView.stopAnimating()
-            self.presentingViewController?.dismiss(animated: true, completion: nil)
-        }
-        
-        // if completion handler is used
-        guard let completion = completion else { return }
-        completion()
-    }
-
     /// Shares file at `rowIndex`.
     internal func actionShareFileAtIndex(_ rowIndex: Int, tableView: UITableView, indexPath: IndexPath) {
         guard let gpxFileInfo: GPXFileInfo = (fileList.object(at: rowIndex) as? GPXFileInfo) else {

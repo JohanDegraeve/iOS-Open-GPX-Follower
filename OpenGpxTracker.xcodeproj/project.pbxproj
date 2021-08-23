@@ -58,6 +58,7 @@
 		C894B839E0B8DC37DE05DDCC /* Pods_OpenGpxTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95D28CBDF2535138FA16F38F /* Pods_OpenGpxTracker.framework */; };
 		DC4908A11C4A136F009484AE /* TrackerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4908A01C4A136F009484AE /* TrackerButton.swift */; };
 		DC4908A31C4A332E009484AE /* MapViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4908A21C4A332E009484AE /* MapViewDelegate.swift */; };
+		F87269D726D2F219005907FB /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F87269D626D2F219005907FB /* Utilities.swift */; };
 		F8B7180E26BDD6B4002ED1C3 /* AddGPXFileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7180D26BDD6B4002ED1C3 /* AddGPXFileViewController.swift */; };
 		F8B7181126BF2B6A002ED1C3 /* UIAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7181026BF2B6A002ED1C3 /* UIAlertController.swift */; };
 		F8B7181526C060E8002ED1C3 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7181426C060E8002ED1C3 /* String.swift */; };
@@ -175,6 +176,7 @@
 		D39420E523CC1B0500EDC8F6 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DC4908A01C4A136F009484AE /* TrackerButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackerButton.swift; sourceTree = "<group>"; };
 		DC4908A21C4A332E009484AE /* MapViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewDelegate.swift; sourceTree = "<group>"; };
+		F87269D626D2F219005907FB /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		F8AD19460733F6AD5C43BE2D /* Pods-OpenGpxTracker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenGpxTracker.release.xcconfig"; path = "Pods/Target Support Files/Pods-OpenGpxTracker/Pods-OpenGpxTracker.release.xcconfig"; sourceTree = "<group>"; };
 		F8B7180D26BDD6B4002ED1C3 /* AddGPXFileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGPXFileViewController.swift; sourceTree = "<group>"; };
 		F8B7181026BF2B6A002ED1C3 /* UIAlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIAlertController.swift; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 		898EECD719C49B5800B4B207 /* OpenGpxTracker */ = {
 			isa = PBXGroup;
 			children = (
+				F87269D526D2F1E4005907FB /* Utilities */,
 				F8B7180F26BF2B3E002ED1C3 /* Extensions */,
 				899D678019D2373600C88A0A /* Views */,
 				899D677919D0CAF400C88A0A /* Controllers */,
@@ -358,6 +361,14 @@
 				F8AD19460733F6AD5C43BE2D /* Pods-OpenGpxTracker.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		F87269D526D2F1E4005907FB /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				F87269D626D2F219005907FB /* Utilities.swift */,
+			);
+			name = Utilities;
 			sourceTree = "<group>";
 		};
 		F8B7180F26BF2B3E002ED1C3 /* Extensions */ = {
@@ -562,6 +573,7 @@
 				BF68ECC62448B887005C779F /* DateFieldTypeView.swift in Sources */,
 				899D677019CE024600C88A0A /* GPXFileManager.swift in Sources */,
 				898EECDE19C49B5800B4B207 /* OpenGpxTracker.xcdatamodeld in Sources */,
+				F87269D726D2F219005907FB /* Utilities.swift in Sources */,
 				F8B7181526C060E8002ED1C3 /* String.swift in Sources */,
 				89EA86652157C444002E03A7 /* Int+asFilesize.swift in Sources */,
 				F8B7181926C083B4002ED1C3 /* AddGPXFileViewControllerDelegate.swift in Sources */,

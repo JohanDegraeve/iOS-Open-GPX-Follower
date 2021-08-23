@@ -172,4 +172,35 @@ class GPXFileManager: NSObject {
             print(error)
         }
     }
+    
+    /// returns the GPXFileInfo with the most recent udpate date, nil of there's no files
+    class func getMostRecentFile() -> GPXFileInfo? {
+        
+        var returnValue: GPXFileInfo?
+        
+        // iterate through files to find the most recent file
+        for file in fileList {
+            
+            // if there's no file known yet then this is the first file and use that one
+            if returnValue == nil {
+                
+                returnValue = file
+                
+                continue
+                
+            }
+            
+            // check if the already stored file in returnValue is older and if yes update it
+            if returnValue!.modifiedDate < file.modifiedDate {
+                
+                returnValue = file
+                
+            }
+            
+        }
+        
+        return returnValue
+        
+    }
+    
 }
