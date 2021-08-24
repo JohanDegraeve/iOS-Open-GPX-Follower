@@ -259,8 +259,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        map.coreDataHelper.retrieveFromCoreData()
-        
         //Because of the edges, iPhone X* is slightly different on the layout.
         //So, Is the current device an iPhone X?
         if UIDevice.current.userInterfaceIdiom == .phone {
@@ -536,8 +534,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
         notificationCenter.addObserver(self, selector: #selector(applicationWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
 
-        notificationCenter.addObserver(self, selector: #selector(loadRecoveredFile(_:)), name: .loadRecoveredFile, object: nil)
-        
         notificationCenter.addObserver(self, selector: #selector(updateAppearance), name: .updateAppearance, object: nil)
         
         notificationCenter.addObserver(self, selector: #selector(loadNewFile),
@@ -576,28 +572,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             setNeedsStatusBarAppearanceUpdate()
             updatePolylineColor()
         }
-    }
-    
-    @objc func loadRecoveredFile(_ notification: Notification) {
-        guard let root = notification.userInfo?["recoveredRoot"] as? GPXRoot else {
-            return
-        }
-        guard let fileName = notification.userInfo?["fileName"] as? String else {
-            return
-        }
-
-        lastGpxFilename = fileName
-        // adds last file name to core data as well
-        self.map.coreDataHelper.add(toCoreData: fileName, willContinueAfterSave: false)
-
-        //load data
-        self.map.continueFromGPXRoot(root)
-
-        //Sets the map region to display all the GPX data in the map (segments and waypoints).
-        self.map.regionToGPXExtent()
-        
-        self.totalTrackedDistanceLabel.distance = self.map.session.totalTrackedDistance
-
     }
     
     ///
@@ -1176,6 +1150,5 @@ extension ViewController: CLLocationManagerDelegate {
 }
 
 extension Notification.Name {
-    static let loadRecoveredFile = Notification.Name("loadRecoveredFile")
     static let updateAppearance = Notification.Name("updateAppearance")
 }

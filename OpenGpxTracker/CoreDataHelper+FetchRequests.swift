@@ -74,48 +74,4 @@ extension CoreDataHelper {
         return asynchronousTrackPointFetchRequest
     }
     
-    func waypointFetchRequest() -> NSAsynchronousFetchRequest<CDWaypoint> {
-        let wptFetchRequest = NSFetchRequest<CDWaypoint>(entityName: "CDWaypoint")
-        let sortWpt = NSSortDescriptor(key: "waypointId", ascending: true)
-        wptFetchRequest.sortDescriptors = [sortWpt]
-        
-        let asynchronousWaypointFetchRequest = NSAsynchronousFetchRequest(fetchRequest: wptFetchRequest) { asynchronousFetchResult in
-            
-            print("Core Data Helper: fetching recoverable waypoints from Core Data")
-            
-            // Retrieves an array of points from Core Data
-            guard let waypointResults = asynchronousFetchResult.finalResult else { return }
-            
-            // Dispatches to use the data in the main queue
-            DispatchQueue.main.async {
-                for result in waypointResults {
-                    let objectID = result.objectID
-                    
-                    // thread safe
-                    guard let safePoint = self.appDelegate.managedObjectContext.object(with: objectID) as? CDWaypoint else { continue }
-                    
-                    let pt = GPXWaypoint(latitude: safePoint.latitude, longitude: safePoint.longitude)
-                    
-                    pt.time = safePoint.time
-                    pt.desc = safePoint.desc
-                    pt.name = safePoint.name
-                    if safePoint.elevation != .greatestFiniteMagnitude {
-                        pt.elevation = safePoint.elevation
-                    }
-                    
-                    self.waypoints.append(pt)
-                }
-                
-                self.waypointId = waypointResults.last?.waypointId ?? Int64()
-                
-                // trackpoint request first, followed by waypoint request
-                // hence, crashFileRecovery method is ran in this.
-                self.crashFileRecovery() // should always be in the LAST fetch request!
-                print("Core Data Helper: async fetches complete.")
-            }
-        }
-        
-        return asynchronousWaypointFetchRequest
-    }
-    
 }

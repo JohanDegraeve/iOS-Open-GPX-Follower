@@ -25,14 +25,9 @@ import MapCache
 
 class GPXMapView: MKMapView {
     
-    let coreDataHelper = CoreDataHelper()
-    
     /// Current session of GPX location logging. Handles all background tasks and recording.
     let session = GPXSession()
 
-    /// The line being displayed on the map that corresponds to the current segment.
-    var currentSegmentOverlay: MKPolyline
-    
     ///
     var extent: GPXExtentCoordinates = GPXExtentCoordinates() //extent of the GPX points and tracks
 
@@ -120,8 +115,7 @@ class GPXMapView: MKMapView {
     /// Initializes the map with an empty currentSegmentOverlay.
     ///
     required init?(coder aDecoder: NSCoder) {
-        var tmpCoords: [CLLocationCoordinate2D] = [] //init with empty
-        currentSegmentOverlay = MKPolyline(coordinates: &tmpCoords, count: 0)
+
         compassRect = CGRect.init(x: 0, y: 0, width: 36, height: 36)
         super.init(coder: aDecoder)
         
@@ -222,24 +216,6 @@ class GPXMapView: MKMapView {
     }
     
     ///
-    /// If current segmet has points, it appends currentSegment to trackSegments and
-    /// initializes currentSegment to a new one.
-    ///
-    func startNewTrackSegment() {
-        if session.currentSegment.trackpoints.count > 0 {
-            session.startNewTrackSegment()
-            currentSegmentOverlay = MKPolyline()
-        }
-    }
-    
-    ///
-    /// Finishes current segment.
-    ///
-    func finishCurrentSegment() {
-        startNewTrackSegment() //basically, we need to append the segment to the list of segments
-    }
-    
-    ///
     /// Clears map.
     ///
     func clearMap() {
@@ -298,41 +274,6 @@ class GPXMapView: MKMapView {
                 }
             }
         }
-    }
-    
-    func continueFromGPXRoot(_ gpx: GPXRoot) {
-        clearMap()
-        
-        session.continueFromGPXRoot(gpx)
-        
-        // for last session's previous tracks, through resuming
-        for oneTrack in session.tracks {
-            session.totalTrackedDistance += oneTrack.length
-            for segment in oneTrack.tracksegments {
-                let overlay = segment.overlay
-                addOverlay(overlay)
-                
-                let segmentTrackpoints = segment.trackpoints
-                //add point to map extent
-                for waypoint in segmentTrackpoints {
-                    extent.extendAreaToIncludeLocation(waypoint.coordinate)
-                }
-            }
-        }
-        
-        // for last session track segment
-        for trackSegment in session.trackSegments {
-            
-            let overlay = trackSegment.overlay
-            addOverlay(overlay)
-            
-            let segmentTrackpoints = trackSegment.trackpoints
-            //add point to map extent
-            for waypoint in segmentTrackpoints {
-                extent.extendAreaToIncludeLocation(waypoint.coordinate)
-            }
-        }
-        
     }
     
     /// onTrack

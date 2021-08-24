@@ -68,28 +68,6 @@ class GPXSession {
     }
     
     ///
-    /// Adds a new point to current segment.
-    /// - Parameters:
-    ///    - location: Typically a location provided by CLLocation
-    ///
-    func addPointToCurrentTrackSegmentAtLocation(_ location: CLLocation) {
-        let pt = GPXTrackPoint(location: location)
-        self.currentSegment.add(trackpoint: pt)
-        
-        //add the distance to previous tracked point
-        if self.currentSegment.trackpoints.count >= 2 { //at elast there are two points in the segment
-            let prevPt = self.currentSegment.trackpoints[self.currentSegment.trackpoints.count-2] //get previous point
-            guard let latitude = prevPt.latitude, let longitude = prevPt.longitude else { return }
-            let prevPtLoc = CLLocation(latitude: latitude, longitude: longitude)
-            //now get the distance
-            let distance = prevPtLoc.distance(from: location)
-            self.currentTrackDistance += distance
-            self.totalTrackedDistance += distance
-            self.currentSegmentDistance += distance
-        }
-    }
-    
-    ///
     /// Appends currentSegment to trackSegments and initializes currentSegment to a new one.
     ///
     func startNewTrackSegment() {
