@@ -1,31 +1,29 @@
 Open GPX Follower
 =================
 
-- Load GPX files from Internet and display them on map
-- When you start moving, map will automatically rotate in moving direction, and pan the screen as you move
+- Load GPX files from Internet or open GPX files from other app on your iOS device and display them on map
+- When you start moving, map will 
+  - automatically rotate in moving direction
+  - and pan the screen as you move
+  - zoom in our out accoording to speed
+- when going away from the track, the map will zoom in and out, to make sure the track remains visible on the map
 - with offline map cache support.
-
-Based on [GPX Tracker](https://github.com/merlos/iOS-Open-GPX-Tracker)
-
-If you are goint to track without Internet... don't worry! Just browse the area where you'll be tracking and it will be cached.
-
-Open GPX Follower is an open source app (same lincense as Open GPX Tracker)
-
-## Main Features
-
- - Displays GPX track on map
- - Supports Apple Map Kit, [Open Street Map](http://wiki.openstreetmap.org/wiki/Tile_usage_policy) and [Carto DB](http://www.cartodb.com) as map sources
+- Supports Apple Map Kit, [Open Street Map](http://wiki.openstreetmap.org/wiki/Tile_usage_policy) and [Carto DB](http://www.cartodb.com) as map sources
  - Offline maps support (of browsed areas)
  - Displays current location and altitude
  - Displays user heading (device orientation) 
- - Displays location accuracy 
  - Share GPX files with other apps
  - Settings
     - Offline cache On/Off
     - Clear cache
     - Select the map server.
   - Darkmode
+ 
+Based on [GPX Tracker](https://github.com/merlos/iOS-Open-GPX-Tracker)
 
+If you are goint to track without Internet... don't worry! Just browse the area where you'll be tracking and it will be cached.
+
+Open GPX Follower is an open source app (same lincense as Open GPX Tracker)
 
 ## Download Source code
 This application is written in Swift. To download the code run this command in a console:
