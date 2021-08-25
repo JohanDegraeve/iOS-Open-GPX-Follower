@@ -16,7 +16,7 @@ extension GPXRoot {
     public var tracksLength: CLLocationDistance {
         var tLength: CLLocationDistance = 0.0
         for track in self.tracks {
-            tLength += track.length
+            tLength += track.length(actualDistanceFromStart: tLength)
         }
         return tLength
     }

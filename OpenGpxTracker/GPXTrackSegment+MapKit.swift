@@ -39,7 +39,9 @@ extension GPXTrackSegment {
     }
     
     /// Calculates length in meters of the segment
-    func length() -> CLLocationDistance {
+    /// - parameters:
+    ///     - actualDistanceFromStart : the function will iterate through each GPXTrackPoint and set in each GPXTrackPoint the distance from the start of the session. actualDistanceFromStart will be added to this length, so after having finished the function, every GPXTrackPoint in the segment will know the distance from the start of the session
+    func length(actualDistanceFromStart: CLLocationDistance) -> CLLocationDistance {
         var length: CLLocationDistance = 0.0
         var distanceTwoPoints: CLLocationDistance
         //we need at least two points
@@ -53,10 +55,15 @@ extension GPXTrackSegment {
                 prev = pt
                 continue
             }
+            
             distanceTwoPoints = pt.distance(from: prev!)
             length += distanceTwoPoints
             //set current point as previous point
             prev = pt
+            
+            // assign distanceFromStart to length since start of the session
+            point.distanceFromStart = length + actualDistanceFromStart
+            
         }
         return length
     }    

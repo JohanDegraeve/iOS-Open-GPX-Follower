@@ -111,6 +111,22 @@ class GPXMapView: MKMapView {
     /// when did the last gesture end ?
     var timeStampGestureEnd:Date = Date(timeIntervalSince1970: 0)
     
+    /// track on which last but one trackpoint was found less than expected maximum distance from user
+    var previousGPXTrackIndex: Int?
+    
+    /// trackSegment on which last trackpoint was found less than expected maximum distance from user
+    ///
+    /// in other words, the user is on that tracksegment now
+    var previousGPXTrackSegmentIndex: Int?
+    
+    /// last  one trackPoint less than expected maximum distance from user
+    var currentGPXTrackPointIndex: Int?
+    
+    /// last but one trackPoint less than expected maximum distance from user
+    ///
+    /// in other words, the user is on that tracksegment now
+    var previousGPXTrackPointIndex: Int?
+    
     ///
     /// Initializes the map with an empty currentSegmentOverlay.
     ///
@@ -229,6 +245,13 @@ class GPXMapView: MKMapView {
         if tileServer != .apple {
             addOverlay(tileServerOverlay, level: .aboveLabels)
         }
+        
+        // varialbles used to track distance to start or end of the track (depending on direction), reset all to nil
+        previousGPXTrackPointIndex = nil
+        previousGPXTrackSegmentIndex = nil
+        previousGPXTrackIndex = nil
+        currentGPXTrackPointIndex = nil
+        
     }
     
     ///
@@ -263,7 +286,7 @@ class GPXMapView: MKMapView {
     private func addTrackSegments(for gpx: GPXRoot) {
         session.tracks = gpx.tracks
         for oneTrack in session.tracks {
-            session.totalTrackedDistance += oneTrack.length
+            session.totalTrackedDistance += oneTrack.length(actualDistanceFromStart: session.totalTrackedDistance)
             for segment in oneTrack.tracksegments {
                 let overlay = segment.overlay
                 addOverlay(overlay)
@@ -281,17 +304,41 @@ class GPXMapView: MKMapView {
     ///     - boolean : that tells if there's at least one trackpoint within maximumDistanceInMeters, (circle around userlocation of maximumDistanceInMeters radius, should have at least one trackpoint)
     func onTrack(maximumDistanceInMeters: Int) -> Bool {
         
-        for track in session.tracks {
+        for (trackindex, track) in session.tracks.enumerated() {
             
-            for segment in track.tracksegments {
+            for (segmentindex, segment) in track.tracksegments.enumerated() {
                 
-                for trackpoint in segment.trackpoints {
+                for (trackpointindex, trackpoint) in segment.trackpoints.enumerated() {
                     
                     if let latitude = trackpoint.latitude, let longitude = trackpoint.longitude {
 
                         if let location = userLocation.location {
                             
                             if location.distance(from: CLLocation(latitude: latitude, longitude: longitude)) <= Double(maximumDistanceInMeters) {
+                                
+                                // if not on the same track anymore, then assign all previous indexes to nil
+                                if let previousGPXTrackIndex = previousGPXTrackIndex, previousGPXTrackIndex != trackindex {
+                                    
+                                    self.previousGPXTrackSegmentIndex = nil
+                                    self.previousGPXTrackPointIndex = nil
+                                    
+                                }
+                                
+                                // assign previousGPXTrackIndex to current trackindex, to be used next time
+                                previousGPXTrackIndex = trackindex
+                                
+                                // if not on the same segment, then assign previous trackpoint index to nil
+                                if let previousGPXTrackSegmentIndex = previousGPXTrackSegmentIndex, previousGPXTrackSegmentIndex != segmentindex {
+                                    
+                                    self.previousGPXTrackPointIndex = nil
+                                    
+                                }
+                                
+                                // assign previousGPXTrackSegmentIndex to current segmentindex, to be used next time
+                                previousGPXTrackSegmentIndex = segmentindex
+                                
+                                // assign previousGPXTrackIndex to current trackindex
+                                currentGPXTrackPointIndex = trackpointindex
                                 
                                 return true
                                 
