@@ -46,7 +46,13 @@ open class DistanceLabel: UILabel {
         }
         set {
             _distance = newValue
-            text = newValue.toDistance(useImperial: _useImperial)
+            
+            if (_distance != 0.0) {
+                
+                text = abs(newValue).toDistance(useImperial: _useImperial)
+
+            }
+            
         }
     }
 }

@@ -35,14 +35,8 @@ class GPXSession {
     /// Segment in which device locations are added.
     var currentSegment: GPXTrackSegment =  GPXTrackSegment()
     
-    /// Total tracked distance in meters
-    var totalTrackedDistance = 0.00
-    
-    /// Distance in meters of current track (track in which new user positions are being added)
-    var currentTrackDistance = 0.00
-    
-    /// Current segment distance in meters
-    var currentSegmentDistance = 0.00
+    /// Total distance in meters
+    var distance = 0.00
     
     ///
     /// Adds a waypoint to the map.
@@ -74,7 +68,6 @@ class GPXSession {
         if self.currentSegment.trackpoints.count > 0 {
             self.trackSegments.append(self.currentSegment)
             self.currentSegment = GPXTrackSegment()
-            self.currentSegmentDistance = 0.00
         }
     }
     
@@ -87,10 +80,8 @@ class GPXSession {
         self.currentSegment = GPXTrackSegment()
         self.waypoints = []
         
-        self.totalTrackedDistance = 0.00
-        self.currentTrackDistance = 0.00
-        self.currentSegmentDistance = 0.00
-        
+        self.distance = 0.00
+
     }
     
     ///

@@ -13,6 +13,8 @@ import CoreLocation
 import MapKit
 import CoreGPX
 
+let text_total_distance = "Total Distance"
+
 /// - current location is further away from track than maximumDistanceFromTrackBeforeStartingZoomInInMeter, then start zooming in
 let maximumDistanceFromTrackBeforeStartingZoomInInMeter = 150
 
@@ -30,7 +32,7 @@ let reachTopOfScreenInMinutes = 1.5
 /// minimum distance of top of screen in meters
 let minimumTopOfScreenInMeters = 500.0
 
-/// maximum amount to store in measuredSpeads
+/// maximum amount to store in measuredSpeads, average of those speeds is used to display
 let maxMeasuredSpeads = 7
 
 /// if user gestures the map, then there's no more auto rotation and zoom, this for maximum pauzeUdateMapCenterAfterGestureEndForHowManySeconds seconds
@@ -43,6 +45,11 @@ let latitudeLongitudeDeltas:[Double] = [0.001, 0.003] + (0...100).map{ 0.005 * p
 /// - normally an update of the map is done by moving or rotating the device, but sometimes (eg at launch) the device is not moving, but still an update might be needed, for instance zoomin or zoomout after loading a track
 /// - this value determines how often to do the check
 let timeScheduleToCheckMapUpdateInSeconds = 0.5
+
+/// how many subsequent track points in the same moving direction before deciding if user is moving in the direction start to end or end to start
+///
+/// should be value 3, 5, 7, ....
+let amountOfTrackPointsToDetermineDirection = 5
 
 /// White color for button background
 let kWhiteBackgroundColor: UIColor = UIColor(red: 254.0/255.0, green: 254.0/255.0, blue: 254.0/255.0, alpha: 0.90)
@@ -104,6 +111,12 @@ var notInitialAppLaunch = defaults.bool(forKey: userDefaultsKeyForNotInitialAppL
 /// when fired, a call will be made to updateMapCenter
 var timerToCheckMapUpdate: Timer?
 
+/// if nil then moving direction is not known. If true, user is moving from start to end, if false, user is moving from end to start
+var movesStartToEnd:Bool?
+
+/// how many subsequent trackPoints in the same direction, used together with movesStartToEnd
+var subsequentTrackPointsInSameDirection:Int = 0
+
 ///
 /// Main View Controller of the Application. It is loaded when the application is launched
 ///
@@ -152,15 +165,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// Label that displays current latitude and longitude (lat,long)
     var coordsLabel: UILabel
     
-    /// Label that displays last known speed (in km/h)
-    var speedLabel: UILabel
+    /// Label that displays "distance to start", or "distnace to end" or "total distance"
+    var movingDirectionLabel: UILabel
     
     /// Distance of the total segments tracked
-    var totalTrackedDistanceLabel: DistanceLabel
+    var distanceLabel: DistanceLabel
     
-    /// Distance of the current segment being tracked (since last time the Tracker button was pressed)
-    var currentSegmentDistanceLabel: DistanceLabel
- 
     /// Used to display in imperial (foot, miles, mph) or metric system (m, km, km/h)
     var useImperial = false
     
@@ -196,10 +206,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
         self.coordsLabel = UILabel(coder: aDecoder)!
         
-        self.speedLabel = UILabel(coder: aDecoder)!
-        self.totalTrackedDistanceLabel = DistanceLabel(coder: aDecoder)!
-        self.currentSegmentDistanceLabel = DistanceLabel(coder: aDecoder)!
-        
+        self.movingDirectionLabel = UILabel(coder: aDecoder)!
+        self.distanceLabel = DistanceLabel(coder: aDecoder)!
+
         self.folderButton = UIButton(coder: aDecoder)!
         self.aboutButton = UIButton(coder: aDecoder)!
         self.preferencesButton = UIButton(coder: aDecoder)!
@@ -360,21 +369,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         // Tracked info
         let iPhoneXdiff: CGFloat  = isIPhoneX ? 40 : 0
 
-        //speed Label
-        speedLabel.textAlignment = .right
-        speedLabel.font = font36
-        speedLabel.text = 0.00.toSpeed(useImperial: useImperial)
-        //timeLabel.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5)
-        map.addSubview(speedLabel)
+        movingDirectionLabel.textAlignment = .right
+        movingDirectionLabel.font = font36
+        movingDirectionLabel.text = ""
+        map.addSubview(movingDirectionLabel)
         
-        //tracked distance
-        totalTrackedDistanceLabel.textAlignment = .right
-        totalTrackedDistanceLabel.font = font36
-        totalTrackedDistanceLabel.useImperial = useImperial
-        totalTrackedDistanceLabel.distance = 0.00
-        totalTrackedDistanceLabel.autoresizingMask = [.flexibleWidth, .flexibleLeftMargin, .flexibleRightMargin]
-        //timeLabel.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5)
-        map.addSubview(totalTrackedDistanceLabel)
+        // distance from star to end or from end to start, depending on moving direction
+        distanceLabel.textAlignment = .right
+        distanceLabel.font = font36
+        distanceLabel.useImperial = useImperial
+        distanceLabel.distance = 0.00
+        distanceLabel.autoresizingMask = [.flexibleWidth, .flexibleLeftMargin, .flexibleRightMargin]
+        map.addSubview(distanceLabel)
         
         //about button
         aboutButton.frame = CGRect(x: 5 + 8, y: 14 + 5 + 48 + 5 + iPhoneXdiff, width: 32, height: 32)
@@ -472,17 +478,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let kSignalViewOffset: CGFloat = 25
         
         // Switch off all autoresizing masks translate
-        speedLabel.translatesAutoresizingMaskIntoConstraints = false
-        totalTrackedDistanceLabel.translatesAutoresizingMaskIntoConstraints = false
-        currentSegmentDistanceLabel.translatesAutoresizingMaskIntoConstraints = false
+        movingDirectionLabel.translatesAutoresizingMaskIntoConstraints = false
+        distanceLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        NSLayoutConstraint(item: speedLabel, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: -7).isActive = true
-        NSLayoutConstraint(item: speedLabel, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: kSignalViewOffset).isActive = true
-        NSLayoutConstraint(item: speedLabel, attribute: .top, relatedBy: .equal, toItem: self.topLayoutGuide, attribute: .bottom, multiplier: 1, constant: 20).isActive = true
+        NSLayoutConstraint(item: movingDirectionLabel, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: -7).isActive = true
         
-        NSLayoutConstraint(item: totalTrackedDistanceLabel, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: -7).isActive = true
-        NSLayoutConstraint(item: totalTrackedDistanceLabel, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: kSignalViewOffset).isActive = true
-        NSLayoutConstraint(item: totalTrackedDistanceLabel, attribute: .top, relatedBy: .equal, toItem: speedLabel, attribute: .bottom, multiplier: 1, constant: 5).isActive = true
+        //  this restricts the width of the label, too small.
+        //NSLayoutConstraint(item: movingDirectionLabel, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: kSignalViewOffset).isActive = true
+        
+        NSLayoutConstraint(item: movingDirectionLabel, attribute: .top, relatedBy: .equal, toItem: self.topLayoutGuide, attribute: .bottom, multiplier: 1, constant: 20).isActive = true
+        
+        NSLayoutConstraint(item: distanceLabel, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: -7).isActive = true
+        NSLayoutConstraint(item: distanceLabel, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: kSignalViewOffset).isActive = true
+        NSLayoutConstraint(item: distanceLabel, attribute: .top, relatedBy: .equal, toItem: movingDirectionLabel, attribute: .bottom, multiplier: 1, constant: 5).isActive = true
         
     }
     
@@ -818,6 +826,27 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             updateMapCenter(locationManager: locationManager)
 
         }
+       
+        // update distance
+        if let distanceToDest = map.calculateDistanceToDestination(currentDistanceToDestination: distanceLabel.distance) {
+
+            distanceLabel.distance = distanceToDest
+            
+            if distanceLabel.distance == 0.0 {
+                
+                movingDirectionLabel.text = text_total_distance
+                
+            } else if distanceLabel.distance > 0.0 {
+                
+                movingDirectionLabel.text = "To end"
+                
+            } else if distanceLabel.distance < 0.0 {
+                
+                movingDirectionLabel.text = "To start"
+                
+            }
+
+        }
         
     }
     
@@ -830,14 +859,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         // unwrap locationg
         if let newLocation = locationManager.location {
             
-            // inititalize set speedlabel text to unknown, will be updated if newSpeed is not nil
-            speedLabel.text = kUnknownSpeedText
-
             // only if speed >= 0, then calculate new average speed
-            if let newSpeed = locationManager.location?.speed {
-                
-                // Update speed text, start by setting to actual speed report by locationManager
-                speedLabel.text = (newSpeed < 0) ? kUnknownSpeedText : newSpeed.toSpeed(useImperial: useImperial)
+            if let newSpeed = locationManager.location?.speed, newSpeed > 0.0 {
                 
                 // store new speed in array, to keep track of recent speeds and calculate the average
                 // but remove last one if maximum amount is already stored
@@ -851,9 +874,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             // calculate average of measuredSpeads
             let averageSpeed = measuredSpeads.reduce(0.0, +)/Double(measuredSpeads.count)
             
-            // set speedlabel text to average speed
-            speedLabel.text = averageSpeed.toSpeed(useImperial: useImperial)
-
             // if time since last gesture end is less than pauzeUdateMapCenterAfterGestureEndForHowManySeconds, then don't further update the map
             if screenFrozen() {return}
             
@@ -950,6 +970,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             }
 
         }
+        
     }
     
     /// - just a piece of code that is used several times, it sets map.region to a region with latitudeDelta, value from latitudeLongitudeDeltas array, using index currentLongitudedeltaIndex
@@ -1042,11 +1063,8 @@ extension ViewController: PreferencesTableViewControllerDelegate {
     func didUpdateUseImperial(_ newUseImperial: Bool) {
         print("PreferencesTableViewControllerDelegate:: didUpdateUseImperial: \(newUseImperial)")
         useImperial = newUseImperial
-        totalTrackedDistanceLabel.useImperial = useImperial
-        currentSegmentDistanceLabel.useImperial = useImperial
-        //Because we dont know if last speed was unknown we set it as unknown.
-        // In regular circunstances it will go to the new units relatively fast.
-        speedLabel.text = kUnknownSpeedText
+        distanceLabel.useImperial = useImperial
+
     }}
 
 // MARK: location manager Delegate
@@ -1061,13 +1079,15 @@ extension ViewController: GPXFilesTableViewControllerDelegate {
     ///
     func didLoadGPXFileWithName(gpxRoot: GPXRoot) {
 
-        //load data
-        self.map.importFromGPXRoot(gpxRoot)
+        //load data and assign distanceLabel.distance to distance of all tracks in the session
+        self.distanceLabel.distance = self.map.importFromGPXRoot(gpxRoot)
 
         //center map in GPX data
         self.map.regionToGPXExtent()
         
-        self.totalTrackedDistanceLabel.distance = self.map.session.totalTrackedDistance
+        // user isn't moving yet (or at least moving isn't detected because gpx just loaded
+        // set text to "Total distance"
+        self.movingDirectionLabel.text = text_total_distance
         
     }
 }

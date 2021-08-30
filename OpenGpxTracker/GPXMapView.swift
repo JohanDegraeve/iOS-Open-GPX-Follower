@@ -112,20 +112,23 @@ class GPXMapView: MKMapView {
     var timeStampGestureEnd:Date = Date(timeIntervalSince1970: 0)
     
     /// track on which last but one trackpoint was found less than expected maximum distance from user
-    var previousGPXTrackIndex: Int?
+    private var previousGPXTrackIndex: Int?
     
     /// trackSegment on which last trackpoint was found less than expected maximum distance from user
     ///
     /// in other words, the user is on that tracksegment now
-    var previousGPXTrackSegmentIndex: Int?
+    private var previousGPXTrackSegmentIndex: Int?
     
     /// last  one trackPoint less than expected maximum distance from user
-    var currentGPXTrackPointIndex: Int?
+    private var currentGPXTrackPointIndex: Int?
     
     /// last but one trackPoint less than expected maximum distance from user
     ///
     /// in other words, the user is on that tracksegment now
-    var previousGPXTrackPointIndex: Int?
+    private var previousGPXTrackPointIndex: Int?
+
+    /// distance from start for the trackpoint at currentGPXTrackPointIndex
+    public var currentGPXTrackPointDistanceFromStart: Double = 0.0
     
     ///
     /// Initializes the map with an empty currentSegmentOverlay.
@@ -251,6 +254,7 @@ class GPXMapView: MKMapView {
         previousGPXTrackSegmentIndex = nil
         previousGPXTrackIndex = nil
         currentGPXTrackPointIndex = nil
+        currentGPXTrackPointDistanceFromStart = 0.0
         
     }
     
@@ -275,18 +279,25 @@ class GPXMapView: MKMapView {
     /// - Parameters:
     ///     - gpx: The result of loading a gpx file with iOS-GPX-Framework.
     ///
-    func importFromGPXRoot(_ gpx: GPXRoot) {
+    /// - returns:
+    ///     - total distance of all tracks in gpx
+    func importFromGPXRoot(_ gpx: GPXRoot) -> Double {
 
         clearMap()
 
-        addTrackSegments(for: gpx)
+        return addTrackSegments(for: gpx)
 
     }
 
-    private func addTrackSegments(for gpx: GPXRoot) {
+    /// - returns:
+    ///     - total distance of all tracks in gpx
+    private func addTrackSegments(for gpx: GPXRoot) -> Double {
+        
         session.tracks = gpx.tracks
+        
         for oneTrack in session.tracks {
-            session.totalTrackedDistance += oneTrack.length(actualDistanceFromStart: session.totalTrackedDistance)
+            
+            session.distance += oneTrack.length(actualDistanceFromStart: session.distance)
             for segment in oneTrack.tracksegments {
                 let overlay = segment.overlay
                 addOverlay(overlay)
@@ -297,6 +308,9 @@ class GPXMapView: MKMapView {
                 }
             }
         }
+        
+        return session.distance
+        
     }
     
     /// onTrack
@@ -310,7 +324,7 @@ class GPXMapView: MKMapView {
                 
                 for (trackpointindex, trackpoint) in segment.trackpoints.enumerated() {
                     
-                    if let latitude = trackpoint.latitude, let longitude = trackpoint.longitude {
+                    if let latitude = trackpoint.latitude, let longitude = trackpoint.longitude, let distanceFromStart = trackpoint.distanceFromStart {
 
                         if let location = userLocation.location {
                             
@@ -339,6 +353,9 @@ class GPXMapView: MKMapView {
                                 
                                 // assign previousGPXTrackIndex to current trackindex
                                 currentGPXTrackPointIndex = trackpointindex
+                                
+                                // currentGPXTrackPointDistanceFromStart to distanceFromStart for trackpoint at currentGPXTrackPointIndex
+                                currentGPXTrackPointDistanceFromStart = distanceFromStart
                                 
                                 return true
                                 
@@ -412,4 +429,84 @@ class GPXMapView: MKMapView {
         
     }
     
+    /// distance to destination = end of the all tracks in the session
+    func calculateDistanceToDestination(currentDistanceToDestination: Double) -> Double? {
+        
+        if let previousGPXTrackPointIndex = previousGPXTrackPointIndex, let currentGPXTrackPointIndex = currentGPXTrackPointIndex {
+            
+            // case where current gpx trackpoint did not change
+            if  currentGPXTrackPointIndex == previousGPXTrackPointIndex {
+                
+                // there's been no move, no change in distance label
+                return currentDistanceToDestination
+                
+            }
+            
+            // case where current gpxtrackpointindex increased
+            if currentGPXTrackPointIndex > previousGPXTrackPointIndex {
+                
+                // possibly moving from start to end
+                if subsequentTrackPointsInSameDirection == amountOfTrackPointsToDetermineDirection {
+                    
+                    // reached amountOfTrackPointsToDetermineDirection to determine the moving direction
+                    movesStartToEnd = true
+                    
+                } else {
+                    
+                    // did not reach amountOfTrackPointsToDetermineDirection to determine the moving direction
+                    // increase the value
+                    subsequentTrackPointsInSameDirection += subsequentTrackPointsInSameDirection
+                    
+                    // possibly user changed direction, return current distance
+                    return currentDistanceToDestination
+                    
+                }
+                
+            }
+            
+            // case where current gpxtrackpointindex decreased
+            if currentGPXTrackPointIndex < previousGPXTrackPointIndex {
+                
+                // possibly moving from end to start
+                // this is the case of subsequentTrackPointsInSameDirection equals negative value for amountOfTrackPointsToDetermineDirection
+                if subsequentTrackPointsInSameDirection == -amountOfTrackPointsToDetermineDirection {
+                    
+                    // reached amountOfTrackPointsToDetermineDirection to determine the moving direction
+                    movesStartToEnd = false
+                    
+                } else {
+                    
+                    // did not reach amountOfTrackPointsToDetermineDirection to determine the moving direction
+                    // increase the value
+                    subsequentTrackPointsInSameDirection -= subsequentTrackPointsInSameDirection
+                    
+                    // possibly user changed direction, return current distance
+                    return currentDistanceToDestination
+                    
+                }
+                
+            }
+            
+        }
+        
+        // amountOfTrackPointsToDetermineDirection has been reached, so we can calculate the distance to end or start
+        if let movesStartToEnd = movesStartToEnd {
+            
+            if movesStartToEnd {
+                
+                return session.distance - currentGPXTrackPointDistanceFromStart
+                
+            } else {
+                
+                return -currentGPXTrackPointDistanceFromStart
+                
+            }
+            
+        }
+        
+        // no moving detected yet
+        return nil
+        
+    }
+
 }
