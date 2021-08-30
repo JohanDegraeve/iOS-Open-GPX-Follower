@@ -183,15 +183,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// View preferences button
     var preferencesButton: UIButton
     
-    /// Share current gpx file button
-    var shareButton: UIButton
-    
-    /// Spinning Activity Indicator for shareButton
-    let shareActivityIndicator: UIActivityIndicatorView
-    
-    /// Spinning Activity Indicator's color
-    var shareActivityColor = UIColor(red: 0, green: 0.61, blue: 0.86, alpha: 1)
-    
     /// Check if device is notched type phone
     var isIPhoneX = false
     
@@ -212,10 +203,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.folderButton = UIButton(coder: aDecoder)!
         self.aboutButton = UIButton(coder: aDecoder)!
         self.preferencesButton = UIButton(coder: aDecoder)!
-        self.shareButton = UIButton(coder: aDecoder)!
         
-        self.shareActivityIndicator = UIActivityIndicatorView(coder: aDecoder)
-
         super.init(coder: aDecoder)!
         
         launchTimerToCheckMapUpdate()
@@ -402,16 +390,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         //aboutButton.layer.cornerRadius = 24
         map.addSubview(preferencesButton)
         
-        // Share button
-        shareButton.frame = CGRect(x: 5 + 10 + 48 * 2, y: 14 + 5 + 8  + iPhoneXdiff, width: 32, height: 32)
-        shareButton.setImage(UIImage(named: "share"), for: UIControl.State())
-        shareButton.setImage(UIImage(named: "share_high"), for: .highlighted)
-        shareButton.addTarget(self, action: #selector(ViewController.openShare), for: .touchUpInside)
-        shareButton.autoresizingMask = [.flexibleRightMargin]
-        //aboutButton.backgroundColor = kWhiteBackgroundColor
-        //aboutButton.layer.cornerRadius = 24
-        map.addSubview(shareButton)
-        
         // Folder button
         let folderW: CGFloat = kButtonSmallSize
         let folderH: CGFloat = kButtonSmallSize
@@ -432,10 +410,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         map.rotationGesture.delegate = self
         map.panGesture.delegate = self
         updateAppearance()
-        
-        if #available(iOS 13, *) {
-            shareActivityColor = .mainUIColor
-        }
         
         // prevent screen dim/lock - once opened, the app will stay in the foreground
         UIApplication.shared.isIdleTimerDisabled = true
@@ -659,65 +633,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         vc.delegate = self
         let navController = UINavigationController(rootViewController: vc)
         self.present(navController, animated: true) { () -> Void in }
-    }
-    
-    /// Opens an Activity View Controller to share the file
-    @objc func openShare() {
-        print("ViewController: Share Button tapped")
-        
-        // async such that process is done in background
-        DispatchQueue.global(qos: .utility).async {
-            // UI code
-            DispatchQueue.main.sync {
-                self.shouldShowShareActivityIndicator(true)
-            }
-            
-            //Create a temporary file
-            let gpxString: String = self.map.exportToGPXString()
-            let tmpFile = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(self.lastGpxFilename).gpx")
-            GPXFileManager.saveToURL(tmpFile, gpxContents: gpxString)
-            //Add it to the list of tmpFiles.
-            //Note: it may add more than once the same file to the list.
-            
-            // UI code
-            DispatchQueue.main.sync {
-                //Call Share activity View controller
-                let activityViewController = UIActivityViewController(activityItems: [tmpFile], applicationActivities: nil)
-                activityViewController.popoverPresentationController?.sourceView = self.shareButton
-                activityViewController.popoverPresentationController?.sourceRect = self.shareButton.bounds
-                self.present(activityViewController, animated: true, completion: nil)
-                self.shouldShowShareActivityIndicator(false)
-            }
-            
-        }
-    }
-    
-    /// Displays spinning activity indicator for share button when true
-    func shouldShowShareActivityIndicator(_ isTrue: Bool) {
-        // setup
-        shareActivityIndicator.color = shareActivityColor
-        shareActivityIndicator.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
-        shareActivityIndicator.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-        
-        if isTrue {
-            // cross dissolve from button to indicator
-            UIView.transition(with: self.shareButton, duration: 0.35, options: [.transitionCrossDissolve], animations: {
-                self.shareButton.addSubview(self.shareActivityIndicator)
-            }, completion: nil)
-            
-            shareActivityIndicator.startAnimating()
-            shareButton.setImage(nil, for: UIControl.State())
-            shareButton.isUserInteractionEnabled = false
-        } else {
-            // cross dissolve from indicator to button
-            UIView.transition(with: self.shareButton, duration: 0.35, options: [.transitionCrossDissolve], animations: {
-                self.shareActivityIndicator.removeFromSuperview()
-            }, completion: nil)
-            
-            shareActivityIndicator.stopAnimating()
-            shareButton.setImage(UIImage(named: "share"), for: UIControl.State())
-            shareButton.isUserInteractionEnabled = true
-        }
     }
     
     ///
