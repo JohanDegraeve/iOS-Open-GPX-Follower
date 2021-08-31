@@ -65,6 +65,7 @@
 		F8B7181726C07922002ED1C3 /* StringProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7181626C07922002ED1C3 /* StringProtocol.swift */; };
 		F8B7181926C083B4002ED1C3 /* AddGPXFileViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7181826C083B4002ED1C3 /* AddGPXFileViewControllerDelegate.swift */; };
 		F8CA85C526D052F90004DA34 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CA85C426D052F90004DA34 /* Date.swift */; };
+		F8CB576A26DD834B0010200B /* GPXTrackPointDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB576926DD834B0010200B /* GPXTrackPointDistance.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -184,6 +185,7 @@
 		F8B7181626C07922002ED1C3 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
 		F8B7181826C083B4002ED1C3 /* AddGPXFileViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGPXFileViewControllerDelegate.swift; sourceTree = "<group>"; };
 		F8CA85C426D052F90004DA34 /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
+		F8CB576926DD834B0010200B /* GPXTrackPointDistance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPXTrackPointDistance.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -234,6 +236,7 @@
 				BFE026BF244A0160005423E6 /* String+CountInstances.swift */,
 				BFE026C1244A01DB005423E6 /* UIInsetLabel.swift */,
 				BFE026C3244A0281005423E6 /* DateField.swift */,
+				F8CB576926DD834B0010200B /* GPXTrackPointDistance.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -577,6 +580,7 @@
 				F8B7181526C060E8002ED1C3 /* String.swift in Sources */,
 				89EA86652157C444002E03A7 /* Int+asFilesize.swift in Sources */,
 				F8B7181926C083B4002ED1C3 /* AddGPXFileViewControllerDelegate.swift in Sources */,
+				F8CB576A26DD834B0010200B /* GPXTrackPointDistance.swift in Sources */,
 				BF214B5E22E60B64000E96AA /* CLActivityType+Info.swift in Sources */,
 				BF5C0D2222D771D1001C2575 /* DistanceLabel.swift in Sources */,
 				89F6E0F5227D091900CE3E3F /* Double+Measures.swift in Sources */,

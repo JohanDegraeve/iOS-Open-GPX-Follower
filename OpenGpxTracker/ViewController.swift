@@ -15,8 +15,8 @@ import CoreGPX
 
 let text_total_distance = "Total Distance"
 
-/// - current location is further away from track than maximumDistanceFromTrackBeforeStartingZoomInInMeter, then start zooming in
-let maximumDistanceFromTrackBeforeStartingZoomInInMeter = 150
+/// - current location is further away from track than maximumDistanceFromTrackBeforeStartingZoomInInMeter, then start zooming in or out to make sure track stays on screen
+let maximumDistanceFromTrackBeforeStartingZoomInOrOutInMeter = 150
 
 /// - if not on track anymore then mapped will be zoomed out further to make sure that the track is still visible in a view 70% of the normal full view
 /// - value between 0 and 100, but better take between 50 and 90
@@ -30,10 +30,10 @@ let reducedViewPercentageMin = 40
 let reachTopOfScreenInMinutes = 1.5
 
 /// minimum distance of top of screen in meters
-let minimumTopOfScreenInMeters = 500.0
+let minimumTopOfScreenInMeters = 200.0
 
 /// maximum amount to store in measuredSpeads, average of those speeds is used to display
-let maxMeasuredSpeads = 7
+let maxMeasuredSpeads = 6
 
 /// if user gestures the map, then there's no more auto rotation and zoom, this for maximum pauzeUdateMapCenterAfterGestureEndForHowManySeconds seconds
 let pauzeUdateMapCenterAfterGestureEndForHowManySeconds = 30.0
@@ -47,9 +47,7 @@ let latitudeLongitudeDeltas:[Double] = [0.001, 0.003] + (0...100).map{ 0.005 * p
 let timeScheduleToCheckMapUpdateInSeconds = 0.5
 
 /// how many subsequent track points in the same moving direction before deciding if user is moving in the direction start to end or end to start
-///
-/// should be value 3, 5, 7, ....
-let amountOfTrackPointsToDetermineDirection = 5
+let amountOfTrackPointsToDetermineDirection = 3
 
 /// White color for button background
 let kWhiteBackgroundColor: UIColor = UIColor(red: 254.0/255.0, green: 254.0/255.0, blue: 254.0/255.0, alpha: 0.90)
@@ -110,12 +108,6 @@ var notInitialAppLaunch = defaults.bool(forKey: userDefaultsKeyForNotInitialAppL
 
 /// when fired, a call will be made to updateMapCenter
 var timerToCheckMapUpdate: Timer?
-
-/// if nil then moving direction is not known. If true, user is moving from start to end, if false, user is moving from end to start
-var movesStartToEnd:Bool?
-
-/// how many subsequent trackPoints in the same direction, used together with movesStartToEnd
-var subsequentTrackPointsInSameDirection:Int = 0
 
 ///
 /// Main View Controller of the Application. It is loaded when the application is launched
@@ -743,26 +735,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         }
        
         // update distance
-        if let distanceToDest = map.calculateDistanceToDestination(currentDistanceToDestination: distanceLabel.distance) {
-
-            distanceLabel.distance = distanceToDest
+        distanceLabel.distance = map.calculateDistanceToDestination(currentDistanceToDestination: distanceLabel.distance)
+        print("distanceLabel.distance: \(distanceLabel.distance)")
+        if distanceLabel.distance == 0.0 {
             
-            if distanceLabel.distance == 0.0 {
-                
-                movingDirectionLabel.text = text_total_distance
-                
-            } else if distanceLabel.distance > 0.0 {
-                
-                movingDirectionLabel.text = "To end"
-                
-            } else if distanceLabel.distance < 0.0 {
-                
-                movingDirectionLabel.text = "To start"
-                
-            }
-
+            movingDirectionLabel.text = ""
+            
+        } else if distanceLabel.distance > 0.0 {
+            
+            movingDirectionLabel.text = "To end"
+            
+        } else if distanceLabel.distance < 0.0 {
+            
+            movingDirectionLabel.text = "To start"
+            
         }
-        
+
     }
     
     /// updates the map center, map zoom, map rotation, depending on user location, speed, distance from track and wheter or not user reacently did a gesture
@@ -775,7 +763,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         if let newLocation = locationManager.location {
             
             // only if speed >= 0, then calculate new average speed
-            if let newSpeed = locationManager.location?.speed, newSpeed > 0.0 {
+            if let newSpeed = locationManager.location?.speed, newSpeed >= 0.0 {
                 
                 // store new speed in array, to keep track of recent speeds and calculate the average
                 // but remove last one if maximum amount is already stored
@@ -817,7 +805,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             let distanceToTopOfViewInMeters = abs(newLocation.distance(from: CLLocation(latitude: map.centerCoordinate.latitude, longitude: map.centerCoordinate.longitude + map.region.span.longitudeDelta))) * 0.7/0.5
             
             /// is user on track or not ? (storing in a variable because it's used two times)
-            let userIsOntrack = map.onTrack(maximumDistanceInMeters: maximumDistanceFromTrackBeforeStartingZoomInInMeter)
+            let userIsOntrack = map.onTrack(maximumDistanceInMeters: maximumDistanceFromTrackBeforeStartingZoomInOrOutInMeter)
             
             // If there's a track then first off all check that the user is currently on track, within maximumDistanceFromTrackBeforeStartingZoomInInMeter
             // if there's no track loaded yet, then the zoom will only depend on the speed

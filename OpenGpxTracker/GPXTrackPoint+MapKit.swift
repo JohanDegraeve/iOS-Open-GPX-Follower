@@ -13,24 +13,6 @@ import CoreGPX
 /// Extends the GPXTrackPoint to be able to be initialized with a `CLLocation` object.
 extension GPXTrackPoint {
 
-    /// to be able to add var in extension
-    struct Holder {
-        
-        /// distance form start in meters
-        static var _distanceFromStart: CLLocationDistance?
-        
-    }
-    
-    /// distance form start in meters
-    var distanceFromStart: CLLocationDistance? {
-        get {
-            return Holder._distanceFromStart
-        }
-        set(newValue) {
-            Holder._distanceFromStart = newValue
-        }
-    }
-
     /// Initializes a trackpoint with the CLLocation data
     convenience init(location: CLLocation) {
         self.init()

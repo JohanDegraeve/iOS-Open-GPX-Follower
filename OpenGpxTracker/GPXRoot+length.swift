@@ -13,11 +13,11 @@ import CoreGPX
 extension GPXRoot {
     
     /// Distance in meters of all the track segments
-    public var tracksLength: CLLocationDistance {
+  /*  public var tracksLength: CLLocationDistance {
         var tLength: CLLocationDistance = 0.0
         for track in self.tracks {
             tLength += track.length(actualDistanceFromStart: tLength)
         }
         return tLength
-    }
+    }*/
 }
