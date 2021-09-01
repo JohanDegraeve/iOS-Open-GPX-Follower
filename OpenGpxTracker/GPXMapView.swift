@@ -33,11 +33,14 @@ class GPXMapView: MKMapView {
     /// how many subsequent trackPoints in the same direction, used together with movesStartToEnd
     private var subsequentTrackPointsInSameDirection:Int = 0
 
+    /// how many subsequent track points in the same moving direction before deciding if user is moving in the direction start to end or end to start
+    private let amountOfTrackPointsToDetermineDirection = 3
+
     /// Current session of GPX location logging. Handles all background tasks and recording.
     let session = GPXSession()
 
     /// array of all trackpoints in the session
-    var trackPointDistances = [GPXTrackPointDistance]()
+    private var trackPointDistances = [GPXTrackPointDistance]()
     
     ///
     var extent: GPXExtentCoordinates = GPXExtentCoordinates() //extent of the GPX points and tracks
@@ -366,7 +369,7 @@ class GPXMapView: MKMapView {
 
             // start checking as of previous index found
             for n in previousGPXTrackPointIndex...(trackPointDistances.count - 1) {
-                print("previousGPXTrackPointIndex \(previousGPXTrackPointIndex)")
+
                 if checkOnTrack(n) {
                     
                     return true

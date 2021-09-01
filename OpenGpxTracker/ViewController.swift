@@ -38,16 +38,14 @@ let maxMeasuredSpeads = 6
 /// if user gestures the map, then there's no more auto rotation and zoom, this for maximum pauzeUdateMapCenterAfterGestureEndForHowManySeconds seconds
 let pauzeUdateMapCenterAfterGestureEndForHowManySeconds = 30.0
 
-/// delta latitude land ongitude to use in MKSpan, for zooming in or out
-let latitudeLongitudeDeltas:[Double] = [0.001, 0.003] + (0...100).map{ 0.005 * pow(1.1, Double($0)) }
+/// delta latitude and longitude to use in MKSpan, for zooming in or out
+//let latitudeLongitudeDeltas:[Double] = [0.0015, 0.003] + (0...100).map{ 0.005 * pow(1.1, Double($0)) }
+let latitudeLongitudeDeltas:[Double] = (0...100).map{ 0.0015 * pow(1.1, Double($0)) }
 
 /// - timer will check latest update of the map, if no recent update, then update will be triggered
 /// - normally an update of the map is done by moving or rotating the device, but sometimes (eg at launch) the device is not moving, but still an update might be needed, for instance zoomin or zoomout after loading a track
 /// - this value determines how often to do the check
-let timeScheduleToCheckMapUpdateInSeconds = 0.5
-
-/// how many subsequent track points in the same moving direction before deciding if user is moving in the direction start to end or end to start
-let amountOfTrackPointsToDetermineDirection = 3
+let timeScheduleToCheckMapUpdateInSeconds = 0.25
 
 /// White color for button background
 let kWhiteBackgroundColor: UIColor = UIColor(red: 254.0/255.0, green: 254.0/255.0, blue: 254.0/255.0, alpha: 0.90)
@@ -736,7 +734,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
        
         // update distance
         distanceLabel.distance = map.calculateDistanceToDestination(currentDistanceToDestination: distanceLabel.distance)
-        print("distanceLabel.distance: \(distanceLabel.distance)")
+
         if distanceLabel.distance == 0.0 {
             
             movingDirectionLabel.text = ""
@@ -775,7 +773,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             }
             
             // calculate average of measuredSpeads
-            let averageSpeed = measuredSpeads.reduce(0.0, +)/Double(measuredSpeads.count)
+            let averageSpeed = measuredSpeads.reduce(0.0, +)/(measuredSpeads.count > 0 ? Double(measuredSpeads.count) : 1.0)
             
             // if time since last gesture end is less than pauzeUdateMapCenterAfterGestureEndForHowManySeconds, then don't further update the map
             if screenFrozen() {return}
