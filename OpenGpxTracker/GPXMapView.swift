@@ -10,7 +10,6 @@ import UIKit
 import MapKit
 import CoreLocation
 import CoreGPX
-import CoreData
 import MapCache
 
 ///
