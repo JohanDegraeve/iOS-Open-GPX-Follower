@@ -26,7 +26,6 @@
 "COORDS_LABEL" = "(%@, %@) · altitude: %@";
 "NO_FILES" = "Geen GPX bestanden";
 "YOUR_FILES" = "Jouw GPX bestanden";
-"LAST_SAVED" = "Laatst opgeslagen %@ (%@)";
 "DELETE" = "Verwijderen";
 "SELECT_OPTION" = "Selecteer optie";
 "LOAD_IN_MAP" = "Laad in kaart";

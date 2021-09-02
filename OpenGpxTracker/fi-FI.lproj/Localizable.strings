@@ -26,7 +26,6 @@ Created by Phiilman on 28.03.20.
 "COORDS_LABEL" = "(%@, %@) · korkeus: %@";
 "NO_FILES" = "Ei GPX -tiedostoja";
 "YOUR_FILES" = "Sinun GPX tiedostosi";
-"LAST_SAVED" = "Viimeksi tallennettu %@ (%@)";
 "DELETE" = "Poista";
 "SELECT_OPTION" = "Valitse asetus";
 "LOAD_IN_MAP" = "Lataa kartalle";

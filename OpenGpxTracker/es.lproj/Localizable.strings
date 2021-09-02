@@ -26,7 +26,6 @@
 "COORDS_LABEL" = "(%@, %@) · altitud: %@";
 "NO_FILES" = "No hay archivos GPX";
 "YOUR_FILES" = "Tus archivos GPX";
-"LAST_SAVED" = "Guardado %@ (%@)";
 "DELETE" = "Borrar";
 "SELECT_OPTION" = "Selecciona una opción";
 "LOAD_IN_MAP" = "Cargar en el mapa";

@@ -30,7 +30,6 @@
 "COORDS_LABEL" = "(%@, %@) · 海拔: %@";
 "NO_FILES" = "无法找到任何 GPX 文件";
 "YOUR_FILES" = "您的 GPX 文件";
-"LAST_SAVED" = "最后记录： %@ (%@)";
 "DELETE" = "删除";
 "SELECT_OPTION" = "请选择";
 "LOAD_IN_MAP" = "用地图显示文件资料";

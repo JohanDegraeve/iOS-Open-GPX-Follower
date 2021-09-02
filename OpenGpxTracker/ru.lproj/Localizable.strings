@@ -26,7 +26,7 @@
 "COORDS_LABEL" = "(%@, %@) · высота: %@";
 "NO_FILES" = "Нет GPX-файлов";
 "YOUR_FILES" = "Ваши GPX-файлы";
-"LAST_SAVED" = "Сохранен %@ (%@)";
+
 "DELETE" = "Удалить";
 "SELECT_OPTION" = "Выберите действие";
 "LOAD_IN_MAP" = "Показать на карте";

@@ -132,20 +132,16 @@ class GPXFilesTableViewController: UITableViewController, UINavigationBarDelegat
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as UITableViewCell
         if gpxFilesFound {
+            
             let cell: UITableViewCell = UITableViewCell(style: UITableViewCell.CellStyle.subtitle, reuseIdentifier: "Cell")
-            //cell.accessoryType = UITableViewCellAccessoryType.DetailDisclosureButton
-            //cell.accessoryView = [[ UIImageView alloc ] initWithImage:[UIImage imageNamed:@"Something" ]];
-            // swiftlint:disable force_cast
+
             let gpxFileInfo = fileList.object(at: (indexPath as NSIndexPath).row) as! GPXFileInfo
-            let lastSaved = NSLocalizedString("LAST_SAVED", comment: "no comment")
+            
             cell.textLabel?.text = gpxFileInfo.fileName
-            cell.detailTextLabel?.text = String(format: lastSaved, gpxFileInfo.modifiedDatetimeAgo, gpxFileInfo.fileSizeHumanised)
-            if #available(iOS 13, *) {
-                cell.detailTextLabel?.textColor = UIColor.secondaryLabel
-            } else {
-                cell.detailTextLabel?.textColor = UIColor.darkGray
-            }
+
+
             return cell
+
         } else {
             let cell: UITableViewCell = UITableViewCell(style: UITableViewCell.CellStyle.subtitle, reuseIdentifier: "Cell")
             cell.textLabel?.text = fileList.object(at: (indexPath as NSIndexPath).row) as? NSString as String? ?? ""

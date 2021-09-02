@@ -41,7 +41,6 @@
 		89F6E0F5227D091900CE3E3F /* Double+Measures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89F6E0F4227D091900CE3E3F /* Double+Measures.swift */; };
 		89F6E0F7227E107C00CE3E3F /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89F6E0F6227E107C00CE3E3F /* Preferences.swift */; };
 		89F8749B1BBB7362004EF41A /* GPXTrack+length.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89F8749A1BBB7362004EF41A /* GPXTrack+length.swift */; };
-		89F8749F1BBCB97F004EF41A /* GPXRoot+length.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89F8749E1BBCB97F004EF41A /* GPXRoot+length.swift */; };
 		BF15092223916FC100F51F1B /* UIColor+DarkMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF15092123916FC100F51F1B /* UIColor+DarkMode.swift */; };
 		BF177EEA24D54F9200D5E021 /* CoreDataHelper+BatchDelete.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF177EE924D54F9200D5E021 /* CoreDataHelper+BatchDelete.swift */; };
 		BF1FE1A8230EAB9B00404B59 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = BF1FE1A6230EAB9B00404B59 /* Localizable.strings */; };
@@ -150,7 +149,6 @@
 		89F6E0F4227D091900CE3E3F /* Double+Measures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Measures.swift"; sourceTree = "<group>"; };
 		89F6E0F6227E107C00CE3E3F /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		89F8749A1BBB7362004EF41A /* GPXTrack+length.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GPXTrack+length.swift"; sourceTree = "<group>"; };
-		89F8749E1BBCB97F004EF41A /* GPXRoot+length.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GPXRoot+length.swift"; sourceTree = "<group>"; };
 		93BD71BED3CF101C2B01ABDA /* Pods_OpenGpxTracker_Watch_Extension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenGpxTracker_Watch_Extension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		95D28CBDF2535138FA16F38F /* Pods_OpenGpxTracker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenGpxTracker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF15092123916FC100F51F1B /* UIColor+DarkMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+DarkMode.swift"; sourceTree = "<group>"; };
@@ -223,7 +221,6 @@
 				899D677C19D22E1B00C88A0A /* StopWatchDelegate.swift */,
 				895F04B31A7143CE004BEE8A /* GPXExtentCoordinates.swift */,
 				89F8749A1BBB7362004EF41A /* GPXTrack+length.swift */,
-				89F8749E1BBCB97F004EF41A /* GPXRoot+length.swift */,
 				89EA86602157A08E002E03A7 /* Date+timeAgo.swift */,
 				89EA86642157C444002E03A7 /* Int+asFilesize.swift */,
 				89EA86622157B42C002E03A7 /* GPXFileInfo.swift */,
@@ -612,7 +609,6 @@
 				F8B7180E26BDD6B4002ED1C3 /* AddGPXFileViewController.swift in Sources */,
 				898EED3619C6402900B4B207 /* GPXFilesTableViewController.swift in Sources */,
 				DC4908A11C4A136F009484AE /* TrackerButton.swift in Sources */,
-				89F8749F1BBCB97F004EF41A /* GPXRoot+length.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
