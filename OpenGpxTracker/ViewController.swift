@@ -936,7 +936,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         if let storedHeading = self.map.storedHeading {
             
-            self.map.camera.heading = storedHeading.trueHeading //+ map.cameraHeadingOffset
+            self.map.camera.heading = storedHeading.trueHeading + map.cameraHeadingOffset
             
         }
         
@@ -1113,7 +1113,7 @@ extension ViewController: CLLocationManagerDelegate {
         // only if end of last gesture > pauzeUdateMapCenterAfterGestureEndForHowManySeconds
         if abs(map.timeStampGestureEnd.timeIntervalSince(Date())) >= pauzeUdateMapCenterAfterGestureEndForHowManySeconds {
             
-            map.camera.heading = newHeading.trueHeading //+ map.cameraHeadingOffset
+            map.camera.heading = newHeading.trueHeading + map.cameraHeadingOffset
 
         }
 
