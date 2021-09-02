@@ -35,6 +35,11 @@ let minimumTopOfScreenInMeters = 200.0
 /// maximum amount to store in measuredSpeads, average of those speeds is used to display
 let maxMeasuredSpeads = 6
 
+/// maximum amount to store in measuredCourseDeltas,
+///
+/// measuredCourseDeltas is used to measure the difference between the course (in which direction the user is moving) and the heading (direction in which device is pointing)
+let maxMeasuredCourseDelta = 200
+
 /// if user gestures the map, then there's no more auto rotation and zoom, this for maximum pauzeUdateMapCenterAfterGestureEndForHowManySeconds seconds
 let pauzeUdateMapCenterAfterGestureEndForHowManySeconds = 30.0
 
@@ -80,12 +85,6 @@ let kSignalAccuracy3 = 51.0
 let kSignalAccuracy2 = 101.0
 /// Upper limits threshold (in meters) on signal accuracy.
 let kSignalAccuracy1 = 201.0
-
-/// to measure the average speeds
-var measuredSpeads = [Double]()
-
-/// current index in latitueLongitudedeltas, default 2
-var currentLongitudedeltaIndex = 2
 
 /// UserDefaults.standard
 fileprivate let defaults = UserDefaults.standard
@@ -178,6 +177,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     /// to keep track when last time map view as updated
     var timestampLastCallToUpdateMapCenter = Date(timeIntervalSince1970: 0)
+    
+    /// to measure the difference between the course (in which direction the user is moving) and the heading (direction in which device is pointing)
+    private var measuredCourseDeltas = [Double]()
+    
+    /// to measure the average speeds
+    private var measuredSpeads = [Double]()
+    
+    /// current index in latitueLongitudedeltas, default 2
+    var currentLongitudedeltaIndex = 2
+    
+    /// - camera heading will be update if user has rotate device permenantly (eg fix on bike or motorcycle, but not in heading direction)
+    /// - this update will happen once per minute
+    private var timeStampLastUpdateCameraHeading = Date()
+    
+    /// every minute, a camera heading update will be done
+    private let cameraHeadingFrequencyInMinutes = 1.0
     
     /// Initializer. Just initializes the class vars/const
     required init(coder aDecoder: NSCoder) {
@@ -757,7 +772,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         // set lastCallToUpdateMapCenter
         timestampLastCallToUpdateMapCenter = Date()
         
-        // unwrap locationg
+        // unwrap location
         if let newLocation = locationManager.location {
             
             // only if speed >= 0, then calculate new average speed
@@ -775,6 +790,43 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             // calculate average of measuredSpeads
             let averageSpeed = measuredSpeads.reduce(0.0, +)/(measuredSpeads.count > 0 ? Double(measuredSpeads.count) : 1.0)
             
+            // store coures
+            if let newCourse = locationManager.location?.course, let trueHeading = map.storedHeading?.trueHeading {
+                
+                // store new course in array, to keep track of recent courses and calculate the average
+                // but remove last one if maximum amount is already stored
+                if measuredCourseDeltas.count == maxMeasuredCourseDelta {
+                    measuredCourseDeltas.removeLast()
+                }
+                measuredCourseDeltas.insert(newCourse - trueHeading, at: 0)
+                
+            }
+            
+            // calculate average of measuredSpeads, if the array is full
+            var averageCourseDelta = 0.0
+            if measuredCourseDeltas.count == maxMeasuredCourseDelta {
+
+                averageCourseDelta = measuredCourseDeltas.reduce(0.0, +)/(measuredCourseDeltas.count > 0 ? Double(measuredCourseDeltas.count) : 1.0)
+
+            }
+            
+            if let heading = map.storedHeading {
+                
+                print("averageCourseDelta: \(averageCourseDelta)")
+                
+                print("heading: \(heading.trueHeading)")
+                
+            }
+            
+            // update camera offset if needed
+            if let trueHeading = map.storedHeading?.trueHeading, abs(timeStampLastUpdateCameraHeading.timeIntervalSince(Date())) * 60.0 > cameraHeadingFrequencyInMinutes, averageCourseDelta > 0.0 {
+                
+                map.cameraHeadingOffset = averageCourseDelta - trueHeading
+
+                print("updating map.cameraHeadingOffset to : \(map.cameraHeadingOffset)")
+                
+            }
+             
             // if time since last gesture end is less than pauzeUdateMapCenterAfterGestureEndForHowManySeconds, then don't further update the map
             if screenFrozen() {return}
             
@@ -884,7 +936,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         if let storedHeading = self.map.storedHeading {
             
-            self.map.camera.heading = storedHeading.trueHeading
+            self.map.camera.heading = storedHeading.trueHeading //+ map.cameraHeadingOffset
             
         }
         
@@ -990,6 +1042,8 @@ extension ViewController: GPXFilesTableViewControllerDelegate {
         // set text to "Total distance"
         self.movingDirectionLabel.text = text_total_distance
         
+        currentLongitudedeltaIndex = 2
+        
     }
 }
 
@@ -1040,7 +1094,7 @@ extension ViewController: CLLocationManagerDelegate {
         
         // user moved location, so update center of the map
         updateMapCenter(locationManager: locationManager)
-
+        
     }
 
     ///
@@ -1059,7 +1113,7 @@ extension ViewController: CLLocationManagerDelegate {
         // only if end of last gesture > pauzeUdateMapCenterAfterGestureEndForHowManySeconds
         if abs(map.timeStampGestureEnd.timeIntervalSince(Date())) >= pauzeUdateMapCenterAfterGestureEndForHowManySeconds {
             
-            map.camera.heading = newHeading.trueHeading
+            map.camera.heading = newHeading.trueHeading //+ map.cameraHeadingOffset
 
         }
 

@@ -63,7 +63,10 @@ class GPXMapView: MKMapView {
     
     /// temp storage heading, updated each time a new heading is received from the location manager. Used when user rotates map (not device but map)
     var storedHeading: CLHeading?
-
+    
+    /// offset to use in camera heading
+    var cameraHeadingOffset = 0.0
+    
     /// Arrow image to display heading (orientation of the device)
     /// initialized on MapViewDelegate
     var headingImageView: UIImageView?
@@ -264,6 +267,7 @@ class GPXMapView: MKMapView {
         currentGPXTrackPointIndex = 0
         currentGPXTrackPointDistanceFromStart = 0.0
         movesStartToEnd = true
+        subsequentTrackPointsInSameDirection = 0
         
     }
     
