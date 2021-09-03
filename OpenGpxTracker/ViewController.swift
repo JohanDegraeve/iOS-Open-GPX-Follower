@@ -35,11 +35,6 @@ let minimumTopOfScreenInMeters = 200.0
 /// maximum amount to store in measuredSpeads, average of those speeds is used to display
 let maxMeasuredSpeads = 6
 
-/// maximum amount to store in measuredCourseDeltas,
-///
-/// measuredCourseDeltas is used to measure the difference between the course (in which direction the user is moving) and the heading (direction in which device is pointing)
-let maxMeasuredCourseDelta = 200
-
 /// if user gestures the map, then there's no more auto rotation and zoom, this for maximum pauzeUdateMapCenterAfterGestureEndForHowManySeconds seconds
 let pauzeUdateMapCenterAfterGestureEndForHowManySeconds = 30.0
 
@@ -177,9 +172,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     /// to keep track when last time map view as updated
     var timestampLastCallToUpdateMapCenter = Date(timeIntervalSince1970: 0)
-    
-    /// to measure the difference between the course (in which direction the user is moving) and the heading (direction in which device is pointing)
-    private var measuredCourseDeltas = [Double]()
     
     /// to measure the average speeds
     private var measuredSpeads = [Double]()
@@ -790,43 +782,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             // calculate average of measuredSpeads
             let averageSpeed = measuredSpeads.reduce(0.0, +)/(measuredSpeads.count > 0 ? Double(measuredSpeads.count) : 1.0)
             
-            // store coures
-            if let newCourse = locationManager.location?.course, let trueHeading = map.storedHeading?.trueHeading {
-                
-                // store new course in array, to keep track of recent courses and calculate the average
-                // but remove last one if maximum amount is already stored
-                if measuredCourseDeltas.count == maxMeasuredCourseDelta {
-                    measuredCourseDeltas.removeLast()
-                }
-                measuredCourseDeltas.insert(newCourse - trueHeading, at: 0)
-                
-            }
-            
-            // calculate average of measuredSpeads, if the array is full
-            var averageCourseDelta = 0.0
-            if measuredCourseDeltas.count == maxMeasuredCourseDelta {
-
-                averageCourseDelta = measuredCourseDeltas.reduce(0.0, +)/(measuredCourseDeltas.count > 0 ? Double(measuredCourseDeltas.count) : 1.0)
-
-            }
-            
-            if let heading = map.storedHeading {
-                
-                print("averageCourseDelta: \(averageCourseDelta)")
-                
-                print("heading: \(heading.trueHeading)")
-                
-            }
-            
-            // update camera offset if needed
-            if let trueHeading = map.storedHeading?.trueHeading, abs(timeStampLastUpdateCameraHeading.timeIntervalSince(Date())) * 60.0 > cameraHeadingFrequencyInMinutes, averageCourseDelta > 0.0 {
-                
-                map.cameraHeadingOffset = averageCourseDelta - trueHeading
-
-                print("updating map.cameraHeadingOffset to : \(map.cameraHeadingOffset)")
-                
-            }
-             
             // if time since last gesture end is less than pauzeUdateMapCenterAfterGestureEndForHowManySeconds, then don't further update the map
             if screenFrozen() {return}
             
