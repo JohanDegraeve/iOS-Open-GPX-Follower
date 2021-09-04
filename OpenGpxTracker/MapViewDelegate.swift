@@ -16,6 +16,7 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIAlertViewDelegate {
         }
         
         if overlay is MKPolyline {
+            
             let pr = MKPolylineRenderer(overlay: overlay)
             
             pr.alpha = 0.8
@@ -29,7 +30,11 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIAlertViewDelegate {
                 }
             }
             
-            pr.lineWidth = 10
+            if overlay is FatMKPolyline {
+                pr.lineWidth = 10
+            } else {
+                pr.lineWidth = 4
+            }
             return pr
         }
         return MKOverlayRenderer()

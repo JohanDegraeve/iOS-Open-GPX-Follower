@@ -188,7 +188,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     /// Initializer. Just initializes the class vars/const
     required init(coder aDecoder: NSCoder) {
+        
         self.map = GPXMapView(coder: aDecoder)!
+        
+        masterPolyline = MKPolyline(coordinates: &map.masterLineCoordinates, count: map.masterLineCoordinates.count)
+        
+        self.map.addOverlay(masterPolyline)
         
         self.appTitleLabel = UILabel(coder: aDecoder)!
 
@@ -214,6 +219,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         timerToCheckMapUpdate = Timer.scheduledTimer(timeInterval: timeScheduleToCheckMapUpdateInSeconds, target: self, selector: #selector(regularCallToUpdateMapCenter), userInfo: nil, repeats: true)
 
     }
+    
+    /// polyLine to show points on next 1 km in different color, or more fat
+    private var masterPolyline:MKPolyline
     
     ///
     /// De initalize the ViewController.
@@ -755,7 +763,20 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             movingDirectionLabel.text = "To start"
             
         }
+        
+        
+        // udpate the fat polyline
+        updateMasterPolyLine()
 
+    }
+    
+    func updateMasterPolyLine() {
+
+        masterPolyline = FatMKPolyline(coordinates: &map.masterLineCoordinates, count: map.masterLineCoordinates.count)
+        
+        map.removeOverlay(masterPolyline)
+        map.addOverlay(masterPolyline)
+        
     }
     
     /// updates the map center, map zoom, map rotation, depending on user location, speed, distance from track and wheter or not user reacently did a gesture

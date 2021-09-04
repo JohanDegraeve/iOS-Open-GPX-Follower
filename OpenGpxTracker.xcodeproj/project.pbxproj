@@ -60,6 +60,7 @@
 		F8B7181926C083B4002ED1C3 /* AddGPXFileViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7181826C083B4002ED1C3 /* AddGPXFileViewControllerDelegate.swift */; };
 		F8CA85C526D052F90004DA34 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CA85C426D052F90004DA34 /* Date.swift */; };
 		F8CB576A26DD834B0010200B /* GPXTrackPointDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB576926DD834B0010200B /* GPXTrackPointDistance.swift */; };
+		F8CB576C26E4185C0010200B /* FatMKPolyline.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB576B26E4185C0010200B /* FatMKPolyline.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -171,6 +172,7 @@
 		F8B7181826C083B4002ED1C3 /* AddGPXFileViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGPXFileViewControllerDelegate.swift; sourceTree = "<group>"; };
 		F8CA85C426D052F90004DA34 /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		F8CB576926DD834B0010200B /* GPXTrackPointDistance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPXTrackPointDistance.swift; sourceTree = "<group>"; };
+		F8CB576B26E4185C0010200B /* FatMKPolyline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FatMKPolyline.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -218,6 +220,7 @@
 				BFE026C1244A01DB005423E6 /* UIInsetLabel.swift */,
 				BFE026C3244A0281005423E6 /* DateField.swift */,
 				F8CB576926DD834B0010200B /* GPXTrackPointDistance.swift */,
+				F8CB576B26E4185C0010200B /* FatMKPolyline.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -541,6 +544,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F8CB576C26E4185C0010200B /* FatMKPolyline.swift in Sources */,
 				BFE026C6244A02A4005423E6 /* DatePatternButton.swift in Sources */,
 				BF15092223916FC100F51F1B /* UIColor+DarkMode.swift in Sources */,
 				899D677F19D2366100C88A0A /* GPXMapView.swift in Sources */,

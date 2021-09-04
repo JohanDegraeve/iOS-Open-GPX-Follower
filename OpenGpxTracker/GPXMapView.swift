@@ -127,10 +127,38 @@ class GPXMapView: MKMapView {
     /// when did the last gesture end ?
     var timeStampGestureEnd:Date = Date(timeIntervalSince1970: 0)
     
-    /// last  one trackPoint less than expected maximum distance from user
+    /// last trackPoint less than expected maximum distance from user
     ///
     /// initialize to 0 means we assume we start at the start of the session
-    private var currentGPXTrackPointIndex = 0
+    private var currentGPXTrackPointIndex = 0 {
+        
+        didSet {
+            
+           if oldValue != currentGPXTrackPointIndex {
+
+                if trackPointDistances.count > 0 {
+                    
+                    masterLineCoordinates = [CLLocationCoordinate2D]()
+
+                    for cntr in currentGPXTrackPointIndex-50...currentGPXTrackPointIndex+50 {
+                        
+                        if cntr >= 0, cntr < trackPointDistances.count, let latitude = trackPointDistances[cntr].gpxTrackPoint.latitude, let longitude = trackPointDistances[cntr].gpxTrackPoint.longitude {
+                            
+                            masterLineCoordinates.append(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                            
+                        }
+                        
+                    }
+                    
+                }
+
+            }
+            
+        }
+    }
+    
+    /// coordinates for which a more fat polyline must be drawn on the screen, so that user clearly sees which track to follow
+    public var masterLineCoordinates = [CLLocationCoordinate2D]()
     
     /// last but one trackPoint less than expected maximum distance from user
     ///
@@ -157,6 +185,7 @@ class GPXMapView: MKMapView {
         
         isUserInteractionEnabled = true
         isMultipleTouchEnabled = true
+        
     }
     
     ///
@@ -267,6 +296,7 @@ class GPXMapView: MKMapView {
         currentGPXTrackPointDistanceFromStart = 0.0
         movesStartToEnd = true
         subsequentTrackPointsInSameDirection = 0
+        masterLineCoordinates = [CLLocationCoordinate2D]()
         
     }
     
