@@ -11,6 +11,7 @@ import Foundation
 import UIKit
 import CoreLocation
 import MapCache
+import MessageUI
 
 /// Units Section Id in PreferencesTableViewController
 let kUnitsSection = 0
@@ -24,6 +25,9 @@ let kMapSourceSection = 2
 /// Activity Type Section Id in PreferencesTableViewController
 let kActivityTypeSection = 3
 
+/// developer settings
+let kDeveloperSection = 4
+
 /// Cell Id of the Use Imperial units in UnitsSection
 let kUseImperialUnitsCell = 0
 
@@ -32,6 +36,10 @@ let kUseOfflineCacheCell = 0
 
 /// Cell Id for Clear cache in CacheSection of PreferencesTableViewController
 let kClearCacheCell = 1
+
+let kSendTraceFileCell = 0
+
+let traceFileDestinationAddress = "gpxfollower@proximus.be"
 
 ///
 /// There are two preferences available:
@@ -99,7 +107,7 @@ class PreferencesTableViewController: UITableViewController, UINavigationBarDele
     /// Returns 4 sections: Units, Cache, Map Source, Activity Type
     override func numberOfSections(in tableView: UITableView?) -> Int {
         // Return the number of sections.
-        return 4
+        return 5
     }
     
     /// Returns the title of the existing sections.
@@ -111,6 +119,7 @@ class PreferencesTableViewController: UITableViewController, UINavigationBarDele
         case kCacheSection: return NSLocalizedString("CACHE", comment: "no comment")
         case kMapSourceSection: return NSLocalizedString("MAP_SOURCE", comment: "no comment")
         case kActivityTypeSection: return NSLocalizedString("ACTIVITY_TYPE", comment: "no comment")
+        case kDeveloperSection: return "Developer"
 
         default: fatalError("Unknown section")
         }
@@ -125,6 +134,7 @@ class PreferencesTableViewController: UITableViewController, UINavigationBarDele
         case kUnitsSection: return 1
         case kMapSourceSection: return GPXTileServer.count
         case kActivityTypeSection: return CLActivityType.count
+        case kDeveloperSection: return 1
 
         default: fatalError("Unknown section")
         }
@@ -197,6 +207,14 @@ class PreferencesTableViewController: UITableViewController, UINavigationBarDele
             if indexPath.row + 1 == preferences.locationActivityTypeInt {
                 cell.accessoryType = .checkmark
             }
+        }
+        
+        if indexPath.section == kDeveloperSection {
+            
+            cell = UITableViewCell(style: .value1, reuseIdentifier: "CacheCell")
+            cell.textLabel?.text = "Send Trace File"
+            cell.accessoryType = .none
+            
         }
         
         return cell
@@ -292,7 +310,51 @@ class PreferencesTableViewController: UITableViewController, UINavigationBarDele
             self.delegate?.didUpdateActivityType((indexPath as NSIndexPath).row + 1)
         }
         
+        if indexPath.section == kDeveloperSection {
+            
+            let mail = MFMailComposeViewController()
+            mail.mailComposeDelegate = self
+            mail.setToRecipients([traceFileDestinationAddress])
+            mail.setMessageBody("See attachment", isHTML: true)
+            
+            // add all trace files as attachment
+            let traceFilesInData = Trace.getTraceFilesInData()
+            for (index, traceFileInData) in traceFilesInData.0.enumerated() {
+                mail.addAttachmentData(traceFileInData as Data, mimeType: "text/txt", fileName: traceFilesInData.1[index])
+            }
+            
+            self.present(mail, animated: true)
+
+        }
+        
         //unselect row
         tableView.deselectRow(at: indexPath, animated: true)
+        
     }
+}
+
+extension PreferencesTableViewController: MFMailComposeViewControllerDelegate {
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        
+        controller.dismiss(animated: true, completion: nil)
+        
+        switch result {
+        
+        case .cancelled:
+            break
+            
+        case .sent, .saved:
+            break
+            
+        case .failed:
+            break
+            
+        @unknown default:
+            break
+            
+        }
+        
+    }
+    
 }
