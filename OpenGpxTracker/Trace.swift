@@ -1,5 +1,4 @@
 import Foundation
-import Combine
 
 /// for use in NSLog
 fileprivate let tracePrefix = "GPXFollower-NSLog"

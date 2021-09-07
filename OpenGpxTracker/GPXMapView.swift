@@ -35,6 +35,15 @@ class GPXMapView: MKMapView {
     /// how many subsequent track points in the same moving direction before deciding if user is moving in the direction start to end or end to start
     private let amountOfTrackPointsToDetermineDirection = 3
 
+    /// current location is further away from track than maximumDistanceFromTrackBeforeStartingZoomInInMeter, then consider not on track
+    let maximumDistanceFromTrackInMeter = 150
+
+    /// - how often to check if still on track
+    let timeScheduleToCheckOnTrackInSeconds = 3.0
+
+    /// minimum distance of top of screen in meters
+    let minimumTopOfScreenInMeters = 200.0
+
     /// Current session of GPX location logging. Handles all background tasks and recording.
     let session = GPXSession()
 
@@ -127,38 +136,16 @@ class GPXMapView: MKMapView {
     /// when did the last gesture end ?
     var timeStampGestureEnd:Date = Date(timeIntervalSince1970: 0)
     
+    /// value will be set by background process
+    var isOnTrack = false
+    
     /// last trackPoint less than expected maximum distance from user
     ///
     /// initialize to 0 means we assume we start at the start of the session
-    private var currentGPXTrackPointIndex = 0 {
-        
-        didSet {
-            
-           if oldValue != currentGPXTrackPointIndex {
-
-                if trackPointDistances.count > 0 {
-                    
-                    masterLineCoordinates = [CLLocationCoordinate2D]()
-
-                    for cntr in currentGPXTrackPointIndex-50...currentGPXTrackPointIndex+50 {
-                        
-                        if cntr >= 0, cntr < trackPointDistances.count, let latitude = trackPointDistances[cntr].gpxTrackPoint.latitude, let longitude = trackPointDistances[cntr].gpxTrackPoint.longitude {
-                            
-                            masterLineCoordinates.append(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
-                            
-                        }
-                        
-                    }
-                    
-                }
-
-            }
-            
-        }
-    }
+    private var currentGPXTrackPointIndex = 0
     
     /// coordinates for which a more fat polyline must be drawn on the screen, so that user clearly sees which track to follow
-    public var masterLineCoordinates = [CLLocationCoordinate2D]()
+    public var fatPolylineCoordinates = [CLLocationCoordinate2D]()
     
     /// last but one trackPoint less than expected maximum distance from user
     ///
@@ -167,12 +154,24 @@ class GPXMapView: MKMapView {
     
     private var currentGPXTrackPointDistanceFromStart: Double = 0.0
     
+    /// used for background processing, like check if on track
+    private var operationQueue = OperationQueue()
+    
+    /// when fired, a call will be made to updateMapCenter
+    var timerToCheckOnTrack: Timer?
+
+    /// used in calculation of zoom, als in map to calculate lenght of fatline
+    var requiredDistanceToTopOffViewInMeters: Double
+
     ///
     /// Initializes the map with an empty currentSegmentOverlay.
     ///
     required init?(coder aDecoder: NSCoder) {
 
         compassRect = CGRect.init(x: 0, y: 0, width: 36, height: 36)
+
+        requiredDistanceToTopOffViewInMeters = minimumTopOfScreenInMeters
+        
         super.init(coder: aDecoder)
         
         // Rotation Gesture handling (for the map rotation's influence towards heading pointing arrow)
@@ -185,6 +184,9 @@ class GPXMapView: MKMapView {
         
         isUserInteractionEnabled = true
         isMultipleTouchEnabled = true
+        
+        // used for calculating on track in background, no need to calculate this mulitple times in parallel
+        operationQueue.maxConcurrentOperationCount = 1
         
     }
     
@@ -296,7 +298,8 @@ class GPXMapView: MKMapView {
         currentGPXTrackPointDistanceFromStart = 0.0
         movesStartToEnd = true
         subsequentTrackPointsInSameDirection = 0
-        masterLineCoordinates = [CLLocationCoordinate2D]()
+        fatPolylineCoordinates = [CLLocationCoordinate2D]()
+        isOnTrack = false
         
     }
     
@@ -352,107 +355,6 @@ class GPXMapView: MKMapView {
         }
         
         return session.distance
-        
-    }
-    
-    /// onTrack
-    /// - returns
-    ///     - boolean : that tells if there's at least one trackpoint within maximumDistanceInMeters, (circle around userlocation of maximumDistanceInMeters radius, should have at least one trackpoint)
-    func onTrack(maximumDistanceInMeters: Int) -> Bool {
-        
-        // if no session exists (distance 0) then for sure not on track
-        if session.distance == 0 {return false}
-        
-        // should never be the case, because if session.distance != 0, then there must be elements in this array - anyway let's check to avoid crashes
-        if trackPointDistances.count == 0 {return false}
-        
-        /// piece off code to call two times, it checks if the given trackpoint is within minimum distance and if yes sets the values for previousGPXTrackPointIndex, currentGPXTrackPointIndex and currentGPXTrackPointDistanceFromStart
-        let checkOnTrack = { (trackPointDistanceIndex: Int) -> Bool in
-            
-            let trackPointDistance = self.trackPointDistances[trackPointDistanceIndex]
-            
-            if let latitude = trackPointDistance.gpxTrackPoint.latitude, let longitude = trackPointDistance.gpxTrackPoint.longitude {
-                
-                if let location = self.userLocation.location {
-                    
-                    if location.distance(from: CLLocation(latitude: latitude, longitude: longitude)) <= Double(maximumDistanceInMeters) {
-                        
-                        // assign previousGPXTrackPointIndex to currentGPXTrackPointIndex
-                        self.previousGPXTrackPointIndex = self.currentGPXTrackPointIndex
-                        
-                        // assign currentGPXTrackPointIndex to current trackPointDistanceIndex
-                        self.currentGPXTrackPointIndex = trackPointDistanceIndex
-                        
-                        // currentGPXTrackPointDistanceFromStart to distance of trackPointDistance
-                        self.currentGPXTrackPointDistanceFromStart = trackPointDistance.distance
-                        
-                        return true
-                        
-                    }
-                    
-                }
-                
-            }
-            
-            return false
-            
-        }
-        
-        if movesStartToEnd {
-
-            // start checking as of previous index found
-            for n in previousGPXTrackPointIndex...(trackPointDistances.count - 1) {
-
-                if checkOnTrack(n) {
-                    
-                    return true
-                    
-                } else {
-                    
-                    // not found from previous index up to end of the array, restart at 0
-                    for n in 0...(previousGPXTrackPointIndex) {
-                        
-                        if checkOnTrack(n) {
-                            
-                            return true
-                            
-                        }
-                        
-                    }
-                    
-                }
-                
-            }
-
-        } else {
-            
-            // moving end to start
-            // start checking as of previous index found
-            for n in (0...previousGPXTrackPointIndex).reversed() {
-                
-                if checkOnTrack(n) {
-                    
-                    return true
-                    
-                } else {
-                    
-                    for n in (previousGPXTrackPointIndex...(trackPointDistances.count - 1)).reversed() {
-                        
-                        if checkOnTrack(n) {
-                            
-                            return true
-                            
-                        }
-                        
-                    }
-                    
-                }
-                
-            }
-            
-        }
-        
-        return false
         
     }
     
@@ -516,7 +418,7 @@ class GPXMapView: MKMapView {
         // case where current gpx trackpoint did not change
         if  currentGPXTrackPointIndex == previousGPXTrackPointIndex {
             
-            // there's been no move, no change in distance label
+            // there's been no move, no change in distance
             return currentDistanceToDestination
             
         }
@@ -529,12 +431,14 @@ class GPXMapView: MKMapView {
                 
                 // reached amountOfTrackPointsToDetermineDirection to determine the moving direction
                 movesStartToEnd = true
-                
+                trace("setting movesStartToEnd to true")
+
             } else {
                 
                 // did not reach amountOfTrackPointsToDetermineDirection to determine the moving direction
                 // increase the value
                 subsequentTrackPointsInSameDirection += 1
+                trace("setting subsequentTrackPointsInSameDirection to %{public}@", subsequentTrackPointsInSameDirection.description)
                 
                 // possibly user changed direction, return current distance
                 return currentDistanceToDestination
@@ -552,13 +456,15 @@ class GPXMapView: MKMapView {
                 
                 // reached amountOfTrackPointsToDetermineDirection to determine the moving direction
                 movesStartToEnd = false
+                trace("setting movesStartToEnd to false")
                 
             } else {
                 
                 // did not reach amountOfTrackPointsToDetermineDirection to determine the moving direction
-                // increase the value
+                // decrease the value
                 subsequentTrackPointsInSameDirection -= 1
-                
+                trace("setting subsequentTrackPointsInSameDirection to %{public}@", subsequentTrackPointsInSameDirection.description)
+
                 // possibly user changed direction, return current distance
                 return currentDistanceToDestination
                 
@@ -576,6 +482,236 @@ class GPXMapView: MKMapView {
             
         }
 
+    }
+    
+    @objc private func checkOnTrackInBackground() {
+        
+        let operation = BlockOperation(block: {
+            
+            // new values used, just to avoid that values are used in main thread while being updated in background thread
+            
+            /// new value of isOnTrack calculated in the operation
+            var newIsOntrack = self.isOnTrack
+            
+            /// new value of previousGPXTrackPointIndex calculated in the operation
+            var newPreviousGPXTrackPointIndex = self.previousGPXTrackPointIndex
+            
+            /// new value of currentGPXTrackPointIndex calculated in the operation
+            var newCurrentGPXTrackPointIndex = self.currentGPXTrackPointIndex
+            
+            /// new value of currentGPXTrackPointDistanceFromStart calculated in the operation
+            var newCurrentGPXTrackPointDistanceFromStart = self.currentGPXTrackPointDistanceFromStart
+            
+            // before leaving the function, assign values to new values, in main thread
+            // also calculate newFatPolylineCoordinates (not in the main thread)
+            defer {
+                
+                trace("in defer")
+
+                // calculate newFatPolylineCoordinates
+                var newFatPolylineCoordinates = self.fatPolylineCoordinates
+                if self.currentGPXTrackPointIndex != newCurrentGPXTrackPointIndex {
+                    
+                    newFatPolylineCoordinates = self.calculateFatpolyLineCoordinates(currentGPXTrackPointIndex: newCurrentGPXTrackPointIndex)
+                    trace("calculated newFatPolylineCoordinates with currentGPXTrackPointIndex = %{public}@", newCurrentGPXTrackPointIndex.description)
+                    
+                }
+                
+                // assign values to new values, in main thread
+                DispatchQueue.main.async {
+                    
+                    trace("newIsOntrack = %{public}@", newIsOntrack.description)
+                    trace("newPreviousGPXTrackPointIndex = %{public}@", newPreviousGPXTrackPointIndex.description)
+                    trace("newCurrentGPXTrackPointIndex = %{public}@", newCurrentGPXTrackPointIndex.description)
+                    trace("newCurrentGPXTrackPointDistanceFromStart = %{public}@", newCurrentGPXTrackPointDistanceFromStart.description)
+                    
+                    self.isOnTrack = newIsOntrack
+                    self.previousGPXTrackPointIndex = newPreviousGPXTrackPointIndex
+                    self.currentGPXTrackPointIndex = newCurrentGPXTrackPointIndex
+                    self.currentGPXTrackPointDistanceFromStart = newCurrentGPXTrackPointDistanceFromStart
+                    self.fatPolylineCoordinates = newFatPolylineCoordinates
+                    
+                }
+                
+            }
+            
+            // if there's more than one operation waiting for execution, it makes no sense to execute this one
+            guard self.operationQueue.operations.count <= 1 else {return}
+            
+            // if no session exists (distance 0) then for sure not on track
+            if self.session.distance == 0 {
+                
+                newIsOntrack = false
+                return
+                
+            }
+            
+            trace("start checkontrack")
+            
+            // assume not on track
+            newIsOntrack = false
+            
+            // should never be the case, because if session.distance != 0, then there must be elements in this array - anyway let's check to avoid crashes
+            if self.trackPointDistances.count == 0 {
+
+                trace("trackPointDistances.count = 0")
+                
+                return
+
+            }
+
+            // assign previousGPXTrackPointIndex to currentGPXTrackPointIndex
+            newPreviousGPXTrackPointIndex = newCurrentGPXTrackPointIndex
+
+            /// piece off code to call two times, it checks if the given trackpoint is within minimum distance and if yes sets the values for previousGPXTrackPointIndex, currentGPXTrackPointIndex and currentGPXTrackPointDistanceFromStart
+            let checkOnTrack = { (trackPointDistanceIndex: Int) -> Bool in
+                
+                let trackPointDistance = self.trackPointDistances[trackPointDistanceIndex]
+                
+                if let latitude = trackPointDistance.gpxTrackPoint.latitude, let longitude = trackPointDistance.gpxTrackPoint.longitude {
+                    
+                    if let location = self.userLocation.location {
+                        
+                        if location.distance(from: CLLocation(latitude: latitude, longitude: longitude)) <= Double(self.maximumDistanceFromTrackInMeter) {
+                            
+                            // assign currentGPXTrackPointIndex to current trackPointDistanceIndex
+                            newCurrentGPXTrackPointIndex = trackPointDistanceIndex
+                            
+                            // currentGPXTrackPointDistanceFromStart to distance of trackPointDistance
+                            newCurrentGPXTrackPointDistanceFromStart = trackPointDistance.distance
+                            
+                            return true
+                            
+                        }
+                        
+                    }
+                    
+                }
+                
+                return false
+                
+            }
+            
+            if self.movesStartToEnd {
+                trace("movesStartToEnd is currently true")
+                // start checking as of previous index found
+                forloop: for n in newPreviousGPXTrackPointIndex...(self.trackPointDistances.count - 1) {
+                    
+                    newIsOntrack = checkOnTrack(n)
+                    if newIsOntrack {
+                        trace("newIsOntrack is true with n = %{public}@", n.description)
+                        break forloop
+                        
+                    }
+                    
+                }
+                
+                if !newIsOntrack {
+                    
+                    // not found from previous index up to end of the array, restart at 0
+                    forloop:for n in 0...(newPreviousGPXTrackPointIndex) {
+                        
+                        newIsOntrack = checkOnTrack(n)
+                        if newIsOntrack {
+                            trace("newIsOntrack is true with n = %{public}@", n.description)
+                            break forloop
+                            
+                        }
+
+                    }
+                    
+                }
+                
+            } else {
+                
+                trace("movesStartToEnd is currently false")
+                
+                // moving end to start
+                // start checking as of previous index found
+                forloop:for n in (0...newPreviousGPXTrackPointIndex).reversed() {
+                    
+                    newIsOntrack = checkOnTrack(n)
+                    if newIsOntrack {
+                        trace("newIsOntrack is true with n = %{public}@", n.description)
+                        break forloop
+                        
+                    }
+
+                }
+                
+                if !newIsOntrack {
+                    
+                    forloop:for n in (newPreviousGPXTrackPointIndex...(self.trackPointDistances.count - 1)).reversed() {
+                        
+                        newIsOntrack = checkOnTrack(n)
+                        if newIsOntrack {
+                            trace("newIsOntrack is true with n = %{public}@", n.description)
+                            break forloop
+                            
+                        }
+
+                    }
+                    
+                }
+                
+            }
+            
+            trace("before leaving function, right before calling defer, newIsOntrack = %{public}@", newIsOntrack.description)
+            
+        })
+        
+        operationQueue.addOperation {
+            operation.start()
+        }
+        
+    }
+
+    public func launchTimerToCheckOnTrack() {
+        
+        timerToCheckOnTrack = Timer.scheduledTimer(timeInterval: timeScheduleToCheckOnTrackInSeconds, target: self, selector: #selector(checkOnTrackInBackground), userInfo: nil, repeats: true)
+        
+    }
+    
+    private func calculateFatpolyLineCoordinates(currentGPXTrackPointIndex: Int) -> [CLLocationCoordinate2D] {
+        
+        var fatPolylineCoordinates = [CLLocationCoordinate2D]()
+
+        if trackPointDistances.count > 0 {
+            
+            // nr of trackpoints to add to fat polyline depends on speed
+            let lengthOfFatLineInMeters = minimumTopOfScreenInMeters * 3
+            
+            for cntr in currentGPXTrackPointIndex-500...currentGPXTrackPointIndex {
+                
+                if cntr < 0 {continue}
+                
+                if abs(trackPointDistances[currentGPXTrackPointIndex].distance - trackPointDistances[cntr].distance) > lengthOfFatLineInMeters {continue}
+                
+                if  let latitude = trackPointDistances[cntr].gpxTrackPoint.latitude, let longitude = trackPointDistances[cntr].gpxTrackPoint.longitude {
+                    fatPolylineCoordinates.append(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                    
+                }
+                
+            }
+            
+            for cntr in currentGPXTrackPointIndex+1...currentGPXTrackPointIndex+500 {
+                
+                if cntr >= trackPointDistances.count {break}
+                
+                if abs(trackPointDistances[currentGPXTrackPointIndex].distance - trackPointDistances[cntr].distance) > lengthOfFatLineInMeters {break}
+                
+                if let latitude = trackPointDistances[cntr].gpxTrackPoint.latitude, let longitude = trackPointDistances[cntr].gpxTrackPoint.longitude {
+                    
+                    fatPolylineCoordinates.append(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                    
+                }
+                
+            }
+            
+        }
+        
+        return fatPolylineCoordinates
+        
     }
 
 }

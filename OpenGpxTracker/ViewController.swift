@@ -15,9 +15,6 @@ import CoreGPX
 
 let text_total_distance = "Total Distance"
 
-/// - current location is further away from track than maximumDistanceFromTrackBeforeStartingZoomInInMeter, then start zooming in or out to make sure track stays on screen
-let maximumDistanceFromTrackBeforeStartingZoomInOrOutInMeter = 150
-
 /// - if not on track anymore then mapped will be zoomed out further to make sure that the track is still visible in a view 70% of the normal full view
 /// - value between 0 and 100, but better take between 50 and 90
 let reducedViewPercentageMax = 70
@@ -28,9 +25,6 @@ let reducedViewPercentageMin = 40
 
 /// determines automatic zooming, if value is for example 1, and I'm moving at 30 km/h, then the top of the screen is 500 meter away
 let reachTopOfScreenInMinutes = 1.5
-
-/// minimum distance of top of screen in meters
-let minimumTopOfScreenInMeters = 200.0
 
 /// maximum amount to store in measuredSpeads, average of those speeds is used to display
 let maxMeasuredSpeads = 6
@@ -46,6 +40,11 @@ let latitudeLongitudeDeltas:[Double] = (0...100).map{ 0.0015 * pow(1.1, Double($
 /// - normally an update of the map is done by moving or rotating the device, but sometimes (eg at launch) the device is not moving, but still an update might be needed, for instance zoomin or zoomout after loading a track
 /// - this value determines how often to do the check
 let timeScheduleToCheckMapUpdateInSeconds = 0.25
+
+/// how often to update the fat polyline (the one which is thicker)
+///
+/// just to avoid this happens to often,  I assume this demands resources
+let timeSheduleToUpdateFatMKPolyLineInSeconds = 5.0
 
 /// White color for button background
 let kWhiteBackgroundColor: UIColor = UIColor(red: 254.0/255.0, green: 254.0/255.0, blue: 254.0/255.0, alpha: 0.90)
@@ -98,9 +97,6 @@ var notInitialAppLaunch = defaults.bool(forKey: userDefaultsKeyForNotInitialAppL
     
 }
 
-/// when fired, a call will be made to updateMapCenter
-var timerToCheckMapUpdate: Timer?
-
 ///
 /// Main View Controller of the Application. It is loaded when the application is launched
 ///
@@ -108,6 +104,9 @@ var timerToCheckMapUpdate: Timer?
 ///
 ///
 class ViewController: UIViewController, UIGestureRecognizerDelegate {
+    
+    /// when fired, a call will be made to updateMapCenter
+    var timerToCheckMapUpdate: Timer?
     
     /// location manager instance configuration
     let locationManager: CLLocationManager = {
@@ -173,6 +172,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// to keep track when last time map view as updated
     var timestampLastCallToUpdateMapCenter = Date(timeIntervalSince1970: 0)
     
+    /// to keep track when last time fat polyline
+    var timestampLastUpdateFatPolyline = Date(timeIntervalSince1970: 0)
+    
     /// to measure the average speeds
     private var measuredSpeads = [Double]()
     
@@ -191,9 +193,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         self.map = GPXMapView(coder: aDecoder)!
         
-        masterPolyline = MKPolyline(coordinates: &map.masterLineCoordinates, count: map.masterLineCoordinates.count)
+        fatPolyline = MKPolyline(coordinates: &map.fatPolylineCoordinates, count: map.fatPolylineCoordinates.count)
         
-        self.map.addOverlay(masterPolyline)
+        self.map.addOverlay(fatPolyline)
         
         self.appTitleLabel = UILabel(coder: aDecoder)!
 
@@ -210,6 +212,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         launchTimerToCheckMapUpdate()
         
+        map.launchTimerToCheckOnTrack()
+        
     }
     
     /// timer will check latest update of the map, if no recent update, then update will be triggered
@@ -221,7 +225,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     /// polyLine to show points on next 1 km in different color, or more fat
-    private var masterPolyline:MKPolyline
+    private var fatPolyline:MKPolyline
     
     ///
     /// De initalize the ViewController.
@@ -575,6 +579,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         launchTimerToCheckMapUpdate()
         
+        map.launchTimerToCheckOnTrack()
+        
         // reset map timeStampGestureEnd
         // assume the user has been gesturing right before bringing the app to the background, and then immediately coming to the foreground, then it would take 30 seconds before the map starts centering again around the user's location, rotating the map and autozooming
         map.timeStampGestureEnd = Date(timeIntervalSince1970: 0)
@@ -597,6 +603,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         // stop timerToCheckMapUpdateInSeconds
         timerToCheckMapUpdate?.invalidate()
+        
+        // stop timerToCheckOnTrack
+        map.timerToCheckOnTrack?.invalidate()
 
     }
     
@@ -764,18 +773,26 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             
         }
         
-        
-        // udpate the fat polyline
-        updateMasterPolyLine()
+        if abs(timestampLastUpdateFatPolyline.timeIntervalSince(Date())) > timeSheduleToUpdateFatMKPolyLineInSeconds {
+            
+            // udpate the fat polyline
+            updateFatPolyLine()
+            
+            timestampLastUpdateFatPolyline = Date()
+
+        }
+
 
     }
     
-    func updateMasterPolyLine() {
+    func updateFatPolyLine() {
 
-        masterPolyline = FatMKPolyline(coordinates: &map.masterLineCoordinates, count: map.masterLineCoordinates.count)
+        trace("updating fatPolyline")
         
-        map.removeOverlay(masterPolyline)
-        map.addOverlay(masterPolyline)
+        fatPolyline = FatMKPolyline(coordinates: &map.fatPolylineCoordinates, count: map.fatPolylineCoordinates.count)
+        
+        map.removeOverlay(fatPolyline)
+        map.addOverlay(fatPolyline)
         
     }
     
@@ -817,7 +834,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             /// - when moving, the top of the screen should be reached in approximately reachTopOfScreenInMinutes minute
             /// - so the question is where would in one minute if I keep moving at the current speed
             /// - Exception : is user is too far away from the track, then verify that track is still visible on the screen and if not zoom in
-            let requiredDistanceToTopOffViewInMeters = max(averageSpeed * reachTopOfScreenInMinutes * 60, minimumTopOfScreenInMeters)
+            map.requiredDistanceToTopOffViewInMeters = max(averageSpeed * reachTopOfScreenInMinutes * 60, map.minimumTopOfScreenInMeters)
             
             // temporary store current centerCoordinate of map
             let currentCenterCoordinate = map.centerCoordinate // Temporary saved map current center position
@@ -831,18 +848,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             let distanceToTopOfViewInMeters = abs(newLocation.distance(from: CLLocation(latitude: map.centerCoordinate.latitude, longitude: map.centerCoordinate.longitude + map.region.span.longitudeDelta))) * 0.7/0.5
             
             /// is user on track or not ? (storing in a variable because it's used two times)
-            let userIsOntrack = map.onTrack(maximumDistanceInMeters: maximumDistanceFromTrackBeforeStartingZoomInOrOutInMeter)
+            let userIsOntrack = map.isOnTrack
             
             // If there's a track then first off all check that the user is currently on track, within maximumDistanceFromTrackBeforeStartingZoomInInMeter
             // if there's no track loaded yet, then the zoom will only depend on the speed
             if userIsOntrack || map.session.tracks.count == 0 {
 
                 // now if distanceToTopOfViewInMeters is more than x% more or less than requiredDistanceToTopOffViewInMeters, then decrease or increase the span
-                if distanceToTopOfViewInMeters > requiredDistanceToTopOffViewInMeters * 1.3 {
+                if distanceToTopOfViewInMeters > map.requiredDistanceToTopOffViewInMeters * 1.3 {
                     
                     zoomIn()
                     
-                } else if distanceToTopOfViewInMeters < requiredDistanceToTopOffViewInMeters * 0.7 {
+                } else if distanceToTopOfViewInMeters < map.requiredDistanceToTopOffViewInMeters * 0.7 {
                     
                     zoomOut()
                     
