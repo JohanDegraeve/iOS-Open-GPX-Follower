@@ -160,7 +160,7 @@ class GPXMapView: MKMapView {
     /// when fired, a call will be made to updateMapCenter
     var timerToCheckOnTrack: Timer?
 
-    /// used in calculation of zoom, als in map to calculate lenght of fatline
+    /// set in calculation of zoom, and used to calculate length of fat polyline
     var requiredDistanceToTopOffViewInMeters: Double
 
     ///
@@ -680,7 +680,7 @@ class GPXMapView: MKMapView {
         if trackPointDistances.count > 0 {
             
             // nr of trackpoints to add to fat polyline depends on speed
-            let lengthOfFatLineInMeters = minimumTopOfScreenInMeters * 3
+            let lengthOfFatLineInMeters = requiredDistanceToTopOffViewInMeters * 3
             
             for cntr in (currentGPXTrackPointIndex-500...currentGPXTrackPointIndex).reversed() {
                 
