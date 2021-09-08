@@ -54,6 +54,10 @@ extension GPXTrackSegment {
             let pt: CLLocation = CLLocation(latitude: Double(point.latitude!), longitude: Double(point.longitude!) )
             if prev == nil { //if first point => set it as previous and go for next
                 prev = pt
+
+                // add the first point to trackPointDistances
+                trackPointDistances.append(GPXTrackPointDistance(gpxTrackPoint: point, distance: length + actualDistanceFromStart))
+                
                 continue
             }
             
@@ -61,7 +65,7 @@ extension GPXTrackSegment {
             length += distanceTwoPoints
             //set current point as previous point
             prev = pt
-            
+
             // append GPXTrackPointDistance to trackPointDistances
             trackPointDistances.append(GPXTrackPointDistance(gpxTrackPoint: point, distance: length + actualDistanceFromStart))
             

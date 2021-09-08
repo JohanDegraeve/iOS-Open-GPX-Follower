@@ -509,8 +509,9 @@ class GPXMapView: MKMapView {
                 trace("in defer")
 
                 // calculate newFatPolylineCoordinates
+                // only if current gpx trackpoint changed, or it didn't change and it's 0 which is the case when loading the track while you're at point 0
                 var newFatPolylineCoordinates = self.fatPolylineCoordinates
-                if self.currentGPXTrackPointIndex != newCurrentGPXTrackPointIndex {
+                if (self.currentGPXTrackPointIndex != newCurrentGPXTrackPointIndex) ||  (self.currentGPXTrackPointIndex == newCurrentGPXTrackPointIndex && newCurrentGPXTrackPointIndex == 0){
                     
                     newFatPolylineCoordinates = self.calculateFatpolyLineCoordinates(currentGPXTrackPointIndex: newCurrentGPXTrackPointIndex)
                     trace("calculated newFatPolylineCoordinates with currentGPXTrackPointIndex = %{public}@", newCurrentGPXTrackPointIndex.description)
@@ -681,14 +682,15 @@ class GPXMapView: MKMapView {
             // nr of trackpoints to add to fat polyline depends on speed
             let lengthOfFatLineInMeters = minimumTopOfScreenInMeters * 3
             
-            for cntr in currentGPXTrackPointIndex-500...currentGPXTrackPointIndex {
+            for cntr in (currentGPXTrackPointIndex-500...currentGPXTrackPointIndex).reversed() {
                 
-                if cntr < 0 {continue}
+                if cntr < 0 {break}
                 
-                if abs(trackPointDistances[currentGPXTrackPointIndex].distance - trackPointDistances[cntr].distance) > lengthOfFatLineInMeters {continue}
+                if abs(trackPointDistances[currentGPXTrackPointIndex].distance - trackPointDistances[cntr].distance) > lengthOfFatLineInMeters {break}
                 
                 if  let latitude = trackPointDistances[cntr].gpxTrackPoint.latitude, let longitude = trackPointDistances[cntr].gpxTrackPoint.longitude {
-                    fatPolylineCoordinates.append(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                    trace("adding point to fatpolyline with index %{public}@", cntr.description)
+                    fatPolylineCoordinates.insert(CLLocationCoordinate2D(latitude: latitude, longitude: longitude), at: 0)
                     
                 }
                 
@@ -701,7 +703,8 @@ class GPXMapView: MKMapView {
                 if abs(trackPointDistances[currentGPXTrackPointIndex].distance - trackPointDistances[cntr].distance) > lengthOfFatLineInMeters {break}
                 
                 if let latitude = trackPointDistances[cntr].gpxTrackPoint.latitude, let longitude = trackPointDistances[cntr].gpxTrackPoint.longitude {
-                    
+                    trace("adding point to fatpolyline with index %{public}@", cntr.description)
+
                     fatPolylineCoordinates.append(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
                     
                 }
