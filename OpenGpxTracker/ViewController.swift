@@ -166,6 +166,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// View preferences button
     var preferencesButton: UIButton
     
+    /// Follow user button
+    var followUserButton: UIButton
+    
     /// Check if device is notched type phone
     var isIPhoneX = false
     
@@ -207,6 +210,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.folderButton = UIButton(coder: aDecoder)!
         self.aboutButton = UIButton(coder: aDecoder)!
         self.preferencesButton = UIButton(coder: aDecoder)!
+        self.followUserButton = UIButton(coder: aDecoder)!
         
         super.init(coder: aDecoder)!
         
@@ -414,6 +418,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         folderButton.autoresizingMask = [.flexibleRightMargin]
         map.addSubview(folderButton)
         
+        // Follow user button
+        followUserButton.layer.cornerRadius = kButtonSmallSize/2
+        followUserButton.backgroundColor = kWhiteBackgroundColor
+        //follow_user represents the user is not being followed. Default status when app starts
+        followUserButton.setImage(UIImage(named: "follow_user"), for: UIControl.State())
+        followUserButton.setImage(UIImage(named: "follow_user"), for: .highlighted)
+        followUserButton.addTarget(self, action: #selector(ViewController.followButtonTroggler), for: .touchUpInside)
+        map.addSubview(followUserButton)
+        
+        // initially set follow user button to hidden, because by default the user is followed
+        followUserButton.isHidden = true
+        
+        
         addConstraints(isIPhoneX)
         
         map.rotationGesture.delegate = self
@@ -435,6 +452,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     func addConstraints(_ isIPhoneX: Bool) {
         addConstraintsToAppTitleBar(isIPhoneX)
         addConstraintsToInfoLabels(isIPhoneX)
+        addConstraintsToButtonBar(isIPhoneX)
     }
     /// Adds constraints to subviews forming the app title bar (top bar)
     func addConstraintsToAppTitleBar(_ isIPhoneX: Bool) {
@@ -476,6 +494,27 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         NSLayoutConstraint(item: distanceLabel, attribute: .top, relatedBy: .equal, toItem: movingDirectionLabel, attribute: .bottom, multiplier: 1, constant: 5).isActive = true
         
     }
+    
+    /// Adds constraints to subviews forming the button bar (bottom session controls bar)
+    func addConstraintsToButtonBar(_ isIPhoneX: Bool) {
+        // MARK: Button Bar
+        
+        // constants
+        let kBottomGap: CGFloat = isIPhoneX ? 0 : 15
+        let kBottomDistance: CGFloat = kBottomGap + 16
+        
+        followUserButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        // seperation distance between button and bottom of view
+        NSLayoutConstraint(item: self.bottomLayoutGuide, attribute: .top, relatedBy: .equal, toItem: followUserButton, attribute: .bottom, multiplier: 1, constant: kBottomDistance).isActive = true
+        NSLayoutConstraint(item: map, attribute: .left, relatedBy: .equal, toItem: followUserButton, attribute: .left, multiplier: 1, constant: -kBottomDistance).isActive = true
+        
+        // fixed dimensions for all buttons
+        NSLayoutConstraint(item: followUserButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonSmallSize).isActive = true
+        NSLayoutConstraint(item: followUserButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonSmallSize).isActive = true
+        
+    }
+
     
     /// For handling compass location changes when orientation is switched.
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -628,7 +667,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let navController = UINavigationController(rootViewController: vc)
         self.present(navController, animated: true) { () -> Void in }
     }
-    
+ 
+    ///
+    /// Triggered when follow Button is taped.
+    @objc func followButtonTroggler() {
+        // this will cause removal of the button, because when setting timeStampGestureEnd to 1.1.1970, then map follows user
+        map.timeStampGestureEnd = Date(timeIntervalSince1970: 0)
+        
+        followUserButton.isHidden = true
+        
+    }
+
     ///
     /// Displays the view controller with the About information.
     ///
@@ -821,7 +870,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             let averageSpeed = measuredSpeads.reduce(0.0, +)/(measuredSpeads.count > 0 ? Double(measuredSpeads.count) : 1.0)
             
             // if time since last gesture end is less than pauzeUdateMapCenterAfterGestureEndForHowManySeconds, then don't further update the map
-            if screenFrozen() {return}
+            if screenFrozen() {
+                
+                followUserButton.isHidden = false
+                
+                return
+                
+            }
+            
             
             /* ****************************************************************************** */
             /* when moving, the top of the screen should be reached in approximately 1 minute */
