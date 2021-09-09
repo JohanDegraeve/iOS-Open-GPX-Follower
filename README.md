@@ -1,5 +1,5 @@
-Open GPX Follower
-=================
+## Open GPX Follower
+
 
 - Load GPX files from Internet or open GPX files from other app on your iOS device and display them on map
 - When you start moving, map will 
@@ -21,9 +21,6 @@ Open GPX Follower
  
 Based on [GPX Tracker](https://github.com/merlos/iOS-Open-GPX-Tracker)
 
-If you are goint to track without Internet... don't worry! Just browse the area where you'll be tracking and it will be cached.
-
-Open GPX Follower is an open source app (same lincense as Open GPX Tracker)
 
 ## Download Source code
 This application is written in Swift. To download the code run this command in a console:
