@@ -876,6 +876,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                 
                 return
                 
+            } else {
+                
+                // for safety setting to false
+                if !followUserButton.isHidden {
+
+                    followUserButton.isHidden = true
+
+                }
+                
             }
             
             
