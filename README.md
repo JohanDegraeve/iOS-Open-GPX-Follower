@@ -67,4 +67,4 @@ This app uses:
 Entry on the [Open Street Maps Wiki](https://wiki.openstreetmap.org/wiki/OpenGpxTracker)
 
 See also:
-- [Avenue GPX Viewer](https://github.com/vincentneo/Avenue-GPX-Viewer), a GPX viewer based on some of the codes used in this project. A side project by collaborator [@vincentneo](http://github.com/vincentneo).
+- [Avenue GPX Viewer](https://github.com/vincentneo/Avenue-GPX-Viewer), a GPX viewer based on some of the codes used in this project. A project by  [@vincentneo](http://github.com/vincentneo).
