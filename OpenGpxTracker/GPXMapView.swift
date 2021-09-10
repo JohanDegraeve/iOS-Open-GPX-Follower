@@ -423,55 +423,14 @@ class GPXMapView: MKMapView {
             
         }
         
-        // case where current gpxtrackpointindex increased
-        if currentGPXTrackPointIndex > previousGPXTrackPointIndex {
+        // check if value of movesStartToEnd is in a changing mood
+        if abs(subsequentTrackPointsInSameDirection) < amountOfTrackPointsToDetermineDirection {
             
-            // possibly moving from start to end
-            if subsequentTrackPointsInSameDirection == amountOfTrackPointsToDetermineDirection {
-                
-                // reached amountOfTrackPointsToDetermineDirection to determine the moving direction
-                movesStartToEnd = true
-                trace("setting movesStartToEnd to true")
-
-            } else {
-                
-                // did not reach amountOfTrackPointsToDetermineDirection to determine the moving direction
-                // increase the value
-                subsequentTrackPointsInSameDirection += 1
-                trace("setting subsequentTrackPointsInSameDirection to %{public}@", subsequentTrackPointsInSameDirection.description)
-                
-                // possibly user changed direction, return current distance
-                return currentDistanceToDestination
-                
-            }
+            print("subsequentTrackPointsInSameDirection =  \(subsequentTrackPointsInSameDirection), abs value is less than \(amountOfTrackPointsToDetermineDirection)")
+            return currentDistanceToDestination
             
         }
         
-        // case where current gpxtrackpointindex decreased
-        if currentGPXTrackPointIndex < previousGPXTrackPointIndex {
-            
-            // possibly moving from end to start
-            // this is the case of subsequentTrackPointsInSameDirection equals negative value for amountOfTrackPointsToDetermineDirection
-            if subsequentTrackPointsInSameDirection == -amountOfTrackPointsToDetermineDirection {
-                
-                // reached amountOfTrackPointsToDetermineDirection to determine the moving direction
-                movesStartToEnd = false
-                trace("setting movesStartToEnd to false")
-                
-            } else {
-                
-                // did not reach amountOfTrackPointsToDetermineDirection to determine the moving direction
-                // decrease the value
-                subsequentTrackPointsInSameDirection -= 1
-                trace("setting subsequentTrackPointsInSameDirection to %{public}@", subsequentTrackPointsInSameDirection.description)
-
-                // possibly user changed direction, return current distance
-                return currentDistanceToDestination
-                
-            }
-            
-        }
-
         if movesStartToEnd {
             
             return session.distance - currentGPXTrackPointDistanceFromStart
@@ -531,6 +490,9 @@ class GPXMapView: MKMapView {
                     self.currentGPXTrackPointIndex = newCurrentGPXTrackPointIndex
                     self.currentGPXTrackPointDistanceFromStart = newCurrentGPXTrackPointDistanceFromStart
                     self.fatPolylineCoordinates = newFatPolylineCoordinates
+                    
+                    // recalculate value for movesStartToEnd
+                    self.updateMovesStartToEnd()
                     
                 }
                 
@@ -667,6 +629,53 @@ class GPXMapView: MKMapView {
         
     }
 
+    private func updateMovesStartToEnd() {
+        
+        // case where current gpxtrackpointindex increased
+        if currentGPXTrackPointIndex > previousGPXTrackPointIndex {
+            
+            // possibly moving from start to end
+            if subsequentTrackPointsInSameDirection == amountOfTrackPointsToDetermineDirection && !movesStartToEnd {
+                
+                // reached amountOfTrackPointsToDetermineDirection to determine the moving direction
+                trace("setting movesStartToEnd to true")
+                movesStartToEnd = true
+                
+            } else {
+                
+                // did not reach amountOfTrackPointsToDetermineDirection to determine the moving direction
+                // increase the value
+                subsequentTrackPointsInSameDirection += 1
+                trace("setting subsequentTrackPointsInSameDirection to %{public}@", subsequentTrackPointsInSameDirection.description)
+                
+            }
+            
+        }
+        
+        // case where current gpxtrackpointindex decreased
+        if currentGPXTrackPointIndex < previousGPXTrackPointIndex {
+            
+            // possibly moving from end to start
+            // this is the case of subsequentTrackPointsInSameDirection equals negative value for amountOfTrackPointsToDetermineDirection
+            if subsequentTrackPointsInSameDirection == -amountOfTrackPointsToDetermineDirection && movesStartToEnd {
+                
+                // reached amountOfTrackPointsToDetermineDirection to determine the moving direction
+                trace("setting movesStartToEnd to false")
+                movesStartToEnd = false
+                
+            } else {
+                
+                // did not reach amountOfTrackPointsToDetermineDirection to determine the moving direction
+                // decrease the value
+                subsequentTrackPointsInSameDirection -= 1
+                trace("setting subsequentTrackPointsInSameDirection to %{public}@", subsequentTrackPointsInSameDirection.description)
+                
+            }
+            
+        }
+        
+    }
+    
     public func launchTimerToCheckOnTrack() {
         
         timerToCheckOnTrack = Timer.scheduledTimer(timeInterval: timeScheduleToCheckOnTrackInSeconds, target: self, selector: #selector(checkOnTrackInBackground), userInfo: nil, repeats: true)
