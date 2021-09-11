@@ -31,7 +31,7 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIAlertViewDelegate {
             }
             
             if overlay is FatMKPolyline {
-                pr.lineWidth = 12
+                pr.lineWidth = 10
             } else {
                 pr.lineWidth = 4
             }
