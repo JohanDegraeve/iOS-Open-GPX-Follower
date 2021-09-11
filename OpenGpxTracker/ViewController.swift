@@ -838,9 +838,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
         trace("updating fatPolyline")
         
+        map.removeOverlay(fatPolyline)
+
         fatPolyline = FatMKPolyline(coordinates: &map.fatPolylineCoordinates, count: map.fatPolylineCoordinates.count)
         
-        map.removeOverlay(fatPolyline)
         map.addOverlay(fatPolyline)
         
     }

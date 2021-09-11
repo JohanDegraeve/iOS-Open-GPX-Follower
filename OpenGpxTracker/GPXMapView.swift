@@ -634,14 +634,14 @@ class GPXMapView: MKMapView {
         // case where current gpxtrackpointindex increased
         if currentGPXTrackPointIndex > previousGPXTrackPointIndex {
             
-            // possibly moving from start to end
+            // check if movesStartToEnd needs to be set to true
             if subsequentTrackPointsInSameDirection == amountOfTrackPointsToDetermineDirection && !movesStartToEnd {
                 
                 // reached amountOfTrackPointsToDetermineDirection to determine the moving direction
                 trace("setting movesStartToEnd to true")
                 movesStartToEnd = true
                 
-            } else {
+            } else if subsequentTrackPointsInSameDirection < amountOfTrackPointsToDetermineDirection {
                 
                 // did not reach amountOfTrackPointsToDetermineDirection to determine the moving direction
                 // increase the value
@@ -655,7 +655,7 @@ class GPXMapView: MKMapView {
         // case where current gpxtrackpointindex decreased
         if currentGPXTrackPointIndex < previousGPXTrackPointIndex {
             
-            // possibly moving from end to start
+            // check if movesStartToEnd needs to be set to false
             // this is the case of subsequentTrackPointsInSameDirection equals negative value for amountOfTrackPointsToDetermineDirection
             if subsequentTrackPointsInSameDirection == -amountOfTrackPointsToDetermineDirection && movesStartToEnd {
                 
@@ -663,7 +663,7 @@ class GPXMapView: MKMapView {
                 trace("setting movesStartToEnd to false")
                 movesStartToEnd = false
                 
-            } else {
+            } else if subsequentTrackPointsInSameDirection > -amountOfTrackPointsToDetermineDirection {
                 
                 // did not reach amountOfTrackPointsToDetermineDirection to determine the moving direction
                 // decrease the value
