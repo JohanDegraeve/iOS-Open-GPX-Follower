@@ -6,7 +6,8 @@ When you start moving, the map will automatically rotate in moving direction, an
 
 When going away from the track, the map will zoom in and out, to make sure the track remains visible on the map
 
-You can chose to follow the track from start to end or end to start, the app will detect your direction and show the remaining distance either to the end of the track or to the start of the track.
+You can choose to follow the track from start to end or end to start, the app will detect your moving direction and show the remaining distance either to the end of the track (if moving towards the end) or to the start of the track (if moving towards the start).
+
 
 **Other features**
 * with offline map cache support.
