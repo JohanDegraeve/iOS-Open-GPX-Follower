@@ -61,7 +61,5 @@ Please note that this source code was released under the GPL license.  So any ch
 This app uses:
 - [CoreGPX Framework](https://github.com/vincentneo/CoreGPX), a SWIFT library for using GPX files. Created by [@vincentneo](http://github.com/vincentneo)
 
-Entry on the [Open Street Maps Wiki](https://wiki.openstreetmap.org/wiki/OpenGpxTracker)
-
 See also:
 - [Avenue GPX Viewer](https://github.com/vincentneo/Avenue-GPX-Viewer), a GPX viewer based on some of the codes used in this project. A project by  [@vincentneo](http://github.com/vincentneo).
