@@ -26,6 +26,14 @@ let reducedViewPercentageMin = 40
 /// determines automatic zooming, if value is for example 1, and I'm moving at 30 km/h, then the top of the screen is 500 meter away
 let reachTopOfScreenInMinutes = 1.5
 
+/// if speed higher than this value, then reachTopOfScreenInMinutes will be increased
+let multiplyReachTopOfScreenInMinutesIfSpeedHigherThan = 22.0 // this corresponds to 80 km/h
+
+/// if speed higher than multiplyReachTopOfScreenInMinutesIfSpeedHigherThan then multiply reachTopOfScreenInMinutes with this value
+///
+/// use 10% more or less to change value, to avoid flipping
+let multiplicationFactorForReachTopOfScreenInMinutes = 1.5
+
 /// maximum amount to store in measuredSpeads, average of those speeds is used to display
 let maxMeasuredSpeads = 6
 
@@ -107,6 +115,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     /// when fired, a call will be made to updateMapCenter
     var timerToCheckMapUpdate: Timer?
+    
+    /// is reachTopOfScreenInMinutes currently multiplied with multiplicationFactorForReachTopOfScreenInMinutes ?
+    var reachTopOfScreenInMinutesMultiplied = false
     
     /// location manager instance configuration
     let locationManager: CLLocationManager = {
@@ -888,19 +899,32 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                 
             }
             
-            
             /* ****************************************************************************** */
-            /* when moving, the top of the screen should be reached in approximately 1 minute */
+            /* when moving, the top of the screen should be reached in approximately          */
+            /* reachTopOfScreenInMinutes minute                                               */
             /* zoom in or out to achieve this (approximately)                                 */
             /*                                                                                */
-            /* And if not on track anhymore then also zoom out should occur to make sure the  */
+            /* And if not on track anymore then also zoom out should occur to make sure the   */
             /* track stays on sreen                                                           */
             /* ****************************************************************************** */
-            
-            /// - when moving, the top of the screen should be reached in approximately reachTopOfScreenInMinutes minute
-            /// - so the question is where would in one minute if I keep moving at the current speed
-            /// - Exception : is user is too far away from the track, then verify that track is still visible on the screen and if not zoom in
             map.requiredDistanceToTopOffViewInMeters = max(averageSpeed * reachTopOfScreenInMinutes * 60, map.minimumTopOfScreenInMeters)
+            
+            // check if multiplication is needed, if speed higher than certain value, eg for high roads, we want to see more
+            if (reachTopOfScreenInMinutesMultiplied && averageSpeed > multiplyReachTopOfScreenInMinutesIfSpeedHigherThan * 0.9) || (!reachTopOfScreenInMinutesMultiplied && averageSpeed > multiplyReachTopOfScreenInMinutesIfSpeedHigherThan * 1.1) {
+                
+                trace("averagespeed =  %{public}@, multiplying requiredDistanceToTopOffViewInMeters with %{public}@", averageSpeed.description, multiplicationFactorForReachTopOfScreenInMinutes.description)
+                
+                reachTopOfScreenInMinutesMultiplied = true
+                
+                map.requiredDistanceToTopOffViewInMeters = map.requiredDistanceToTopOffViewInMeters * multiplicationFactorForReachTopOfScreenInMinutes
+                
+            } else {
+                
+                trace("averagespeed =  %{public}@, not multiplying requiredDistanceToTopOffViewInMeters", averageSpeed.description)
+
+                reachTopOfScreenInMinutesMultiplied = false
+                
+            }
             
             // temporary store current centerCoordinate of map
             let currentCenterCoordinate = map.centerCoordinate // Temporary saved map current center position
@@ -1102,6 +1126,8 @@ extension ViewController: GPXFilesTableViewControllerDelegate {
         self.movingDirectionLabel.text = text_total_distance
         
         currentLongitudedeltaIndex = 2
+        
+        reachTopOfScreenInMinutesMultiplied = false
         
     }
 }

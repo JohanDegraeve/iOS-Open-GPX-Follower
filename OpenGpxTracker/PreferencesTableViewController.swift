@@ -107,7 +107,9 @@ class PreferencesTableViewController: UITableViewController, UINavigationBarDele
     /// Returns 4 sections: Units, Cache, Map Source, Activity Type
     override func numberOfSections(in tableView: UITableView?) -> Int {
         // Return the number of sections.
-        return 5
+        return 4
+        
+        // return 5 for testing only, this allows to send trace files
     }
     
     /// Returns the title of the existing sections.
