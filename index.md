@@ -13,7 +13,7 @@ You can choose to follow the track from start to end or end to start, the app wi
 * with offline map cache support.
   * You first need to browse through the track with while online. The app while cache the areas that you browse.
 * Supports Apple Map Kit, [Open Street Map](http://wiki.openstreetmap.org/wiki/Tile_usage_policy) and [Carto DB](http://www.cartodb.com) as map sources
-* Displays current location and altitude
+* Displays current location
 * Displays user heading (device orientation) 
 * Share GPX files with other apps
 * Settings
