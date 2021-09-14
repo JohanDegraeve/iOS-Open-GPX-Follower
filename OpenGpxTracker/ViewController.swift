@@ -27,12 +27,28 @@ let reducedViewPercentageMin = 40
 let reachTopOfScreenInMinutes = 1.5
 
 /// if speed higher than this value, then reachTopOfScreenInMinutes will be increased
-let multiplyReachTopOfScreenInMinutesIfSpeedHigherThan = 22.0 // this corresponds to 80 km/h
+let multiplyReachTopOfScreenInMinutesIfSpeedHigherThan1 = 22.0 // this corresponds to 80 km/h
+
+/// if speed higher than this value, then reachTopOfScreenInMinutes will be increased
+let multiplyReachTopOfScreenInMinutesIfSpeedHigherThan2 = 28.0 // this corresponds to 100 km/h
+
+/// if speed higher than this value, then reachTopOfScreenInMinutes will be increased
+let multiplyReachTopOfScreenInMinutesIfSpeedHigherThan3 = 33.0 // this corresponds to 100 km/h
 
 /// if speed higher than multiplyReachTopOfScreenInMinutesIfSpeedHigherThan then multiply reachTopOfScreenInMinutes with this value
 ///
 /// use 10% more or less to change value, to avoid flipping
-let multiplicationFactorForReachTopOfScreenInMinutes = 1.5
+let multiplicationFactorForReachTopOfScreenInMinutes1 = 1.5
+
+/// if speed higher than multiplyReachTopOfScreenInMinutesIfSpeedHigherThan then multiply reachTopOfScreenInMinutes with this value
+///
+/// use 10% more or less to change value, to avoid flipping
+let multiplicationFactorForReachTopOfScreenInMinutes2 = 2.0
+
+/// if speed higher than multiplyReachTopOfScreenInMinutesIfSpeedHigherThan then multiply reachTopOfScreenInMinutes with this value
+///
+/// use 10% more or less to change value, to avoid flipping
+let multiplicationFactorForReachTopOfScreenInMinutes3 = 2.5
 
 /// maximum amount to store in measuredSpeads, average of those speeds is used to display
 let maxMeasuredSpeads = 6
@@ -117,7 +133,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     var timerToCheckMapUpdate: Timer?
     
     /// is reachTopOfScreenInMinutes currently multiplied with multiplicationFactorForReachTopOfScreenInMinutes ?
-    var reachTopOfScreenInMinutesMultiplied = false
+    var reachTopOfScreenInMinutesMultiplied1 = false
+    
+    /// is reachTopOfScreenInMinutes currently multiplied with multiplicationFactorForReachTopOfScreenInMinutes ?
+    var reachTopOfScreenInMinutesMultiplied2 = false
+    
+    /// is reachTopOfScreenInMinutes currently multiplied with multiplicationFactorForReachTopOfScreenInMinutes ?
+    var reachTopOfScreenInMinutesMultiplied3 = false
     
     /// location manager instance configuration
     let locationManager: CLLocationManager = {
@@ -909,20 +931,51 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             /* ****************************************************************************** */
             map.requiredDistanceToTopOffViewInMeters = max(averageSpeed * reachTopOfScreenInMinutes * 60, map.minimumTopOfScreenInMeters)
             
-            // check if multiplication is needed, if speed higher than certain value, eg for high roads, we want to see more
-            if (reachTopOfScreenInMinutesMultiplied && averageSpeed > multiplyReachTopOfScreenInMinutesIfSpeedHigherThan * 0.9) || (!reachTopOfScreenInMinutesMultiplied && averageSpeed > multiplyReachTopOfScreenInMinutesIfSpeedHigherThan * 1.1) {
+            // check if multiplication is needed, if speed higher than certain value, eg for highways, we want to see more on the screen
+            if (reachTopOfScreenInMinutesMultiplied1 && averageSpeed > multiplyReachTopOfScreenInMinutesIfSpeedHigherThan1 * 0.9) || (!reachTopOfScreenInMinutesMultiplied1 && averageSpeed > multiplyReachTopOfScreenInMinutesIfSpeedHigherThan1 * 1.1) {
                 
-                trace("averagespeed =  %{public}@, multiplying requiredDistanceToTopOffViewInMeters with %{public}@", averageSpeed.description, multiplicationFactorForReachTopOfScreenInMinutes.description)
-                
-                reachTopOfScreenInMinutesMultiplied = true
-                
-                map.requiredDistanceToTopOffViewInMeters = map.requiredDistanceToTopOffViewInMeters * multiplicationFactorForReachTopOfScreenInMinutes
+                reachTopOfScreenInMinutesMultiplied1 = true
+
+                if (reachTopOfScreenInMinutesMultiplied2 && averageSpeed > multiplyReachTopOfScreenInMinutesIfSpeedHigherThan2 * 0.9) || (!reachTopOfScreenInMinutesMultiplied2 && averageSpeed > multiplyReachTopOfScreenInMinutesIfSpeedHigherThan2 * 1.1) {
+                    
+                    reachTopOfScreenInMinutesMultiplied2 = true
+                    
+                    if (reachTopOfScreenInMinutesMultiplied3 && averageSpeed > multiplyReachTopOfScreenInMinutesIfSpeedHigherThan3 * 0.9) || (!reachTopOfScreenInMinutesMultiplied3 && averageSpeed > multiplyReachTopOfScreenInMinutesIfSpeedHigherThan3 * 1.1) {
+                        
+                        reachTopOfScreenInMinutesMultiplied3 = true
+                        
+                        trace("averagespeed =  %{public}@, multiplying requiredDistanceToTopOffViewInMeters with %{public}@", averageSpeed.description, multiplicationFactorForReachTopOfScreenInMinutes3.description)
+                        
+                        map.requiredDistanceToTopOffViewInMeters = map.requiredDistanceToTopOffViewInMeters * multiplicationFactorForReachTopOfScreenInMinutes3
+                        
+                    } else {
+                        
+                        reachTopOfScreenInMinutesMultiplied3 = false
+                        
+                        trace("averagespeed =  %{public}@, multiplying requiredDistanceToTopOffViewInMeters with %{public}@", averageSpeed.description, multiplicationFactorForReachTopOfScreenInMinutes2.description)
+                        
+                        map.requiredDistanceToTopOffViewInMeters = map.requiredDistanceToTopOffViewInMeters * multiplicationFactorForReachTopOfScreenInMinutes2
+                        
+                    }
+                    
+                } else {
+
+                    reachTopOfScreenInMinutesMultiplied2 = false
+                    reachTopOfScreenInMinutesMultiplied3 = false
+                    
+                    trace("averagespeed =  %{public}@, multiplying requiredDistanceToTopOffViewInMeters with %{public}@", averageSpeed.description, multiplicationFactorForReachTopOfScreenInMinutes1.description)
+                    
+                    map.requiredDistanceToTopOffViewInMeters = map.requiredDistanceToTopOffViewInMeters * multiplicationFactorForReachTopOfScreenInMinutes1
+
+                }
                 
             } else {
                 
                 trace("averagespeed =  %{public}@, not multiplying requiredDistanceToTopOffViewInMeters", averageSpeed.description)
 
-                reachTopOfScreenInMinutesMultiplied = false
+                reachTopOfScreenInMinutesMultiplied1 = false
+                reachTopOfScreenInMinutesMultiplied2 = false
+                reachTopOfScreenInMinutesMultiplied3 = false
                 
             }
             
@@ -1127,8 +1180,10 @@ extension ViewController: GPXFilesTableViewControllerDelegate {
         
         currentLongitudedeltaIndex = 2
         
-        reachTopOfScreenInMinutesMultiplied = false
-        
+        reachTopOfScreenInMinutesMultiplied1 = false
+        reachTopOfScreenInMinutesMultiplied2 = false
+        reachTopOfScreenInMinutesMultiplied3 = false
+
     }
 }
 
