@@ -698,7 +698,9 @@ class GPXMapView: MKMapView {
                 if abs(trackPointDistances[currentGPXTrackPointIndex].distance - trackPointDistances[cntr].distance) > lengthOfFatLineInMeters {break}
                 
                 if  let latitude = trackPointDistances[cntr].gpxTrackPoint.latitude, let longitude = trackPointDistances[cntr].gpxTrackPoint.longitude {
-                    trace("adding point to fatpolyline with index %{public}@", cntr.description)
+                    
+                    //trace("adding point to fatpolyline with index %{public}@", cntr.description)
+                    
                     fatPolylineCoordinates.insert(CLLocationCoordinate2D(latitude: latitude, longitude: longitude), at: 0)
                     
                 }
