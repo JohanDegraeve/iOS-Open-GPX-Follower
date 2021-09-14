@@ -1,5 +1,8 @@
 import Foundation
 
+/// set to true when testing
+let tracingEnabled = false
+
 /// for use in NSLog
 fileprivate let tracePrefix = "GPXFollower-NSLog"
 
