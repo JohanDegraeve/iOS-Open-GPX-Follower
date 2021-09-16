@@ -7,17 +7,9 @@ Created by Phiilman on 28.03.20.
 
 // App
 "NO_LOCATION" = "NEi sijaintia";
-"START_TRACKING" = "Aloita seuranta";
-"PAUSE" = "Tauko";
-"RESUME" = "Jatka";
-"SAVE" = "Tallenna";
 "RESET" = "Nollaa";
 "DONE" = "Valmis";
 "CANCEL" = "Hylkää";
-"WATCH_FILE_RECEIVED_TITLE" = "Tiedosto vastaanotettu Apple Watch";
-"WATCH_FILE_RECEIVED_MESSAGE" = "Vastaanotettu tiedosto: \"%@\"";
-"SAVE_AS" = "Tallenna nimellä";
-"ENTER_SESSION_NAME" = "Anna GPX tapahtumalle nimi";
 "LOCATION_SERVICES_DISABLED" = "Sijainti estetty puhelimen asetuksissa.";
 "ENABLE_LOCATION_SERVICES" = "Salli sijainti puhelimen asetuksista.";
 "SETTINGS" = "Asetukset";
@@ -43,20 +35,6 @@ Created by Phiilman on 28.03.20.
 "CACHE_IS_EMPTY" = "Välimuisti on tyhjä";
 "EDIT_WAYPOINT_NAME_TITLE" = "Nimeä merkkipiste";
 "EDIT_WAYPOINT_NAME_MESSAGE" = "Vihje: Vedä ja pudota nuppineulaa siirtääksesi merkin paikkaa.";
-
-// Watch
-"SENDING" = "Lähettää:";
-"X_FILES" = "%d tiedostoa";
-"SUCCESSFULLY_SENT" = "Lähetetty:";
-"FAILED_TO_SEND" = "Lähetys epäonnistui:";
-"SEND_TO_IOS" = "Lähetä iOS:iin";
-"FILE_SELECTED_TITLE" = "GPX -tiedosto valittu";
-"FILE_SELECTED_MESSAGE" = "Mitä haluaisit tehdä?";
-"ERROR_OCCURED_TITLE" = "Virhe tapahtunut";
-"ERROR_OCCURED_MESSAGE" = "GPX -tiedoston lähetys iOS:iin ei onnistunut: %s ";
-"GPX_TRACKER" = "GPX Follower";
-"FILE_SAVED_TITLE" = "GPX -tiedosto tallennettu";
-"FILE_SAVED_MESSAGE" = "Tapahtuma tallennettu nimellä %s.gpx ";
 
 // Activities
 "AT_AUTOMATIC" = "Automaattinen";
@@ -99,11 +77,3 @@ Created by Phiilman on 28.03.20.
 "T_SECONDS_AGO" = "%d sekuntia sitten";
 
 "T_JUST_NOW" = "nyt";
-
-// CoreDataHelper
-
-"CONTINUE_SESSION_TITLE" = "Jatka edellistä tapahtumaa?";
-"CONTINUE_SESSION_MESSAGE" = "Mitä haluat tehdä edellisen tapahtuman suhteen?";
-
-"CONTINUE_SESSION" = "Jatka tapahtumaa";
-"SAVE_START_NEW" = "Tallenna ja aloita uusi tapahtuma";

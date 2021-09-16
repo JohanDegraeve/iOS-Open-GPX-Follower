@@ -11,17 +11,9 @@
 
 // App
 "NO_LOCATION" = "无法得到定位资料";
-"START_TRACKING" = "开始记录";
-"PAUSE" = "暂停";
-"RESUME" = "继续";
-"SAVE" = "储存";
 "RESET" = "清零";
 "DONE" = "完成";
 "CANCEL" = "取消";
-"WATCH_FILE_RECEIVED_TITLE" = "成功收到 Apple Watch 发来的 GPX 文件";
-"WATCH_FILE_RECEIVED_MESSAGE" = "成功收到 GPX 文件: \"%@\"";
-"SAVE_AS" = "储存为...";
-"ENTER_SESSION_NAME" = "请您输入这 GPX 文件名";
 "LOCATION_SERVICES_DISABLED" = "手机定位服务无法登入";
 "ENABLE_LOCATION_SERVICES" = "请您到 “设置” app，确保本 app 的 “定位服务” 已打开";
 "SETTINGS" = "设置";
@@ -47,20 +39,6 @@
 "CACHE_IS_EMPTY" = "高速缓存已被清空。";
 "EDIT_WAYPOINT_NAME_TITLE" = "改变导航点名";
 "EDIT_WAYPOINT_NAME_MESSAGE" = "暗示：要更改导航点位置吗？您只需要把地图上的红色针图案，拖和搬到新位置。";
-
-// Watch
-"SENDING" = "正在发送中：";
-"X_FILES" = "%d 个文件";
-"SUCCESSFULLY_SENT" = "成功发送";
-"FAILED_TO_SEND" = "发送失败：";
-"SEND_TO_IOS" = "发送到 iOS app";
-"FILE_SELECTED_TITLE" = "GPX 文件已被选种";
-"FILE_SELECTED_MESSAGE" = "请问您想怎样处理文件呢？";
-"ERROR_OCCURED_TITLE" = "差错事故";
-"ERROR_OCCURED_MESSAGE" = "很遗憾的，GPX 文件无法发送到 iOS app，因为： %s ";
-"GPX_TRACKER" = "GPX 定位记录";
-"FILE_SAVED_TITLE" = "GPX 文件储存完毕";
-"FILE_SAVED_MESSAGE" = "目前的定位记录已被储存于 %s.gpx ";
 
 // Activities
 "AT_AUTOMATIC" = "自动设置";
@@ -103,30 +81,6 @@
 "T_SECONDS_AGO" = "%d秒前";
 
 "T_JUST_NOW" = "不久前";
-
-// CoreDataHelper
-
-"CONTINUE_SESSION_TITLE" = "要继续未完成的记录吗？";
-"CONTINUE_SESSION_MESSAGE" = "应该如何对待已恢复好的定位记录呢？";
-
-"CONTINUE_SESSION" = "继续记录";
-"SAVE_START_NEW" = "储存恢复好的记录，并从新开始";
-
-// Default File Name
-
-// in preferences section
-"DEFAULT_NAME_SECTION" = "预设文件名";
-
-// in default name editor view
-"DEFAULT_NAME_DATE_FORMAT" = "文件名格式（根据日期和时间）";
-"DEFAULT_NAME_SETTINGS" = "设置";
-"DEFAULT_NAME_PRESET" = "预定程序";
-
-"DEFAULT_NAME_INPUT_FOOTER" = "在键盘上，按下 “完成” 按钮，无论预定程序有被更改或新程序，就等于设定了文件名格式。关于日期或时间的句法设定，请使用 { ... } 来包围。全部日期或时间的句法可在 Unicode Technical Standard (UTS) #35 里了解。";
-
-"DEFAULT_NAME_SAMPLE_OUTPUT_TITLE" = "样品：";
-"DEFAULT_NAME_USE_UTC" = "要使用 协调世界时（UTC）吗？";
-"DEFAULT_NAME_ENGLISH_LOCALE" = "要使用英文日期和时间写法吗？";
 
 // DateFieldTypeView
 "YEAR" = "年";

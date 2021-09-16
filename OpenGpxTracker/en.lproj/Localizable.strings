@@ -7,17 +7,9 @@
 
 // App
 "NO_LOCATION" = "Not getting location";
-"START_TRACKING" = "Start Tracking";
-"PAUSE" = "Pause";
-"RESUME" = "Resume";
-"SAVE" = "Save";
 "RESET" = "Reset";
 "DONE" = "Done";
 "CANCEL" = "Cancel";
-"WATCH_FILE_RECEIVED_TITLE" = "File Received from Apple Watch";
-"WATCH_FILE_RECEIVED_MESSAGE" = "Received file: \"%@\"";
-"SAVE_AS" = "Save as";
-"ENTER_SESSION_NAME" = "Enter GPX session name";
 "LOCATION_SERVICES_DISABLED" = "Location services disabled";
 "ENABLE_LOCATION_SERVICES" = "Go to settings and enable location.";
 "SETTINGS" = "Settings";
@@ -43,20 +35,6 @@
 "CACHE_IS_EMPTY" = "Cache is now empty";
 "EDIT_WAYPOINT_NAME_TITLE" = "Edit waypoint name";
 "EDIT_WAYPOINT_NAME_MESSAGE" = "Hint: To change the waypoint location drag and drop the pin";
-
-// Watch
-"SENDING" = "Sending:";
-"X_FILES" = "%d files";
-"SUCCESSFULLY_SENT" = "Successfully sent:";
-"FAILED_TO_SEND" = "Failed to send:";
-"SEND_TO_IOS" = "Send to iOS app";
-"FILE_SELECTED_TITLE" = "GPX file selected";
-"FILE_SELECTED_MESSAGE" = "What would you like to do?";
-"ERROR_OCCURED_TITLE" = "Error occured";
-"ERROR_OCCURED_MESSAGE" = "GPX file was unsuccessfully sent to iOS app, due to %s ";
-"GPX_TRACKER" = "GPX Follower";
-"FILE_SAVED_TITLE" = "GPX file saved";
-"FILE_SAVED_MESSAGE" = "Current session saved as %s.gpx ";
 
 // Activities
 "AT_AUTOMATIC" = "Automatic";
@@ -99,30 +77,6 @@
 "T_SECONDS_AGO" = "%d seconds ago";
 
 "T_JUST_NOW" = "just now";
-
-// CoreDataHelper
-
-"CONTINUE_SESSION_TITLE" = "Continue last session?";
-"CONTINUE_SESSION_MESSAGE" = "What would you like to do with the recovered content from last session?";
-
-"CONTINUE_SESSION" = "Continue session";
-"SAVE_START_NEW" = "Save and start new";
-
-// Default File Name
-
-// in preferences section
-"DEFAULT_NAME_SECTION" = "Default file name setup";
-
-// in default name editor view
-"DEFAULT_NAME_DATE_FORMAT" = "File Name Format";
-"DEFAULT_NAME_SETTINGS" = "Settings";
-"DEFAULT_NAME_PRESET" = "Presets";
-
-"DEFAULT_NAME_INPUT_FOOTER" = "Clicking done on the keyboard saves the date format for use, regardless if its a preset or custom. Date format should be encapsulated within { ... }. For full list of applicable date format syntax please refer to Unicode Technical Standard (UTS) #35.";
-
-"DEFAULT_NAME_SAMPLE_OUTPUT_TITLE" = "Sample: ";
-"DEFAULT_NAME_USE_UTC" = "Use UTC Time?";
-"DEFAULT_NAME_ENGLISH_LOCALE" = "Force English locale date format?";
 
 // DateFieldTypeView
 "YEAR" = "Year";

@@ -7,10 +7,6 @@
 
 // App
 "NO_LOCATION" = "Geen locatie ontvangen";
-"START_TRACKING" = "Starten";
-"PAUSE" = "Pauze";
-"RESUME" = "Doorgaan";
-"SAVE" = "Opslaan";
 "RESET" = "Reset";
 "DONE" = "Klaar";
 "CANCEL" = "Annuleren";
@@ -43,20 +39,6 @@
 "CACHE_IS_EMPTY" = "Cache is nu verwijderd";
 "EDIT_WAYPOINT_NAME_TITLE" = "Waypoint naam wijzigen";
 "EDIT_WAYPOINT_NAME_MESSAGE" = "Tip: Om het the waypoint te wijzigen drag en drop de locatie pin.";
-
-// Watch
-"SENDING" = "Aan het versturen:";
-"X_FILES" = "%d bestanden";
-"SUCCESSFULLY_SENT" = "Succesvol verstuurd:";
-"FAILED_TO_SEND" = "Versturen mislukt:";
-"SEND_TO_IOS" = "Versturen naar iOS app";
-"FILE_SELECTED_TITLE" = "GPX bestand geselecteerd";
-"FILE_SELECTED_MESSAGE" = "Wat wil je graag doen?";
-"ERROR_OCCURED_TITLE" = "Error";
-"ERROR_OCCURED_MESSAGE" = "GPX bestand was succesvol verstuurd naar iOS App, door middel van %s ";
-"GPX_TRACKER" = "GPX Follower";
-"FILE_SAVED_TITLE" = "GPX bestand opgeslagen";
-"FILE_SAVED_MESSAGE" = "Huidige sessie opgeslagen als %s.gpx ";
 
 // Activities
 "AT_AUTOMATIC" = "Automatisch";
@@ -99,30 +81,6 @@
 "T_SECONDS_AGO" = "%d seconden geleden";
 
 "T_JUST_NOW" = "nu";
-
-// CoreDataHelper
-
-"CONTINUE_SESSION_TITLE" = "Doorgaan met huidige sessie?";
-"CONTINUE_SESSION_MESSAGE" = "Wat wil je doen met de herstelde data van de afgelopen sessie?";
-
-"CONTINUE_SESSION" = "Doorgaan met sessie";
-"SAVE_START_NEW" = "Opslaan en een nieuwe starten";
-
-// Default File Name
-
-// in preferences section
-"DEFAULT_NAME_SECTION" = "Default bestandsnaam instellingen";
-
-// in default name editor view
-"DEFAULT_NAME_DATE_FORMAT" = "Bestandsnaam format";
-"DEFAULT_NAME_SETTINGS" = "Instellingen";
-"DEFAULT_NAME_PRESET" = "Voorkeuren";
-
-"DEFAULT_NAME_INPUT_FOOTER" = "Door op klaar te klikken op het toetsenbord wordt het datum format opgeslagen voor gebruik, ook als het ingesteld of custom is. Het datum format moet bewerkt worden in { ... }. Voor de volledige lijst van toepasbare datum formats syntax kan je kijken naar de Unicode Technical Standard (UTS) #35.";
-
-"DEFAULT_NAME_SAMPLE_OUTPUT_TITLE" = "Voorbeeld: ";
-"DEFAULT_NAME_USE_UTC" = "Gebruik UTC Tijd?";
-"DEFAULT_NAME_ENGLISH_LOCALE" = "Forceer Engels lokale datum format?";
 
 // DateFieldTypeView
 "YEAR" = "Jaar";
