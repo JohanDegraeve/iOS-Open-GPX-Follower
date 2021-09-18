@@ -5,6 +5,8 @@
  Created by Kurt Höblinger on 19.08.19.
  */
 
+"TO_END" = "To End";
+"TO_START" = "To Start";
 "DOWNLOAD_FILE" = "Download File";
 "Add" = "Add";
 "TOTAL_DISTANCE" = "Total Distance";

@@ -6,6 +6,8 @@
  */
 
 // App
+"TO_END" = "Tot einde";
+"TO_START" = "Tot start";
 "DOWNLOAD_FILE" = "Download Bestand";
 "Add" = "Voeg toe";
 "TOTAL_DISTANCE" = "Totale afstand";

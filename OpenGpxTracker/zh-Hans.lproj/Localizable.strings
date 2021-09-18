@@ -10,6 +10,8 @@
  */
 
 // App
+"TO_END" = "To End";
+"TO_START" = "To Start";
 "DOWNLOAD_FILE" = "Download File";
 "Add" = "Add";
 "TOTAL_DISTANCE" = "Total Distance";

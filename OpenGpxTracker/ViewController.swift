@@ -16,6 +16,12 @@ import CoreGPX
 /// Text to display when the system is not providing coordinates.
 let ktextTotalDistance = NSLocalizedString("TOTAL_DISTANCE", comment: "no comment")
 
+/// text to display top right label, when moving from start to end
+let kTextToEnd = NSLocalizedString("TO_END", comment: "text top right when moving from start to end")
+
+/// text to display top right label, when moving from end to start
+let kTextToStart = NSLocalizedString("TO_START", comment: "text top right when moving from end to start")
+
 /// - if not on track anymore then mapped will be zoomed out further to make sure that the track is still visible in a view 70% of the normal full view
 /// - value between 0 and 100, but better take between 50 and 90
 let reducedViewPercentageMax = 70
@@ -854,11 +860,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             
         } else if distanceLabel.distance > 0.0 && map.isOnTrack {
             
-            movingDirectionLabel.text = "To end"
+            movingDirectionLabel.text = kTextToEnd
             
         } else if distanceLabel.distance < 0.0 && map.isOnTrack {
             
-            movingDirectionLabel.text = "To start"
+            movingDirectionLabel.text = kTextToStart
             
         }
         
