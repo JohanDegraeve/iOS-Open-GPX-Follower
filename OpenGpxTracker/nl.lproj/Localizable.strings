@@ -6,6 +6,9 @@
  */
 
 // App
+"DOWNLOAD_FILE" = "Download Bestand";
+"Add" = "Voeg toe";
+"TOTAL_DISTANCE" = "Totale afstand";
 "NO_LOCATION" = "Geen locatie ontvangen";
 "RESET" = "Reset";
 "DONE" = "Klaar";

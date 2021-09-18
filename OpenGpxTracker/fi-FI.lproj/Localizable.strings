@@ -6,6 +6,9 @@ Created by Phiilman on 28.03.20.
 */
 
 // App
+"DOWNLOAD_FILE" = "Download File";
+"Add" = "Add";
+"TOTAL_DISTANCE" = "Total Distance";
 "NO_LOCATION" = "NEi sijaintia";
 "RESET" = "Nollaa";
 "DONE" = "Valmis";

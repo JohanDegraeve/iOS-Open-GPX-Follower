@@ -7,6 +7,9 @@
  */
 
 // App
+"DOWNLOAD_FILE" = "Download File";
+"Add" = "Add";
+"TOTAL_DISTANCE" = "Total Distance";
 "NO_LOCATION" = "Localisation inaccessible";
 "RESET" = "Réinit.";
 "DONE" = "Terminer";

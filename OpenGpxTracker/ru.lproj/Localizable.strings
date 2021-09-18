@@ -6,6 +6,9 @@
  */
 
 // App
+"DOWNLOAD_FILE" = "Download File";
+"Add" = "Add";
+"TOTAL_DISTANCE" = "Total Distance";
 "NO_LOCATION" = "Геопозиция не получена";
 "RESET" = "Сбросить";
 "DONE" = "Готово";

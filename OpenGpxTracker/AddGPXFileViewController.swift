@@ -8,9 +8,10 @@
 import Foundation
 import UIKit
 
-fileprivate let tableViewCellReuseIdentifier = "LoadFileCell"
+/// Text to display when the system is not providing coordinates.
+let kDownloadFile = NSLocalizedString("DOWNLOAD_FILE", comment: "no comment")
 
-fileprivate let text_labelWithExplanation = "give URL to download GPX file"
+fileprivate let tableViewCellReuseIdentifier = "LoadFileCell"
 
 fileprivate let userDefaultsKeyForUrlEnteredByUser = "urlEnteredByUser"
 
@@ -54,7 +55,7 @@ class AddGPXFileViewController: UITableViewController, UITextFieldDelegate {
         
         super.viewDidLoad()
         
-        self.title = "Download file"
+        self.title = kDownloadFile
         
     }
     
@@ -151,7 +152,7 @@ class AddGPXFileViewController: UITableViewController, UITextFieldDelegate {
             
             // textfield to set url (domain + path)
             case 0:
-                let alert = UIAlertController(title: "Give URL", message: "Give URL only domain name + (optionally) the path, without filename", keyboardType: .URL, text: urlEnteredByUser, placeHolder: "", actionTitle: "Ok", cancelTitle: "Cancel", actionHandler: { (text:String) in
+                let alert = UIAlertController(title: "Give URL", message: "Give URL only domain name + (optionally) the path, without filename", keyboardType: .URL, text: urlEnteredByUser, placeHolder: "", actionTitle: "Ok", cancelTitle: NSLocalizedString("CANCEL", comment: "no comment"), actionHandler: { (text:String) in
                     
                     self.urlEnteredByUser = text
                     
@@ -173,7 +174,7 @@ class AddGPXFileViewController: UITableViewController, UITextFieldDelegate {
             
             // textfield to set filename, clicking action button will load the file
             case 0:
-                let alert = UIAlertController(title: "Give filename", message: "Give filename (.gpx)", keyboardType: .default, text: filenameEnteredByUser, placeHolder: "", actionTitle: "Load", cancelTitle: "Cancel", actionHandler: { (text:String) in
+                let alert = UIAlertController(title: "Give filename", message: "Give filename (.gpx)", keyboardType: .default, text: filenameEnteredByUser, placeHolder: "", actionTitle: "Load", cancelTitle: NSLocalizedString("CANCEL", comment: "no comment"), actionHandler: { (text:String) in
                     
                     self.filenameEnteredByUser = text
                     

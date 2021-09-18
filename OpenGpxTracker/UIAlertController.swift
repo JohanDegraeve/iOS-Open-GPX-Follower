@@ -31,7 +31,7 @@ extension UIAlertController {
         }))
         
         // add cancel button
-        addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        addAction(UIAlertAction(title: NSLocalizedString("CANCEL", comment: "no comment"), style: .cancel, handler: nil))
         
     }
     
@@ -51,7 +51,7 @@ extension UIAlertController {
         }))
         
         // add action for when user clicks cancel
-        addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action:UIAlertAction) in
+        addAction(UIAlertAction(title: NSLocalizedString("CANCEL", comment: "no comment"), style: .cancel, handler: { (action:UIAlertAction) in
             if let cancelHandler = cancelHandler {cancelHandler()}
         }))
     }
@@ -81,7 +81,7 @@ extension UIAlertController {
         var Ok = actionTitle
         if Ok == nil { Ok = "Ok" }
         var cancel = cancelTitle
-        if cancel == nil { cancel = "Cancel" }
+        if cancel == nil { cancel = NSLocalizedString("CANCEL", comment: "no comment") }
         addAction(UIAlertAction(title: Ok!, style: .default, handler: { (action:UIAlertAction) in
             if let textFields = self.textFields {
                 if let text = textFields[0].text {

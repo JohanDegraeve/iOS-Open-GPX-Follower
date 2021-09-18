@@ -13,7 +13,8 @@ import CoreLocation
 import MapKit
 import CoreGPX
 
-let text_total_distance = "Total Distance"
+/// Text to display when the system is not providing coordinates.
+let ktextTotalDistance = NSLocalizedString("TOTAL_DISTANCE", comment: "no comment")
 
 /// - if not on track anymore then mapped will be zoomed out further to make sure that the track is still visible in a view 70% of the normal full view
 /// - value between 0 and 100, but better take between 50 and 90
@@ -841,15 +842,21 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         // update distance
         distanceLabel.distance = map.calculateDistanceToDestination(currentDistanceToDestination: distanceLabel.distance)
 
+        // set movingDirectionLabel text
+        // if distanceLabel.distance == 0.0 then there's no track loaded yet, no need to show any text
+        // if distanceLabel.distance > 0.0 and on track, then show "to end"
+        // if distanceLabel.distance < 0.0 and on track, then show "to start"
+        // if distanceLabel.distance != 0.0 (ie < or >) and not on track, then don't change the text
+        //      it will say "Track distance" until arriving at least once on track
         if distanceLabel.distance == 0.0 {
             
             movingDirectionLabel.text = ""
             
-        } else if distanceLabel.distance > 0.0 {
+        } else if distanceLabel.distance > 0.0 && map.isOnTrack {
             
             movingDirectionLabel.text = "To end"
             
-        } else if distanceLabel.distance < 0.0 {
+        } else if distanceLabel.distance < 0.0 && map.isOnTrack {
             
             movingDirectionLabel.text = "To start"
             
@@ -1176,7 +1183,7 @@ extension ViewController: GPXFilesTableViewControllerDelegate {
         
         // user isn't moving yet (or at least moving isn't detected because gpx just loaded
         // set text to "Total distance"
-        self.movingDirectionLabel.text = text_total_distance
+        self.movingDirectionLabel.text = ktextTotalDistance
         
         currentLongitudedeltaIndex = 2
         

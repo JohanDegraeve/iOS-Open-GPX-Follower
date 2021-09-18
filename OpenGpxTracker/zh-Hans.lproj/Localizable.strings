@@ -10,6 +10,9 @@
  */
 
 // App
+"DOWNLOAD_FILE" = "Download File";
+"Add" = "Add";
+"TOTAL_DISTANCE" = "Total Distance";
 "NO_LOCATION" = "无法得到定位资料";
 "RESET" = "清零";
 "DONE" = "完成";

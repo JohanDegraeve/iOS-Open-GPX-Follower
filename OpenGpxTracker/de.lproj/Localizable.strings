@@ -5,6 +5,9 @@
  Created by Kurt Höblinger on 19.08.19.
  */
 
+"DOWNLOAD_FILE" = "Download File";
+"Add" = "Add";
+"TOTAL_DISTANCE" = "Total Distance";
 "NO_LOCATION" = "GPS nicht verfügbar";
 "RESET" = "Löschen";
 "DONE" = "Fertig";

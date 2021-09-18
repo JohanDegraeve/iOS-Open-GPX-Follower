@@ -6,6 +6,9 @@
  */
 
 // App
+"DOWNLOAD_FILE" = "Download File";
+"Add" = "Add";
+ "TOTAL_DISTANCE" = "Total Distance";
 "NO_LOCATION" = "Not getting location";
 "RESET" = "Reset";
 "DONE" = "Done";
