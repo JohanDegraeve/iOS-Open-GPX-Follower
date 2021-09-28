@@ -1085,7 +1085,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         if let storedHeading = self.map.storedHeading {
             
-            self.map.camera.heading = storedHeading.trueHeading //+ map.cameraHeadingOffset
+            self.map.camera.heading = storedHeading.trueHeading
             
         }
         
@@ -1256,6 +1256,7 @@ extension ViewController: CLLocationManagerDelegate {
     /// to updathe the heading indicator (a small arrow next to user location point)
     ///
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        
         print("ViewController::didUpdateHeading true: \(newHeading.trueHeading) magnetic: \(newHeading.magneticHeading)")
         print("mkMapcamera heading=\(map.camera.heading)")
 
@@ -1266,7 +1267,7 @@ extension ViewController: CLLocationManagerDelegate {
         // only if end of last gesture > pauzeUdateMapCenterAfterGestureEndForHowManySeconds
         if abs(map.timeStampGestureEnd.timeIntervalSince(Date())) >= pauzeUdateMapCenterAfterGestureEndForHowManySeconds {
             
-            map.camera.heading = newHeading.trueHeading //+ map.cameraHeadingOffset
+            map.camera.heading = newHeading.trueHeading
 
         }
 
