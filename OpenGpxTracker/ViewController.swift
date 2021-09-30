@@ -660,10 +660,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         map.launchTimerToCheckOnTrack()
         
-        // reset map timeStampGestureEnd
-        // assume the user has been gesturing right before bringing the app to the background, and then immediately coming to the foreground, then it would take 30 seconds before the map starts centering again around the user's location, rotating the map and autozooming
-        map.timeStampGestureEnd = Date(timeIntervalSince1970: 0)
-        
         checkLocationServicesStatus()
         locationManager.startUpdatingLocation()
         locationManager.startUpdatingHeading()
@@ -925,10 +921,26 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                 
             } else {
                 
-                // for safety setting to false
+                // if currently the followUserButton is shown, then switch to hidden, only if at least walking speed for the moment (3 km/h)
                 if !followUserButton.isHidden {
+                    
+                    if averageSpeed > 0.8333 {
+                        
+                        // so last gesture was at least pauzeUdateMapCenterAfterGestureEndForHowManySeconds seconds ago
+                        // and
+                        // user is moving at least 3 km/h
+                        // hide the follow user button and then continue
+                        followUserButton.isHidden = true
+                        
+                    } else {
+                        
+                        // last gesture was at least pauzeUdateMapCenterAfterGestureEndForHowManySeconds seconds ago
+                        // but user is not really moving fast
+                        // and currnetly followUserButton is shown
+                        // so don't follow user yet, user is probably still panning, zooming .. or anyting else
+                        return
 
-                    followUserButton.isHidden = true
+                    }
 
                 }
                 
