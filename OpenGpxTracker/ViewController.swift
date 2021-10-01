@@ -77,6 +77,10 @@ let timeScheduleToCheckMapUpdateInSeconds = 0.25
 /// just to avoid this happens to often,  I assume this demands resources
 let timeSheduleToUpdateFatMKPolyLineInSeconds = 5.0
 
+/// when user starts panning or zooming, then there's  no more automatic map udpate depending on location (ie follow user) - called 'sreenFrozen'
+/// to go back from frozen to not frozen, the user must have ths minimum speed (in m/s),
+let minimumSpeedToMoveFromFrozenToNotFrozen = 0.8333
+
 /// White color for button background
 let kWhiteBackgroundColor: UIColor = UIColor(red: 254.0/255.0, green: 254.0/255.0, blue: 254.0/255.0, alpha: 0.90)
 
@@ -127,6 +131,9 @@ var notInitialAppLaunch = defaults.bool(forKey: userDefaultsKeyForNotInitialAppL
     }
     
 }
+
+/// average speed measured
+var averageSpeed = 0.0
 
 ///
 /// Main View Controller of the Application. It is loaded when the application is launched
@@ -910,7 +917,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             }
             
             // calculate average of measuredSpeads
-            let averageSpeed = measuredSpeads.reduce(0.0, +)/(measuredSpeads.count > 0 ? Double(measuredSpeads.count) : 1.0)
+            averageSpeed = measuredSpeads.reduce(0.0, +)/(measuredSpeads.count > 0 ? Double(measuredSpeads.count) : 1.0)
             
             // if time since last gesture end is less than pauzeUdateMapCenterAfterGestureEndForHowManySeconds, then don't further update the map
             if screenFrozen() {
@@ -924,7 +931,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                 // if currently the followUserButton is shown, then switch to hidden, only if at least walking speed for the moment (3 km/h)
                 if !followUserButton.isHidden {
                     
-                    if averageSpeed > 0.8333 {
+                    if averageSpeed > minimumSpeedToMoveFromFrozenToNotFrozen {
                         
                         // so last gesture was at least pauzeUdateMapCenterAfterGestureEndForHowManySeconds seconds ago
                         // and
@@ -1276,8 +1283,11 @@ extension ViewController: CLLocationManagerDelegate {
         updateMapCenter(locationManager: locationManager)
         
         // then turn the map in the moving direction
-        // only if end of last gesture > pauzeUdateMapCenterAfterGestureEndForHowManySeconds
-        if abs(map.timeStampGestureEnd.timeIntervalSince(Date())) >= pauzeUdateMapCenterAfterGestureEndForHowManySeconds {
+        // only if
+        //     currently followbutton is hidden
+        //     or (if not hidden)
+        //     if end of last gesture > pauzeUdateMapCenterAfterGestureEndForHowManySeconds and averageSpeed > minimumSpeedToMoveFromFrozenToNotFrozen
+        if followUserButton.isHidden || (!screenFrozen() && averageSpeed > minimumSpeedToMoveFromFrozenToNotFrozen) {
             
             map.camera.heading = newHeading.trueHeading
 
