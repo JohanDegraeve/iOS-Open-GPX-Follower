@@ -136,6 +136,9 @@ class GPXMapView: MKMapView {
     /// value will be set by background process
     var isOnTrack = false
     
+    /// if false, then there hasn't been yet a calculation of distance to destination
+    var didCalculateInitialDistanceToDestination = false
+    
     /// last trackPoint less than expected maximum distance from user
     ///
     /// initialize to 0 means we assume we start at the start of the session
@@ -297,6 +300,7 @@ class GPXMapView: MKMapView {
         subsequentTrackPointsInSameDirection = 0
         fatPolylineCoordinates = [CLLocationCoordinate2D]()
         isOnTrack = false
+        didCalculateInitialDistanceToDestination = false
         
     }
     
@@ -413,18 +417,30 @@ class GPXMapView: MKMapView {
     func calculateDistanceToDestination(currentDistanceToDestination: Double) -> Double {
         
         // case where current gpx trackpoint did not change
-        if  currentGPXTrackPointIndex == previousGPXTrackPointIndex {
+        //     in that case, don't update the distance to destination
+        // except if didCalculateInitialDistanceToDestination is false, then do show the distance to destination (this is the case where user just loaded a new gpx track and is actually on track, then it's go to see immediately the distance to the end of the track)
+        if  currentGPXTrackPointIndex == previousGPXTrackPointIndex && didCalculateInitialDistanceToDestination {
             
             // there's been no move, no change in distance
             return currentDistanceToDestination
             
         }
         
-        // check if value of movesStartToEnd is in a changing mood
-        if abs(subsequentTrackPointsInSameDirection) < amountOfTrackPointsToDetermineDirection {
+        // check if value of movesStartToEnd is in a changing mood, and if so just return currentDistanceToDestination
+        // except if didCalculateInitialDistanceToDestination is false, then do show the distance to destination (this is the case where user just loaded a new gpx track and is actually on track, then it's go to see immediately the distance to the end of the track)
+        if abs(subsequentTrackPointsInSameDirection) < amountOfTrackPointsToDetermineDirection && didCalculateInitialDistanceToDestination {
             
             print("subsequentTrackPointsInSameDirection =  \(subsequentTrackPointsInSameDirection), abs value is less than \(amountOfTrackPointsToDetermineDirection)")
             return currentDistanceToDestination
+            
+        }
+         
+        // if we have a trackloaded (session.distance > 0.0) and didCalculateInitialDistanceToDestination is currently still false and there's already calculated currentGPXTrackPointIndex, then set didCalculateInitialDistanceToDestination to true
+        if didCalculateInitialDistanceToDestination == false && session.distance > 0.0 && currentGPXTrackPointIndex > 0 {
+            
+            trace("didCalculateInitialDistanceToDestination is false, setting to true")
+
+            didCalculateInitialDistanceToDestination = true
             
         }
         
