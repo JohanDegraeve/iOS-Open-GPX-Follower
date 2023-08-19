@@ -1,0 +1,1 @@
+Map is always following the course, ie displays on screen as if user moves to top of screen, no matter the device orientation
