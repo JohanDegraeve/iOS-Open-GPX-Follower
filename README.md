@@ -35,7 +35,7 @@ Please note the [limitations of using Open Street Maps Tile Servers](http://wiki
 
 
 ## License
-Open GPX Follwoer app for iOS.  Copyright (C) 2021  Johan Degraeve
+Open GPX Follower app for iOS.  Copyright (C) 2021  Johan Degraeve
 
 based on GPX Tracker app for iOS written by Juan M. Merlos and Vincent Neo
 
