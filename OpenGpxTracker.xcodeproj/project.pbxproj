@@ -63,6 +63,7 @@
 		F8CB576C26E4185C0010200B /* FatMKPolyline.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB576B26E4185C0010200B /* FatMKPolyline.swift */; };
 		F8CB576E26E6A0EB0010200B /* Trace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB576D26E6A0EB0010200B /* Trace.swift */; };
 		F8CB577226E6A82B0010200B /* URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB577126E6A82B0010200B /* URL.swift */; };
+		F8E672BF2A921E1200E1A94F /* MKMapView+ConvenientOverlayInserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E672BE2A921E1200E1A94F /* MKMapView+ConvenientOverlayInserts.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -177,6 +178,7 @@
 		F8CB576B26E4185C0010200B /* FatMKPolyline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FatMKPolyline.swift; sourceTree = "<group>"; };
 		F8CB576D26E6A0EB0010200B /* Trace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trace.swift; sourceTree = "<group>"; };
 		F8CB577126E6A82B0010200B /* URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URL.swift; sourceTree = "<group>"; };
+		F8E672BE2A921E1200E1A94F /* MKMapView+ConvenientOverlayInserts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKMapView+ConvenientOverlayInserts.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -312,6 +314,7 @@
 				DC4908A01C4A136F009484AE /* TrackerButton.swift */,
 				BFE026C5244A02A4005423E6 /* DatePatternButton.swift */,
 				BF68ECC52448B887005C779F /* DateFieldTypeView.swift */,
+				F8E672BE2A921E1200E1A94F /* MKMapView+ConvenientOverlayInserts.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -550,6 +553,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F8E672BF2A921E1200E1A94F /* MKMapView+ConvenientOverlayInserts.swift in Sources */,
 				F8CB576C26E4185C0010200B /* FatMKPolyline.swift in Sources */,
 				BFE026C6244A02A4005423E6 /* DatePatternButton.swift in Sources */,
 				BF15092223916FC100F51F1B /* UIColor+DarkMode.swift in Sources */,

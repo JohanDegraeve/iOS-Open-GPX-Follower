@@ -289,7 +289,7 @@ class GPXMapView: MKMapView {
         //add tile server overlay
         //by removing all overlays, tile server overlay is also removed. We need to add it back
         if tileServer != .apple {
-            addOverlay(tileServerOverlay, level: .aboveLabels)
+            addOverlayOnBottom(tileServerOverlay)
         }
         
         // variables used to track distance to start or end of the track (depending on direction), reset all
@@ -346,7 +346,7 @@ class GPXMapView: MKMapView {
             session.distance += oneTrack.length(actualDistanceFromStart: session.distance, trackPointDistances: &trackPointDistances)
             for segment in oneTrack.tracksegments {
                 let overlay = segment.overlay
-                addOverlay(overlay)
+                addOverlayOnTop(overlay)
                 let segmentTrackpoints = segment.trackpoints
                 //add point to map extent
                 for waypoint in segmentTrackpoints {

@@ -585,7 +585,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     func updatePolylineColor() {
         for overlay in map.overlays where overlay is MKPolyline {
                 map.removeOverlay(overlay)
-                map.addOverlay(overlay)
+                map.addOverlayOnTop(overlay)
         }
     }
     
