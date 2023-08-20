@@ -58,7 +58,7 @@ class Preferences: NSObject {
     private var _useCache: Bool = true
     
     /// In memory value of the preference.
-    private var _tileServer: GPXTileServer = .apple
+    private var _tileServer: GPXTileServer = .openStreetMap
     
     /// In memory value of the preference.
     private var _activityType: CLActivityType = .other
