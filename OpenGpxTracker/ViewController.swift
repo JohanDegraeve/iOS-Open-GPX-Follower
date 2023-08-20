@@ -231,13 +231,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// current index in latitueLongitudedeltas, default 2
     var currentLongitudedeltaIndex = 2
     
-    /// - camera heading will be update if user has rotate device permenantly (eg fix on bike or motorcycle, but not in heading direction)
-    /// - this update will happen once per minute
-    private var timeStampLastUpdateCameraHeading = Date()
-    
-    /// every minute, a camera heading update will be done
-    private let cameraHeadingFrequencyInMinutes = 1.0
-    
     /// Initializer. Just initializes the class vars/const
     required init(coder aDecoder: NSCoder) {
         
