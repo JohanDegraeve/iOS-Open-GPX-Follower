@@ -72,10 +72,6 @@ class GPXMapView: MKMapView {
     /// temp storage heading, updated each time a new heading is received from the location manager. Used when user rotates map (not device but map)
     var storedHeading: CLHeading?
     
-    /// Arrow image to display heading (orientation of the device)
-    /// initialized on MapViewDelegate
-    var headingImageView: UIImageView?
-    
     /// Selected tile server.
     /// - SeeAlso: GPXTileServer
     var tileServer: GPXTileServer = .apple {
@@ -258,9 +254,6 @@ class GPXMapView: MKMapView {
     /// - Updates the heading arrow based on the heading information
     func updateHeading(to heading: CLHeading) {
         
-        // why setting only here to false ?
-        headingImageView?.isHidden = false
-        
         var rotation: CGFloat!
         
         // if heading nil then set rotation to north
@@ -270,8 +263,6 @@ class GPXMapView: MKMapView {
             rotation = rotation + headingOffset
         }
  
-        headingImageView?.transform = CGAffineTransform(rotationAngle: rotation)
-        
     }
     
     ///

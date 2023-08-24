@@ -231,6 +231,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// current index in latitueLongitudedeltas, default 2
     var currentLongitudedeltaIndex = 2
     
+    /// default X value for frame, assuming frame is in landscape mode
+    var frameX: CGFloat = 0.0
+    
+    /// default X value for frame, assuming frame is in landscape mode
+    var frameY: CGFloat = 0.0
+    
+    /// default width value for frame, assuming frame is in landscape mode
+    var frameWidth: CGFloat = 0.0
+    
+    /// default height value for frame, assuming frame is in landscape mode
+    var frameHeight: CGFloat = 0.0
+    
     /// Initializer. Just initializes the class vars/const
     required init(coder aDecoder: NSCoder) {
         
@@ -339,6 +351,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             }
         }
         
+        frameX = 0.0
+        frameY = (isIPhoneX ? 0.0 : 20.0)
+        frameWidth = self.view.bounds.size.width
+        frameHeight = self.view.bounds.size.height - (isIPhoneX ? 0.0 : 20.0)
+
         // Map autorotate configuration
         map.autoresizesSubviews = true
         map.autoresizingMask = [.flexibleHeight, .flexibleWidth]
@@ -348,10 +365,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         // Map configuration Stuff
         map.delegate = mapViewDelegate
         map.showsUserLocation = true
-        let mapH: CGFloat = self.view.bounds.size.height - (isIPhoneX ? 0.0 : 20.0)
-        map.frame = CGRect(x: 0.0, y: (isIPhoneX ? 0.0 : 20.0), width: self.view.bounds.size.width, height: mapH)
+        
         map.isZoomEnabled = true
         map.isRotateEnabled = true
+        // this will create the frame for the map with correct sizing
+        rotateMapPortrait()
+        
         //set the position of the compass.
         map.compassRect = CGRect(x: map.frame.width/2 - 18, y: isIPhoneX ? 105.0 : 70.0, width: 36, height: 36)
         
@@ -556,10 +575,66 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     
+    
+    override func viewWillLayoutSubviews() {
+        
+        map.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
+        switch UIDevice.current.orientation {
+         case .portrait:
+            
+             rotateMapPortrait()
+             
+         case .landscapeLeft:
+             rotateMapLandScapeLeft()
+             
+         case .landscapeRight:
+             rotateMapLandScapeRight()
+            
+        case .portraitUpsideDown:
+            rotateMapPortraitUpsideDown()
+             
+         case .unknown, .faceUp, .faceDown:
+             break
+         
+         @unknown default:
+             fatalError("Unknown device orientation")
+
+         }
+    }
+    
     /// For handling compass location changes when orientation is switched.
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
+        coordinator.animate(alongsideTransition: { context in
+            
+            // Update the frame of the map view, to support rotation
+            // this seems to give best results, it's not optimal because there are two unfilled grey rectangles left and right
+            if UIDevice.current.orientation == .portrait || UIDevice.current.orientation == .portraitUpsideDown {
+                
+                self.map.frame = CGRect(x: self.frameX, y: self.frameY, width: self.frameWidth, height: self.frameHeight)
+                
+                self.preferencesButton.isHidden = false
+                self.folderButton.isHidden = false
+                self.aboutButton.isHidden = false
+                self.appTitleLabel.isHidden = false
+                self.coordsLabel.isHidden = false
+                
+            } else {
+                
+                self.map.frame = CGRect(x: 0, y: 0, width: self.frameWidth*2, height: self.frameWidth)
+                
+                self.preferencesButton.isHidden = true
+                self.folderButton.isHidden = true
+                self.aboutButton.isHidden = true
+                self.appTitleLabel.isHidden = true
+                self.coordsLabel.isHidden = true
+
+            }
+            
+        }, completion: nil)
+
         DispatchQueue.main.async {
             // set the new position of the compass.
             self.map.compassRect = CGRect(x: size.width/2 - 18, y: 70.0, width: 36, height: 36)
@@ -1134,6 +1209,68 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         return abs(map.timeStampGestureEnd.timeIntervalSince(Date())) < pauzeUdateMapCenterAfterGestureEndForHowManySeconds
         
+    }
+    
+    func findViewOfType(type: String, inView view: UIView) -> UIView? {
+          // function scans subviews recursively and returns reference to the found one of a type
+        if view.subviews.count > 0 {
+            for v in view.subviews {
+                NSLog("view type = %@", String(describing: v))
+            }
+        }
+        if view.subviews.count > 0 {
+            for v in view.subviews {
+                if String(describing: v).containsIgnoringCase(find: type) {
+                    return v
+                }
+                if let inSubviews = self.findViewOfType(type: type, inView: v) {
+                    return inSubviews
+                }
+            }
+            return nil
+        } else {
+            return nil
+        }
+      }
+    
+    /// for rotate map, when device goes to landscape left
+    func rotateMapLandScapeLeft() {
+        
+        rotateMap(angleDegrees: -90)
+
+    }
+    
+    /// for rotate map, when device goes to landscape right
+    func rotateMapLandScapeRight() {
+        
+        rotateMap(angleDegrees: 90)
+        
+    }
+    
+    /// for rotate map, when device goes to landscape right
+    func rotateMapPortrait() {
+
+        map.frame = CGRect(x: frameX, y: frameY, width: frameWidth, height: frameHeight)
+        rotateMap(angleDegrees: 0)
+        
+    }
+    
+    /// or rotate map, when device goes to portraitupsidedown
+    func rotateMapPortraitUpsideDown() {
+        
+        rotateMap(angleDegrees: 180)
+
+    }
+    
+    /// for rotate map, when device goes to landscape left
+    /// angleDegrees : angle to rotatein degrees
+    func rotateMap(angleDegrees: Int) {
+        
+        let mapContentView = findViewOfType(type: "_MKMapContentView", inView: map)
+        if let mapContentView = mapContentView {
+            mapContentView.transform = CGAffineTransform(rotationAngle: CGFloat(angleDegrees) / 180.0 * CGFloat.pi)
+        }
+
     }
     
 }
