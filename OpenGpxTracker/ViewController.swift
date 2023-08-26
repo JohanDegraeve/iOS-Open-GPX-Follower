@@ -358,6 +358,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         map.isZoomEnabled = true
         map.isRotateEnabled = true
+        
         // this will create the frame for the map with correct sizing
         rotateMapPortrait()
         
@@ -392,10 +393,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         //
         // HEADER
         let font36 = UIFont(name: "DinCondensed-Bold", size: 36.0)
-        let font12 = UIFont(name: "DinAlternate-Bold", size: 12.0)
         
         //add the app title Label (Branding, branding, branding! )
-        let dictionary = Bundle.main.infoDictionary
 
         // Tracked info
         let iPhoneXdiff: CGFloat  = isIPhoneX ? 40 : 0
@@ -433,6 +432,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         //aboutButton.layer.cornerRadius = 24
         map.addSubview(preferencesButton)
         
+        
         // Folder button
         let folderW: CGFloat = kButtonSmallSize
         let folderH: CGFloat = kButtonSmallSize
@@ -443,7 +443,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         folderButton.setImage(UIImage(named: "folder"), for: UIControl.State())
         folderButton.setImage(UIImage(named: "folderHigh"), for: .highlighted)
         folderButton.addTarget(self, action: #selector(ViewController.openFolderViewController), for: .touchUpInside)
-        folderButton.backgroundColor = kWhiteBackgroundColor
+        //folderButton.backgroundColor = kWhiteBackgroundColor
         folderButton.layer.cornerRadius = 24
         folderButton.autoresizingMask = [.flexibleRightMargin]
         map.addSubview(folderButton)
@@ -530,8 +530,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
     override func viewWillLayoutSubviews() {
         
-        map.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
         switch UIDevice.current.orientation {
          case .portrait:
             rotateMapPortrait()
@@ -566,7 +564,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             // this seems to give best results, it's not optimal because there are two unfilled grey rectangles left and right
             if UIDevice.current.orientation == .portrait || UIDevice.current.orientation == .portraitUpsideDown {
                 
-                self.map.frame = CGRect(x: self.frameX, y: self.frameY, width: self.frameWidth, height: self.frameHeight)
+                //self.map.frame = CGRect(x: self.frameX, y: self.frameY, width: self.frameWidth, height: self.frameHeight)
                 
                 self.preferencesButton.isHidden = false
                 self.folderButton.isHidden = false
@@ -574,8 +572,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                 
             } else if UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight {
                 
+                // need to set correct height, otherwise it gets smaller, looks like iOS takes int account small header?
                 self.map.frame = CGRect(x: 0, y: 0, width: super.view.frame.width, height: super.view.frame.height)
-                self.map.bounds = CGRect(origin: CGPoint.zero, size: CGSize(width: self.map.frame.size.width, height: self.map.frame.size.height))
+                //self.map.bounds = CGRect(origin: CGPoint.zero, size: CGSize(width: self.map.frame.size.width, height: self.map.frame.size.height))
 
                 self.preferencesButton.isHidden = true
                 self.folderButton.isHidden = true
