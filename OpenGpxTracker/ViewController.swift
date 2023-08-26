@@ -189,12 +189,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     var isDisplayingLocationServicesDenied: Bool = false
     
     //UI
-    /// Label with the title of the app
-    var appTitleLabel: UILabel
-
-    /// Label that displays current latitude and longitude (lat,long)
-    var coordsLabel: UILabel
-    
     /// Label that displays "distance to start", or "distnace to end" or "total distance"
     var movingDirectionLabel: UILabel
     
@@ -251,10 +245,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         fatPolyline = MKPolyline(coordinates: &map.fatPolylineCoordinates, count: map.fatPolylineCoordinates.count)
         
         self.map.addOverlay(fatPolyline)
-        
-        self.appTitleLabel = UILabel(coder: aDecoder)!
-
-        self.coordsLabel = UILabel(coder: aDecoder)!
         
         self.movingDirectionLabel = UILabel(coder: aDecoder)!
         self.distanceLabel = DistanceLabel(coder: aDecoder)!
@@ -406,26 +396,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         //add the app title Label (Branding, branding, branding! )
         let dictionary = Bundle.main.infoDictionary
-        appTitleLabel.text = "  "
-        if let appname = dictionary?["CFBundleDisplayName"] as? String {
-            appTitleLabel.text = "  " + appname
-        }
 
-        
-        appTitleLabel.textAlignment = .left
-        appTitleLabel.font = UIFont.boldSystemFont(ofSize: 10)
-        //appTitleLabel.textColor = UIColor(red: 0.0/255.0, green: 0.0/255.0, blue: 0.0/255.0, alpha: 1.0)
-        appTitleLabel.textColor = UIColor.green
-        appTitleLabel.backgroundColor = UIColor(red: 58.0/255.0, green: 57.0/255.0, blue: 54.0/255.0, alpha: 0.80)
-        self.view.addSubview(appTitleLabel)
-        
-        // CoordLabel
-        coordsLabel.textAlignment = .right
-        coordsLabel.font = font12
-        coordsLabel.textColor = UIColor.white
-        coordsLabel.text = kNotGettingLocationText
-        self.view.addSubview(coordsLabel)
-        
         // Tracked info
         let iPhoneXdiff: CGFloat  = isIPhoneX ? 40 : 0
 
@@ -509,25 +480,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// - Parameters:
     ///     - isIPhoneX: if device is >= iPhone X, bottom gap will be zero
     func addConstraints(_ isIPhoneX: Bool) {
-        addConstraintsToAppTitleBar(isIPhoneX)
         addConstraintsToInfoLabels(isIPhoneX)
         addConstraintsToButtonBar(isIPhoneX)
-    }
-    /// Adds constraints to subviews forming the app title bar (top bar)
-    func addConstraintsToAppTitleBar(_ isIPhoneX: Bool) {
-        // MARK: App Title Bar
-        
-        // Switch off all autoresizing masks translate
-        appTitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        coordsLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint(item: coordsLabel, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: -5).isActive = true
-        // not using self.topLayoutGuide as it will leave a gap between status bar and this, if used on non-notch devices
-        NSLayoutConstraint(item: appTitleLabel, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1, constant: isIPhoneX ? 40.0 : 20.0).isActive = true
-        NSLayoutConstraint(item: appTitleLabel, attribute: .lastBaseline, relatedBy: .equal, toItem: coordsLabel, attribute: .lastBaseline, multiplier: 1, constant: 0).isActive = true
-        NSLayoutConstraint(item: appTitleLabel, attribute: .trailing, relatedBy: .equal, toItem: coordsLabel, attribute: .trailing, multiplier: 1, constant: 5).isActive = true
-        NSLayoutConstraint(item: appTitleLabel, attribute: .leading, relatedBy: .equal, toItem: coordsLabel, attribute: .leading, multiplier: 1, constant: 0).isActive = true
-        NSLayoutConstraint(item: appTitleLabel, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .leading, multiplier: 1, constant: 0).isActive = true
     }
     
     /// Adds constraints to subviews forming the informational labels (top right side; i.e. speed, elapse time labels)
@@ -574,21 +528,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
     }
 
-    
-    
     override func viewWillLayoutSubviews() {
         
         map.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
         switch UIDevice.current.orientation {
          case .portrait:
-            
-             rotateMapPortrait()
-             
+            rotateMapPortrait()
+
          case .landscapeLeft:
              rotateMapLandScapeLeft()
-             
+
          case .landscapeRight:
+            
              rotateMapLandScapeRight()
             
         case .portraitUpsideDown:
@@ -601,6 +553,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
              fatalError("Unknown device orientation")
 
          }
+
     }
     
     /// For handling compass location changes when orientation is switched.
@@ -618,18 +571,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                 self.preferencesButton.isHidden = false
                 self.folderButton.isHidden = false
                 self.aboutButton.isHidden = false
-                self.appTitleLabel.isHidden = false
-                self.coordsLabel.isHidden = false
                 
-            } else {
+            } else if UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight {
                 
-                self.map.frame = CGRect(x: 0, y: 0, width: self.frameWidth*2, height: self.frameWidth)
-                
+                self.map.frame = CGRect(x: 0, y: 0, width: super.view.frame.width, height: super.view.frame.height)
+                self.map.bounds = CGRect(origin: CGPoint.zero, size: CGSize(width: self.map.frame.size.width, height: self.map.frame.size.height))
+
                 self.preferencesButton.isHidden = true
                 self.folderButton.isHidden = true
                 self.aboutButton.isHidden = true
-                self.appTitleLabel.isHidden = true
-                self.coordsLabel.isHidden = true
 
             }
             
@@ -1243,8 +1193,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// for rotate map, when device goes to landscape right
     func rotateMapLandScapeRight() {
         
+        // huidige x = frameWidth
+        // Initiële grootte van het object
+        let initialSize = CGSize(width: frameWidth, height: frameHeight)
+
         rotateMap(angleDegrees: 90)
-        
+
     }
     
     /// for rotate map, when device goes to landscape right
@@ -1363,7 +1317,6 @@ extension ViewController: CLLocationManagerDelegate {
     ///
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("didFailWithError \(error)")
-        coordsLabel.text = kNotGettingLocationText
 
         let locationError = error as? CLError
         switch locationError?.code {
@@ -1387,12 +1340,6 @@ extension ViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         let newLocation = locations.first!
-        
-        //Update coordsLabel
-        let latFormat = String(format: "%.6f", newLocation.coordinate.latitude)
-        let lonFormat = String(format: "%.6f", newLocation.coordinate.longitude)
-        let altitude = newLocation.altitude.toAltitude(useImperial: useImperial)
-        coordsLabel.text = String(format: NSLocalizedString("COORDS_LABEL", comment: "no comment"), latFormat, lonFormat, altitude)
         
         // user moved location, so update center of the map
         updateMapCenter(locationManager: locationManager)

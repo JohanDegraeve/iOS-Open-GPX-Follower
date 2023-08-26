@@ -363,8 +363,17 @@ class GPXMapView: MKMapView {
         /// bottomRight of the map
         let mapBottomRight = CLLocationCoordinate2D(latitude: region.center.latitude - region.span.latitudeDelta / 2, longitude: region.center.longitude + region.span.longitudeDelta / 2)
 
+        /// if landscape mode then region is larger than actual screen, reduce the percentage with 20% more
+        var percentageToUseForLatitude = percentage
+        if UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight {
+            percentageToUseForLatitude = percentageToUseForLatitude - 25
+            if percentageToUseForLatitude < reducedViewPercentageMin {
+                percentageToUseForLatitude = 10
+            }
+        }
+        
         /// how much to reduce longitude region to verify if extent falls within region
-        let diffLongitude = region.span.longitudeDelta * Double(100 - percentage) / 100.0 / 2
+        let diffLongitude = region.span.longitudeDelta * Double(100 - percentageToUseForLatitude) / 100.0 / 2
 
         /// how much to reduce latitude of region to verify if extent falls within region
         let diffLatitude = region.span.latitudeDelta * Double(100 - percentage) / 100.0 / 2

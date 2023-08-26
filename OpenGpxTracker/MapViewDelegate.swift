@@ -45,7 +45,6 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIAlertViewDelegate {
 
         var i = 0
 
-        let gpxMapView = mapView as! GPXMapView
         var hasImpacted = false
         
         //adds the pins with an animation
