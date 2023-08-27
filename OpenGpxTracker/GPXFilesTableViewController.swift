@@ -61,12 +61,12 @@ class GPXFilesTableViewController: UITableViewController, UINavigationBarDelegat
         addNotificationObservers()
         
         // Button to return to the map
-        let addItem = UIBarButtonItem(title: NSLocalizedString("Add", comment: "no comment"),
-                                        style: UIBarButtonItem.Style.plain,
-                                        target: self,
-                                        action: #selector(openAddGPXFileViewController))
+        let shareItem = UIBarButtonItem(title: NSLocalizedString("DONE", comment: "no comment"),
+                                                style: UIBarButtonItem.Style.plain,
+                                                target: self,
+                                                action: #selector(GPXFilesTableViewController.closeGPXFilesTableViewController))
         
-        self.navigationItem.rightBarButtonItems = [addItem]
+        self.navigationItem.rightBarButtonItems = [shareItem]
         
         // Get gpx files
         let list: [GPXFileInfo] = GPXFileManager.fileList
@@ -80,6 +80,13 @@ class GPXFilesTableViewController: UITableViewController, UINavigationBarDelegat
     /// Removes notfication observers
     deinit {
         removeNotificationObservers()
+    }
+    
+    /// Closes this view controller.
+    @objc func closeGPXFilesTableViewController() {
+        print("closeGPXFIlesTableViewController()")
+        self.dismiss(animated: true, completion: { () -> Void in
+        })
     }
     
     ///
