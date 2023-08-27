@@ -577,7 +577,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                 //self.map.bounds = CGRect(origin: CGPoint.zero, size: CGSize(width: self.map.frame.size.width, height: self.map.frame.size.height))
 
                 self.preferencesButton.isHidden = true
-                self.folderButton.isHidden = true
+                self.folderButton.isHidden = false
                 self.aboutButton.isHidden = true
 
             }
