@@ -63,3 +63,13 @@ This app uses:
 
 See also:
 - [Avenue GPX Viewer](https://github.com/vincentneo/Avenue-GPX-Viewer), a GPX viewer based on some of the codes used in this project. A project by  [@vincentneo](http://github.com/vincentneo).
+
+----
+
+to install on iOS 10 device
+- download xcode 13
+- after download : cd to Xcode.app/Contents/MacOS
+- launch xcode with ./Xcode
+- Open OpenGpxTracker.xcworkspace
+- In Xcode build settings, make sure "Allow Multi-Platform Builds" is set to No
+- You may have to clean build and rebuild a few times
