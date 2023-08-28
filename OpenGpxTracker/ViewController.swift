@@ -155,6 +155,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// is reachTopOfScreenInMinutes currently multiplied with multiplicationFactorForReachTopOfScreenInMinutes ?
     var reachTopOfScreenInMinutesMultiplied3 = false
     
+    /// to support device orientation
+    var headingOffsetInDegrees = 0.0
+    
     /// location manager instance configuration
     let locationManager: CLLocationManager = {
         let manager = CLLocationManager()
@@ -346,7 +349,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         frameWidth = self.view.bounds.size.width
         frameHeight = self.view.bounds.size.height - (isIPhoneX ? 0.0 : 20.0)
 
-        // Map autorotate configuration
+        // Map autoresize configuration
         map.autoresizesSubviews = true
         map.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.view.autoresizesSubviews = true
@@ -360,8 +363,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         map.isRotateEnabled = true
         
         // this will create the frame for the map with correct sizing
-        rotateMapPortrait()
-        
+        self.map.frame = CGRect(x: 0, y: 0, width: super.view.frame.width, height: super.view.frame.height)
+
         //set the position of the compass.
         map.compassRect = CGRect(x: map.frame.width/2 - 18, y: isIPhoneX ? 105.0 : 70.0, width: 36, height: 36)
         
@@ -532,17 +535,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         switch UIDevice.current.orientation {
          case .portrait:
-            rotateMapPortrait()
+            headingOffsetInDegrees = 0.0
 
          case .landscapeLeft:
-             rotateMapLandScapeLeft()
+            headingOffsetInDegrees = 90.0
 
          case .landscapeRight:
-            
-             rotateMapLandScapeRight()
+            headingOffsetInDegrees = -90.0
             
         case .portraitUpsideDown:
-            rotateMapPortraitUpsideDown()
+            headingOffsetInDegrees = 180.0
              
          case .unknown, .faceUp, .faceDown:
              break
@@ -558,32 +560,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
-        coordinator.animate(alongsideTransition: { context in
-            
-            // Update the frame of the map view, to support rotation
-            // this seems to give best results, it's not optimal because there are two unfilled grey rectangles left and right
-            if UIDevice.current.orientation == .portrait || UIDevice.current.orientation == .portraitUpsideDown {
-                
-                //self.map.frame = CGRect(x: self.frameX, y: self.frameY, width: self.frameWidth, height: self.frameHeight)
-                
-                self.preferencesButton.isHidden = false
-                self.folderButton.isHidden = false
-                self.aboutButton.isHidden = false
-                
-            } else if UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight {
-                
-                // need to set correct height, otherwise it gets smaller, looks like iOS takes int account small header?
-                self.map.frame = CGRect(x: 0, y: 0, width: super.view.frame.width, height: super.view.frame.height)
-                //self.map.bounds = CGRect(origin: CGPoint.zero, size: CGSize(width: self.map.frame.size.width, height: self.map.frame.size.height))
-
-                self.preferencesButton.isHidden = true
-                self.folderButton.isHidden = false
-                self.aboutButton.isHidden = true
-
-            }
-            
-        }, completion: nil)
-
         DispatchQueue.main.async {
             // set the new position of the compass.
             self.map.compassRect = CGRect(x: size.width/2 - 18, y: 70.0, width: 36, height: 36)
@@ -1121,7 +1097,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         if let storedHeading = self.map.storedHeading {
             
-            self.map.camera.heading = storedHeading.trueHeading
+            self.map.camera.heading = storedHeading.trueHeading + headingOffsetInDegrees
             
         }
         
@@ -1181,50 +1157,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             return nil
         }
       }
-    
-    /// for rotate map, when device goes to landscape left
-    func rotateMapLandScapeLeft() {
-        
-        rotateMap(angleDegrees: -90)
-
-    }
-    
-    /// for rotate map, when device goes to landscape right
-    func rotateMapLandScapeRight() {
-        
-        // huidige x = frameWidth
-        // Initiële grootte van het object
-        let initialSize = CGSize(width: frameWidth, height: frameHeight)
-
-        rotateMap(angleDegrees: 90)
-
-    }
-    
-    /// for rotate map, when device goes to landscape right
-    func rotateMapPortrait() {
-
-        map.frame = CGRect(x: frameX, y: frameY, width: frameWidth, height: frameHeight)
-        rotateMap(angleDegrees: 0)
-        
-    }
-    
-    /// or rotate map, when device goes to portraitupsidedown
-    func rotateMapPortraitUpsideDown() {
-        
-        rotateMap(angleDegrees: 180)
-
-    }
-    
-    /// for rotate map, when device goes to landscape left
-    /// angleDegrees : angle to rotatein degrees
-    func rotateMap(angleDegrees: Int) {
-        
-        let mapContentView = findViewOfType(type: "_MKMapContentView", inView: map)
-        if let mapContentView = mapContentView {
-            mapContentView.transform = CGAffineTransform(rotationAngle: CGFloat(angleDegrees) / 180.0 * CGFloat.pi)
-        }
-
-    }
     
 }
 
@@ -1350,8 +1282,7 @@ extension ViewController: CLLocationManagerDelegate {
     ///
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         
-        print("ViewController::didUpdateHeading true: \(newHeading.trueHeading) magnetic: \(newHeading.magneticHeading)")
-        print("mkMapcamera heading=\(map.camera.heading)")
+        print("HEADING trueHeading = \(newHeading.trueHeading) magnetic = \(newHeading.magneticHeading) mkMapcamera heading=\(map.camera.heading)")
 
         // map possibly rotated, so update center off the map
         updateMapCenter(locationManager: locationManager)
@@ -1363,10 +1294,9 @@ extension ViewController: CLLocationManagerDelegate {
         //     if end of last gesture > pauzeUdateMapCenterAfterGestureEndForHowManySeconds and averageSpeed > minimumSpeedToMoveFromFrozenToNotFrozen
         if followUserButton.isHidden || (!screenFrozen() && averageSpeed > minimumSpeedToMoveFromFrozenToNotFrozen) {
             
-            map.camera.heading = newHeading.trueHeading
+            map.camera.heading = newHeading.trueHeading + headingOffsetInDegrees
 
         }
-
         
         map.storedHeading = newHeading // updates heading variable
         
