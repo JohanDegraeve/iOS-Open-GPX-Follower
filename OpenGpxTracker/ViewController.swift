@@ -1338,8 +1338,6 @@ extension ViewController: CLLocationManagerDelegate {
     ///
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
-        let newLocation = locations.first!
-        
         // user moved location, so update center of the map
         updateMapCenter(locationManager: locationManager)
         
