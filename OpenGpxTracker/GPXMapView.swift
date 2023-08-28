@@ -118,9 +118,6 @@ class GPXMapView: MKMapView {
     /// Overlay that holds map tiles
     var tileServerOverlay: MKTileOverlay = MKTileOverlay()
     
-    /// Offset to heading due to user's map rotation
-    var headingOffset: CGFloat?
-    
     /// Gesture for heading arrow to be updated in realtime during user's map interactions
     var rotationGesture = UIRotationGestureRecognizer()
     
@@ -221,16 +218,8 @@ class GPXMapView: MKMapView {
         // show compass when user rotates
         showsCompass = true
         
-        headingOffset = gesture.rotation
-        
-        if let storedHeading = storedHeading {
-            updateHeading(to: storedHeading)
-        }
-        
         if gesture.state == .ended {
             
-            headingOffset = nil
-
             timeStampGestureEnd = Date()
             
         }
@@ -248,21 +237,6 @@ class GPXMapView: MKMapView {
 
         }
         
-    }
-    
-    ///
-    /// - Updates the heading arrow based on the heading information
-    func updateHeading(to heading: CLHeading) {
-        
-        var rotation: CGFloat!
-        
-        // if heading nil then set rotation to north
-        rotation = CGFloat((heading.trueHeading - camera.heading)/180 * Double.pi)
-        
-        if let headingOffset = headingOffset {
-            rotation = rotation + headingOffset
-        }
- 
     }
     
     ///

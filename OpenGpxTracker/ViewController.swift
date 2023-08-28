@@ -1371,7 +1371,6 @@ extension ViewController: CLLocationManagerDelegate {
 
         
         map.storedHeading = newHeading // updates heading variable
-        map.updateHeading(to: newHeading) // updates heading view's rotation
         
     }
 }
