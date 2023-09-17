@@ -68,7 +68,7 @@ class Preferences: NSObject {
     private var _activityType: CLActivityType = .other
     
     /// in memory value of the orientatin
-    private var _orientation: UIDeviceOrientation = .unknown
+    private var _orientation: UIDeviceOrientation = .portrait
     
     ///
     private var _dateFormat = "dd-MMM-yyyy-HHmm"
