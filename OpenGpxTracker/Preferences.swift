@@ -7,6 +7,7 @@
 //
 import Foundation
 import CoreLocation
+import UIKit
 
 /// Key on Defaults for the Tile Server integer.
 let kDefaultsKeyTileServerInt: String = "TileServerInt"
@@ -19,6 +20,9 @@ let kDefaultsKeyUseImperial: String = "UseImperial"
 
 /// Key on Defaults for the current selected activity type.
 let kDefaultsKeyActivityType: String = "ActivityType"
+
+/// Key on Defaults for the current selected device orientation.
+let kDefaultsDeviceOrientation: String = "DeviceOrientation"
 
 /// Key on Defaults for the current date format..
 let kDefaultsKeyDateFormat: String = "DateFormat"
@@ -62,6 +66,9 @@ class Preferences: NSObject {
     
     /// In memory value of the preference.
     private var _activityType: CLActivityType = .other
+    
+    /// in memory value of the orientatin
+    private var _orientation: UIDeviceOrientation = .unknown
     
     ///
     private var _dateFormat = "dd-MMM-yyyy-HHmm"
@@ -213,6 +220,21 @@ class Preferences: NSObject {
         set {
             _activityType = CLActivityType(rawValue: newValue)!
             defaults.set(newValue, forKey: kDefaultsKeyActivityType)
+        }
+    }
+    
+    var deviceOrientation: Int {
+        get {
+            return _orientation.rawValue
+        }
+        set {
+            if let newOrientation = UIDeviceOrientation(rawValue: newValue) {
+                _orientation = newOrientation
+                defaults.set(newValue ,forKey: kDefaultsDeviceOrientation)
+            } else {
+                _orientation = .portrait
+                defaults.set(UIDeviceOrientation(rawValue: 1), forKey: kDefaultsDeviceOrientation)
+            }
         }
     }
     

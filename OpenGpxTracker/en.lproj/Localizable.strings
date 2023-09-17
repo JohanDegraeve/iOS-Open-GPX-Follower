@@ -53,6 +53,12 @@
 "AT_FITNESS_DESC" = "Running, hiking, cycling...";
 "AT_OTHER_DESC" = "Other than automotive navigation";
 "AT_FLIGHT_DESC" = "Airborne activities";
+"DEVICE_ORIENTATION" = "Device Orientation";
+"Automatic_Orientation" = "Automatic";
+"Portrait" = "Portrait";
+"Portrait Upside Down" = "Portrait Upside Down";
+"Landscape Left" = "Landscape Left";
+"Landscape Right" = "Landscape Right";
 
 // Dates
 "T_YEARS_AGO" = "%d years ago";

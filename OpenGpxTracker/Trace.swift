@@ -80,6 +80,8 @@ fileprivate func getDocumentsDirectory() -> URL {
 /// Example
 func trace(_ message: StaticString, _ args: CVarArg...) {
     
+    guard tracingEnabled else {return}
+    
     // initialize traceFileName if needed
     if traceFileName ==  nil {
         traceFileName = getDocumentsDirectory().appendingPathComponent(traceFileNameToUse + ".0.log")

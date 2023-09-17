@@ -163,7 +163,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let manager = CLLocationManager()
         manager.requestWhenInUseAuthorization()
         manager.activityType = CLActivityType(rawValue: Preferences.shared.locationActivityTypeInt)!
-        print("Chosen CLActivityType: \(manager.activityType.name)")
         manager.desiredAccuracy = kCLLocationAccuracyBest
         manager.distanceFilter = 2 //meters
         manager.headingFilter = 3 //degrees (1 is default)
@@ -282,7 +281,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// Current implementation removes notification observers
     ///
     deinit {
-        print("*** deinit")
         NotificationCenter.default.removeObserver(self)
     }
    
@@ -530,29 +528,47 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         NSLayoutConstraint(item: followUserButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: kButtonSmallSize).isActive = true
         
     }
+    
+    func setHeadingOffsetInDegrees() {
+        switch Preferences.shared.deviceOrientation {
+        case 0:
+            switch UIDevice.current.orientation {
+             case .portrait:
+                headingOffsetInDegrees = 0.0
+
+             case .landscapeLeft:
+                headingOffsetInDegrees = 90.0
+
+             case .landscapeRight:
+                headingOffsetInDegrees = -90.0
+                
+            case .portraitUpsideDown:
+                headingOffsetInDegrees = 180.0
+                 
+             case .unknown, .faceUp, .faceDown:
+                 break
+             
+             @unknown default:
+                 fatalError("Unknown device orientation")
+
+             }
+        case 1:// forced portrait
+            headingOffsetInDegrees = 0.0
+        case 2: // portrait upside down
+            headingOffsetInDegrees = 180.0
+        case 3: // landscape left
+            headingOffsetInDegrees = 90.0
+        case 4: // landscape right
+            headingOffsetInDegrees = -90.0
+        default:
+            headingOffsetInDegrees = 0.0
+        }
+    }
 
     override func viewWillLayoutSubviews() {
         
-        switch UIDevice.current.orientation {
-         case .portrait:
-            headingOffsetInDegrees = 0.0
-
-         case .landscapeLeft:
-            headingOffsetInDegrees = 90.0
-
-         case .landscapeRight:
-            headingOffsetInDegrees = -90.0
-            
-        case .portraitUpsideDown:
-            headingOffsetInDegrees = 180.0
-             
-         case .unknown, .faceUp, .faceDown:
-             break
-         
-         @unknown default:
-             fatalError("Unknown device orientation")
-
-         }
+        setHeadingOffsetInDegrees()
+        
 
     }
     
@@ -835,12 +851,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     /// for use in timer as selector, makes a call to updateMapCenter
     @objc func regularCallToUpdateMapCenter() {
         
-        if abs(timestampLastCallToUpdateMapCenter.timeIntervalSince(Date())) > timeScheduleToCheckMapUpdateInSeconds {
-
-            updateMapCenter(locationManager: locationManager)
-
-        }
-       
         // update distance
         distanceLabel.distance = map.calculateDistanceToDestination(currentDistanceToDestination: distanceLabel.distance)
 
@@ -890,6 +900,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     /// updates the map center, map zoom, map rotation, depending on user location, speed, distance from track and wheter or not user reacently did a gesture
     func updateMapCenter(locationManager: CLLocationManager) {
+
+        if abs(timestampLastCallToUpdateMapCenter.timeIntervalSince(Date())) < timeScheduleToCheckMapUpdateInSeconds {
+
+            return
+
+        }
 
         // set lastCallToUpdateMapCenter
         timestampLastCallToUpdateMapCenter = Date()
@@ -1164,6 +1180,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
 extension ViewController: PreferencesTableViewControllerDelegate {
     
+    func didUpdateDeviceOrientationSetting() {
+        setHeadingOffsetInDegrees()
+    }
+    
+    
     /// Update the activity type that the location manager is using.
     ///
     /// When user changes the activity type in preferences, this function is invoked to update the activity type of the location manager.
@@ -1282,8 +1303,6 @@ extension ViewController: CLLocationManagerDelegate {
     ///
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         
-        print("HEADING trueHeading = \(newHeading.trueHeading) magnetic = \(newHeading.magneticHeading) mkMapcamera heading=\(map.camera.heading)")
-
         // map possibly rotated, so update center off the map
         updateMapCenter(locationManager: locationManager)
         

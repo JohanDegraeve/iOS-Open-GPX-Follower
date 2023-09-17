@@ -22,8 +22,10 @@ let kMapSourceSection = 1
 /// Activity Type Section Id in PreferencesTableViewController
 let kActivityTypeSection = 2
 
+let kDeviceOrientationSection = 3
+
 /// developer settings
-let kDeveloperSection = 3
+let kDeveloperSection = 4
 
 /// Cell Id of the Use Imperial units in UnitsSection
 let kUseImperialUnitsCell = 0
@@ -98,7 +100,7 @@ class PreferencesTableViewController: UITableViewController {
     /// Returns 4 sections: Units, Map Source, Activity Type and possibly developer
     override func numberOfSections(in tableView: UITableView?) -> Int {
         
-        let numberOfSectionsExclusiveDeveloperSection = 3
+        let numberOfSectionsExclusiveDeveloperSection = 4
         
         // Return the number of sections.
         if tracingEnabled {
@@ -117,6 +119,7 @@ class PreferencesTableViewController: UITableViewController {
         case kUnitsSection: return NSLocalizedString("UNITS", comment: "no comment")
         case kMapSourceSection: return NSLocalizedString("MAP_SOURCE", comment: "no comment")
         case kActivityTypeSection: return NSLocalizedString("ACTIVITY_TYPE", comment: "no comment")
+        case kDeviceOrientationSection: return NSLocalizedString("DEVICE_ORIENTATION", comment: "no comment")
         case kDeveloperSection: return "Developer"
 
         default: fatalError("Unknown section")
@@ -131,6 +134,7 @@ class PreferencesTableViewController: UITableViewController {
         case kUnitsSection: return 1
         case kMapSourceSection: return GPXTileServer.count
         case kActivityTypeSection: return CLActivityType.count
+        case kDeviceOrientationSection: return 5
         case kDeveloperSection: return 1
 
         default: fatalError("Unknown section")
@@ -180,6 +184,37 @@ class PreferencesTableViewController: UITableViewController {
             if indexPath.row + 1 == preferences.locationActivityTypeInt {
                 cell.accessoryType = .checkmark
             }
+        }
+        
+        // device orientation sectin
+        if indexPath.section == kDeviceOrientationSection {
+            cell = UITableViewCell(style: .subtitle, reuseIdentifier: "ActivityCell")
+            
+            // 0 = automatic
+            // 1 = portrait
+            // 2 = portraitupsidedown
+            // 3 = landscapeleft
+            // 4 = landscaperight
+            let orientation = UIDeviceOrientation(rawValue: indexPath.row)
+            switch orientation?.rawValue {
+            case 0: //0 is for unknown but let's use that for automatic, ie follow device orientation
+                cell.textLabel?.text = NSLocalizedString("Automatic_Orientation", comment: "no comment")
+            case 1:
+                cell.textLabel?.text = NSLocalizedString("Portrait", comment: "no comment")
+            case 2:
+                cell.textLabel?.text = NSLocalizedString("Portrait Upside Down", comment: "no comment")
+            case 3:
+                cell.textLabel?.text = NSLocalizedString("Landscape Left", comment: "no comment")
+            case 4:
+                cell.textLabel?.text = NSLocalizedString("Landscape Right", comment: "no comment")
+            default:
+                cell.textLabel?.text = "unknown"
+            }
+            
+            if indexPath.row == preferences.deviceOrientation {
+                cell.accessoryType = .checkmark
+            }
+            
         }
         
         if indexPath.section == kDeveloperSection {
@@ -253,6 +288,20 @@ class PreferencesTableViewController: UITableViewController {
             preferences.locationActivityTypeInt = indexPath.row + 1 // +1 as activityType raw value starts at index 1
             
             self.delegate?.didUpdateActivityType((indexPath as NSIndexPath).row + 1)
+        }
+        
+        if indexPath.section == kDeviceOrientationSection {
+            print("PreferencesTableView Orientation section Row at index:  \(indexPath.row + 1)")
+            
+            let selected = IndexPath(row: preferences.deviceOrientation, section: indexPath.section)
+            
+            tableView.cellForRow(at: selected)?.accessoryType = .none
+            
+            //add checkmark to new orientation
+            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+            preferences.deviceOrientation = indexPath.row
+            
+            self.delegate?.didUpdateDeviceOrientationSetting()
         }
         
         if indexPath.section == kDeveloperSection {
