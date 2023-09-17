@@ -165,7 +165,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         manager.activityType = CLActivityType(rawValue: Preferences.shared.locationActivityTypeInt)!
         manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
         manager.distanceFilter = 2 //meters
-        manager.headingFilter = 3 //degrees (1 is default)
+        manager.headingFilter = 7 //degrees (1 is default)
         manager.pausesLocationUpdatesAutomatically = false
         
         if #available(iOS 9.0, *) {
