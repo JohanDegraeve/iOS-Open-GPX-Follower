@@ -124,6 +124,12 @@ class Preferences: NSObject {
             print("** Preferences:: loaded preference from defaults activityTypeInt \(activityTypeInt)")
         }
         
+        // load previous activity type
+        if let deviceOrientationInt = defaults.object(forKey: kDefaultsDeviceOrientation) as? Int {
+            _orientation = UIDeviceOrientation(rawValue: deviceOrientationInt)!
+            print("** Preferences:: loaded preference from defaults deviceOrientationInt \(deviceOrientationInt)")
+        }
+        
         // load previous date format
         if let dateFormatStr = defaults.object(forKey: kDefaultsKeyDateFormat) as? String {
             _dateFormat = dateFormatStr
