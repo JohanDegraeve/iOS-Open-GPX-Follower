@@ -928,6 +928,21 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             // calculate average of measuredSpeads
             averageSpeed = measuredSpeads.reduce(0.0, +)/(measuredSpeads.count > 0 ? Double(measuredSpeads.count) : 1.0)
             
+            // change locationManager.distanceFilter depending on speed, an update in max 1 second
+            if averageSpeed < 1.38 { // 5 km/h
+                self.locationManager.distanceFilter = 2
+            } else if averageSpeed < 5.55 { // 20 km/h
+                self.locationManager.distanceFilter = 6
+            } else if averageSpeed < 16.66 { // 60 km/h
+                self.locationManager.distanceFilter = 17
+            } else if averageSpeed < 22.22 { // 80 km/h
+                self.locationManager.distanceFilter = 23
+            } else if averageSpeed < 27.77 { // 100 km/h
+                self.locationManager.distanceFilter = 28
+            } else {
+                self.locationManager.distanceFilter = 35
+            }
+            
             // if time since last gesture end is less than pauzeUdateMapCenterAfterGestureEndForHowManySeconds, then don't further update the map
             if screenFrozen() {
                 
